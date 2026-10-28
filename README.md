@@ -70,6 +70,18 @@ npm run build
 - The `/locker` page lets players filter their saved roster. It does not require login and is intentionally excluded from search indexing and the sitemap.
 - Saved games are device/browser-local; they are not synced to an account or to other devices yet.
 
+## LevelUP Social Network
+
+The community now uses Supabase-backed data rather than demo posts:
+
+- `/community`: public feed, signed-in post creation, game tags, likes, comments, follow/unfollow and user reports.
+- `/profile/[username]`: public gamer profile, editable display name/bio, public post history and follower/following counts.
+- `/notifications`: database-generated follow/like/comment notifications and read state.
+- `/admin/moderation`: report queue, available only to accounts whose trusted Supabase Auth `app_metadata.role` is set to `admin`.
+- `posts`, `post_likes`, `post_comments`, `follows`, `notifications` and `content_reports` use Row Level Security. A private-schema auth trigger creates a public profile for new accounts.
+- Apply `supabase/schema.sql` first, then `supabase/social-network.sql`. The social migration has already been applied to the connected Supabase project for branch `v2-foundation`.
+- Admin roles must be assigned by a trusted administrator in Supabase Auth app metadata, never through user-editable metadata. Do not expose service-role/secret keys in client code.
+
 ## Steam live data
 
 - `public.steam_game_metrics` caches Steam player counts and Vietnam-region store prices for supported Steam games.

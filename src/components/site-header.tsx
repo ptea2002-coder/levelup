@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { CommunityNavStatus } from "@/components/community-nav-status";
 
 const navigation = [
   { href: "/games", label: "Khám phá game" },
   { href: "/locker", label: "Game Locker" },
   { href: "/news", label: "Tin & hướng dẫn" },
-  { href: "/community", label: "Cộng đồng" },
+  { href: "/community", label: "Bảng tin" },
   { href: "/login", label: "Tài khoản" },
 ];
 
@@ -24,6 +25,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="nav-actions">
+          <CommunityNavStatus />
           <Link href="/games" className="nav-cta">
             Khám phá <span aria-hidden="true">↗</span>
           </Link>
