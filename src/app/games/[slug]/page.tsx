@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GameArtwork } from "@/components/game-artwork";
 import { GameCard } from "@/components/game-card";
+import { GameDetailContent } from "@/components/game-detail-content";
 import { getGameArtworkUrl } from "@/lib/game-art";
 import { getGames } from "@/lib/game-repository";
 
@@ -124,6 +125,8 @@ export default async function GameDetailPage({ params }: GamePageProps) {
           </div>
         </div>
       </section>
+
+      <GameDetailContent game={game} />
 
       {relatedGames.length > 0 ? (
         <section className="section related-games-section">
