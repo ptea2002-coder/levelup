@@ -4,6 +4,7 @@ import { isPublicProduction, siteUrl } from "@/lib/site";
 import { MotionEffects } from "@/components/motion-effects";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { GameLibraryProvider } from "@/components/game-library-provider";
 import "./globals.css";
 
 const vietnameseFont = Be_Vietnam_Pro({
@@ -77,7 +78,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div className="site-shell">
           <a className="skip-link" href="#main-content">Bỏ qua điều hướng, đến nội dung chính</a>
           <SiteHeader />
-          <div id="main-content" tabIndex={-1}>{children}</div>
+          <div id="main-content" tabIndex={-1}><GameLibraryProvider>{children}</GameLibraryProvider></div>
           <SiteFooter />
           <MotionEffects />
         </div>

@@ -63,6 +63,13 @@ npm run build
 - Set `NEXT_PUBLIC_SITE_URL` to the canonical public origin when configuring a production domain. The default is `https://levelup-nine-flame.vercel.app`.
 - Game artwork uses Next.js Image optimization with AVIF/WebP support, responsive `sizes`, an allowlist of known image hosts and a seven-day optimization cache.
 
+## Gamer Game Locker
+
+- The homepage includes a local player command center for a personal game backlog.
+- Save a game as `wishlist`, `playing`, or `completed`; the state is stored in the current browser's local storage and shared across open tabs.
+- The `/locker` page lets players filter their saved roster. It does not require login and is intentionally excluded from search indexing and the sitemap.
+- Saved games are device/browser-local; they are not synced to an account or to other devices yet.
+
 ## Steam live data
 
 - `public.steam_game_metrics` caches Steam player counts and Vietnam-region store prices for supported Steam games.

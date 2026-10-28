@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { GameArtwork } from "@/components/game-artwork";
 import { GameCard } from "@/components/game-card";
 import { GameDetailContent } from "@/components/game-detail-content";
+import { GameLibraryControl } from "@/components/game-library-control";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
 import { steamTrackedGameSlugs } from "@/lib/steam-games";
 import { getGameArtworkUrl } from "@/lib/game-art";
@@ -124,6 +125,10 @@ export default async function GameDetailPage({ params }: GamePageProps) {
                 <Link className="btn btn-secondary" href="/games">
                   Khám phá game khác <span aria-hidden="true">→</span>
                 </Link>
+              </div>
+              <div className="detail-library-panel">
+                <p className="eyebrow">PLAYER INVENTORY / YOUR GAME LOCKER</p>
+                <GameLibraryControl gameSlug={game.slug} gameTitle={game.title} variant="full" />
               </div>
               <p className="data-note">
                 Thông tin giúp bạn khám phá nhanh. Hãy kiểm tra trang chính thức để xem yêu cầu hệ thống và cập nhật mới nhất.

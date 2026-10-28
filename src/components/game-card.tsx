@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import type { Game } from "@/lib/games";
 import { GameArtwork } from "@/components/game-artwork";
+import { GameLibraryControl } from "@/components/game-library-control";
 
 type GameCardProps = {
   game: Game;
@@ -32,6 +35,9 @@ export function GameCard({ game, index }: GameCardProps) {
           </div>
         </div>
       </Link>
+      <div className="game-card-action-row">
+        <GameLibraryControl gameSlug={game.slug} gameTitle={game.title} variant="compact" />
+      </div>
     </article>
   );
 }

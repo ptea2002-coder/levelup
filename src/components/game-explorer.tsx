@@ -13,6 +13,8 @@ type GameExplorerProps = {
 export function GameExplorer({ games }: GameExplorerProps) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const [activePlatform, setActivePlatform] = useState("Tất cả nền tảng");
+  const [sortBy, setSortBy] = useState<"recommended" | "name" | "newest">("recommended");
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -46,6 +48,11 @@ export function GameExplorer({ games }: GameExplorerProps) {
     return ["Tất cả", ...ordered, ...remaining];
   }, [games]);
 
+  const platforms = useMemo(
+    () => Array.from(new Set(games.flatMap((game) => game.platforms))).sort((a, b) => a.localeCompare(b, "vi")),
+    [games],
+  );
+
   const filteredGames = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("vi");
     return games.filter((game) => {
@@ -53,6 +60,7 @@ export function GameExplorer({ games }: GameExplorerProps) {
         activeCategory === "Tất cả" ||
         game.category === activeCategory ||
         game.genres.includes(activeCategory);
+      const matchesPlatform = activePlatform === "Tất cả nền tảng" || game.platforms.includes(activePlatform);
       const searchable = [
         game.title,
         game.category,
@@ -60,9 +68,17 @@ export function GameExplorer({ games }: GameExplorerProps) {
         ...game.genres,
         ...game.platforms,
       ].join(" ").toLocaleLowerCase("vi");
-      return matchesCategory && (!normalizedQuery || searchable.includes(normalizedQuery));
+      return matchesCategory && matchesPlatform && (!normalizedQuery || searchable.includes(normalizedQuery));
     });
-  }, [activeCategory, games, query]);
+  }, [activeCategory, activePlatform, games, query]);
+
+  const sortedGames = useMemo(() => {
+    if (sortBy === "name") return [...filteredGames].sort((a, b) => a.title.localeCompare(b.title, "vi"));
+    if (sortBy === "newest") {
+      return [...filteredGames].sort((a, b) => b.releaseYear - a.releaseYear || a.title.localeCompare(b.title, "vi"));
+    }
+    return filteredGames;
+  }, [filteredGames, sortBy]);
 
   return (
     <div className="game-explorer">
@@ -96,12 +112,38 @@ export function GameExplorer({ games }: GameExplorerProps) {
         </label>
       </div>
 
+      <div className="discovery-extra-filters">
+        <label className="discovery-select">
+          <span>Nền tảng</span>
+          <select value={activePlatform} onChange={(event) => setActivePlatform(event.target.value)} aria-label="Lọc theo nền tảng">
+            <option value="Tất cả nền tảng">Tất cả nền tảng</option>
+            {platforms.map((platform) => <option key={platform} value={platform}>{platform}</option>)}
+          </select>
+        </label>
+        <label className="discovery-select">
+          <span>Sắp xếp</span>
+          <select value={sortBy} onChange={(event) => setSortBy(event.target.value as "recommended" | "name" | "newest")} aria-label="Sắp xếp game">
+            <option value="recommended">Thứ tự gợi ý</option>
+            <option value="newest">Mới phát hành</option>
+            <option value="name">Tên A–Z</option>
+          </select>
+        </label>
+        <button
+          className="discovery-reset"
+          type="button"
+          disabled={!query && activeCategory === "Tất cả" && activePlatform === "Tất cả nền tảng" && sortBy === "recommended"}
+          onClick={() => { setQuery(""); setActiveCategory("Tất cả"); setActivePlatform("Tất cả nền tảng"); setSortBy("recommended"); }}
+        >
+          Đặt lại bộ lọc
+        </button>
+      </div>
+
       <p className="results-count" role="status">
-        {filteredGames.length} tựa game phù hợp
+        {sortedGames.length} tựa game phù hợp
       </p>
 
       <div className="game-grid">
-        {filteredGames.map((game) => (
+        {sortedGames.map((game) => (
           <GameCard key={game.slug} game={game} index={games.findIndex((item) => item.slug === game.slug)} />
         ))}
         {filteredGames.length === 0 && (
@@ -112,7 +154,7 @@ export function GameExplorer({ games }: GameExplorerProps) {
             <button
               className="btn btn-secondary"
               type="button"
-              onClick={() => { setQuery(""); setActiveCategory("Tất cả"); }}
+              onClick={() => { setQuery(""); setActiveCategory("Tất cả"); setActivePlatform("Tất cả nền tảng"); setSortBy("recommended"); }}
             >
               Xóa bộ lọc
             </button>

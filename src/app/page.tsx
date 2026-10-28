@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GameExplorer } from "@/components/game-explorer";
+import { GamerCommandCenter } from "@/components/gamer-command-center";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
 import { articles } from "@/lib/articles";
 import { getGames } from "@/lib/game-repository";
@@ -71,6 +72,8 @@ export default async function HomePage() {
           <span>COMMUNITY FIRST <b>✳</b></span>
         </div>
       </div>
+
+      <GamerCommandCenter games={games} />
 
       <section className="section" id="games">
         <div className="container">
