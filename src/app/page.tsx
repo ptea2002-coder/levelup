@@ -7,6 +7,10 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const games = await getGames();
+  const featuredSlugs = ["valorant", "league-of-legends", "counter-strike-2", "apex-legends", "genshin-impact", "elden-ring"];
+  const featuredGames = games
+    .filter((game) => featuredSlugs.includes(game.slug))
+    .sort((a, b) => featuredSlugs.indexOf(a.slug) - featuredSlugs.indexOf(b.slug));
 
   return (
     <main>
@@ -24,7 +28,7 @@ export default async function HomePage() {
               <Link className="btn btn-secondary" href="/news">Đọc hướng dẫn <span aria-hidden="true">→</span></Link>
             </div>
             <div className="hero-stats">
-              <div><strong>06</strong><span>Game khởi đầu</span></div>
+              <div><strong>{String(games.length).padStart(2, "0")}</strong><span>Game trong thư viện</span></div>
               <div><strong>03</strong><span>Guide biên soạn</span></div>
               <div><strong>V2.0</strong><span>Nền tảng mới</span></div>
             </div>
@@ -70,11 +74,11 @@ export default async function HomePage() {
               <h2>TÌM GAME.<br /><span>ĐÚNG GU.</span></h2>
             </div>
             <div className="section-aside">
-              <p>Khám phá bộ sưu tập khởi đầu. Tìm theo tên, studio hoặc thể loại rồi mở trang riêng của từng game.</p>
+              <p>Khám phá các tựa game nổi bật. Tìm theo tên, studio hoặc thể loại rồi mở trang riêng của từng game.</p>
               <Link className="text-link" href="/games">Toàn bộ thư viện <span aria-hidden="true">↗</span></Link>
             </div>
           </div>
-          <GameExplorer games={games} />
+          <GameExplorer games={featuredGames} />
         </div>
       </section>
 
