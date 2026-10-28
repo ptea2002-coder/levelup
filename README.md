@@ -2,42 +2,45 @@
 
 > **Không chỉ chơi game. Chơi có gu.**
 
-**LevelUP** là landing page dành cho cộng đồng gaming, nơi người chơi khám phá những tựa game nổi bật, bắt nhịp văn hóa game và tìm cảm hứng để nâng cấp trải nghiệm chơi của mình. Website theo đuổi phong cách **Code Gaming / Cyberpunk** với giao diện tối, neon xanh lime, cyan và tím, kết hợp các hiệu ứng chuyển động lấy cảm hứng từ màn hình terminal và HUD trong game.
+LevelUP là website khám phá game theo phong cách **Code Gaming / Cyberpunk**, hướng tới game thủ muốn tìm tựa game phù hợp, đọc thông tin cơ bản và truy cập thẳng nguồn chính thức của nhà phát hành hoặc cửa hàng.
 
-## ✨ Điểm nổi bật
+## ✨ Tính năng đang hoạt động
 
-- **Giao diện Code Gaming:** nền tối, typography đậm chất công nghệ, điểm nhấn neon và bố cục hiện đại.
-- **Hiệu ứng cyberpunk:** mưa ký tự code, scanline kiểu CRT, lưới chuyển động, ánh sáng neon và terminal HUD ở khu vực hero.
-- **Khám phá game:** các thẻ giới thiệu những tựa game như Valorant, League of Legends, Counter-Strike 2, Apex Legends, Genshin Impact và Elden Ring.
-- **Tìm kiếm và lọc:** hỗ trợ tìm game theo tên và lọc danh sách theo thể loại ngay trên trình duyệt.
-- **Góc gaming:** nội dung gợi ý về patch note, setup chơi game và giữ tinh thần ổn định khi thi đấu.
-- **Responsive:** bố cục được tối ưu cho màn hình máy tính và điện thoại.
-- **Chuyển động có cân nhắc:** hỗ trợ tùy chọn giảm chuyển động của hệ điều hành để trải nghiệm dễ chịu hơn.
+- **Khám phá game:** danh sách game gồm Valorant, League of Legends, Counter-Strike 2, Apex Legends, Genshin Impact và Elden Ring.
+- **Tìm kiếm tức thì:** tìm theo tên, thể loại và nền tảng.
+- **Lọc thể loại:** FPS, MOBA, Battle Royale, RPG và danh sách game đã lưu.
+- **Game detail:** mở bảng thông tin từng game với thể loại, nền tảng và liên kết chính thức; một số game có thêm link Steam.
+- **Game đã lưu:** lưu/bỏ lưu game yêu thích và giữ lựa chọn trong trình duyệt bằng `localStorage` trên thiết bị hiện tại.
+- **Hiệu ứng Code Gaming:** nền code rain, terminal gõ chữ, scanline CRT, ánh sáng con trỏ, thanh tiến trình cuộn trang, viền neon và hiệu ứng nghiêng 3D cho thẻ game.
+- **Responsive:** bố cục cho máy tính và điện thoại; tôn trọng cài đặt giảm chuyển động của hệ điều hành.
 
-## 🕹️ Công nghệ
+## 🎨 Thiết kế
+
+- Nền tối với điểm nhấn neon xanh lime, cyan và tím.
+- Typography đậm chất gaming và các chi tiết HUD/terminal.
+- Hiệu ứng chuyển động có giới hạn để tránh chạy khi người dùng bật `prefers-reduced-motion`.
+
+## 🧰 Công nghệ
 
 - **HTML5** — cấu trúc nội dung.
 - **CSS3** — giao diện, responsive và animation.
-- **JavaScript thuần** — tìm kiếm, lọc game và tương tác trên trang.
-- **Canvas API** — hiệu ứng nền code rain.
-- **GitHub Pages** — lưu trữ website tĩnh.
+- **JavaScript thuần** — tìm kiếm, lọc, bảng chi tiết và game đã lưu.
+- **Canvas API** — hiệu ứng code rain.
+- **Web Storage API** — lưu game yêu thích trong trình duyệt.
+- **GitHub Pages** — triển khai website tĩnh.
 
-## 🌐 Truy cập website
+## 🌐 Website
 
-Sau khi GitHub Pages hoàn tất xuất bản, truy cập:
-
-**https://ptea2002-coder.github.io/levelup/**
+https://ptea2002-coder.github.io/levelup/
 
 ## ▶️ Chạy thử trên máy
 
-1. Tải hoặc clone repository này về máy.
-2. Mở file `index.html` bằng trình duyệt.
-3. Để hình ảnh và font chữ bên ngoài tải đầy đủ, hãy kết nối Internet.
+1. Tải hoặc clone repository về máy.
+2. Mở `index.html` bằng trình duyệt.
+3. Cần kết nối Internet để tải font chữ và hình ảnh từ nguồn ngoài.
 
-Website dùng HTML, CSS và JavaScript thuần nên không cần cài Node.js hay chạy bước build.
+Website chạy trực tiếp bằng HTML, CSS và JavaScript, không cần Node.js hay bước build.
 
-## 📌 Lưu ý
+## 📌 Giới hạn hiện tại
 
-- Đây là website front-end tĩnh; thông tin game và nội dung trên trang mang tính giới thiệu/minh họa.
-- Hiện chưa có backend, đăng nhập thành viên, cơ sở dữ liệu, trang quản trị hoặc hệ thống gửi email.
-- Hình ảnh và font chữ bên ngoài có thể cần kết nối Internet để tải.
+LevelUP là website tĩnh có các chức năng tương tác chạy trong trình duyệt. Hiện chưa có backend, tài khoản người dùng, đồng bộ game đã lưu giữa các thiết bị, diễn đàn cộng đồng, hệ thống quản trị hoặc nguồn tin game cập nhật tự động. Các lựa chọn đã lưu chỉ nằm trên trình duyệt/thiết bị mà người dùng đang sử dụng.
