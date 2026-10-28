@@ -1132,3 +1132,81 @@ input:focus-visible {
     will-change: auto;
   }
 }
+
+
+/* Steam live metrics — cached data + Realtime updates */
+.steam-live-section { position: relative; overflow: hidden; }
+.steam-live-section::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle at 88% 15%, rgba(167,139,250,.09), transparent 32%);
+}
+.steam-live-grid { position: relative; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.steam-live-card, .steam-detail-card {
+  min-width: 0; border: 1px solid rgba(255,255,255,.11);
+  background: linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018));
+  border-radius: 18px; padding: 20px;
+  transition: border-color .25s ease,transform .25s ease,background .25s ease;
+}
+.steam-live-card:hover, .steam-detail-card:hover {
+  border-color: rgba(199,255,70,.35);
+  background: linear-gradient(145deg,rgba(199,255,70,.055),rgba(167,139,250,.035));
+  transform: translateY(-3px);
+}
+.steam-live-card-top, .steam-live-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.steam-live-category {
+  display: inline-block; margin-bottom: 8px; color: #a78bfa;
+  font: 600 .68rem/1.2 var(--mono,monospace); letter-spacing: .12em; text-transform: uppercase;
+}
+.steam-live-card h3, .steam-live-heading h2 {
+  margin: 0; color: #f5f5fa; font-family: var(--tech,var(--display,sans-serif));
+  font-size: 1rem; line-height: 1.35; letter-spacing: -.025em;
+}
+.steam-live-pill, .steam-live-status {
+  display: inline-flex; align-items: center; flex: 0 0 auto; gap: 7px;
+  border: 1px solid rgba(199,255,70,.23); border-radius: 999px; padding: 6px 8px;
+  color: #c7ff46; font: 600 .62rem/1 var(--mono,monospace); letter-spacing: .06em; white-space: nowrap;
+}
+.steam-live-pill i, .steam-live-status i {
+  width: 6px; height: 6px; border-radius: 50%; background: #c7ff46;
+  box-shadow: 0 0 10px rgba(199,255,70,.55); animation: levelup-status-pulse 2.2s ease-in-out infinite;
+}
+.steam-live-card-stats, .steam-detail-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; margin-top: 24px; }
+.steam-live-card-stats > div, .steam-detail-stat { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.steam-live-card-stats > div > span, .steam-detail-stat > span {
+  color: #989bab; font: 600 .63rem/1.45 var(--mono,monospace); letter-spacing: .07em;
+}
+.steam-live-card-stats strong, .steam-detail-stat strong {
+  max-width: 100%; color: #f5f5fa; font-family: var(--tech,var(--display,sans-serif));
+  font-size: clamp(1.12rem,2vw,1.45rem); line-height: 1.25; overflow-wrap: anywhere;
+}
+.steam-live-card-stats small, .steam-detail-stat small { color: #8d90a2; font-size: .74rem; line-height: 1.45; }
+.steam-live-card-stats .steam-discount, .steam-detail-stat .steam-discount { color: #c7ff46; font-weight: 700; }
+.steam-live-footer {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin-top: 20px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,.08);
+  color: #8d90a2; font-size: .72rem;
+}
+.steam-live-footer a { color: #c7ff46; font-weight: 650; text-decoration: none; }
+.steam-live-footer a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.steam-live-empty {
+  position: relative; border: 1px dashed rgba(255,255,255,.18); border-radius: 16px;
+  padding: 22px; color: #a5a7b7; font-size: .9rem; text-align: center;
+}
+.steam-detail-section { padding-top: 0; }
+.steam-detail-card { padding: clamp(20px,3vw,30px); }
+.steam-detail-card .steam-live-heading .eyebrow { margin-bottom: 8px; }
+.steam-detail-card .steam-live-heading h2 { font-size: clamp(1.2rem,2vw,1.7rem); }
+.steam-detail-stats { margin-top: 25px; gap: 24px; }
+.steam-detail-stat strong { font-size: clamp(1.45rem,3vw,2rem); }
+@media (max-width: 980px) { .steam-live-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 620px) {
+  .steam-live-grid { grid-template-columns: minmax(0,1fr); }
+  .steam-live-card { padding: 17px; }
+  .steam-live-card h3 { font-size: .95rem; }
+  .steam-live-status { font-size: .55rem; }
+  .steam-detail-stats { gap: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .steam-live-pill i, .steam-live-status i { animation: none !important; }
+  .steam-live-card, .steam-detail-card { transition: none !important; }
+}
