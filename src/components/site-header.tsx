@@ -6,6 +6,7 @@ const navigation = [
   { href: "/locker", label: "Game Locker" },
   { href: "/news", label: "Tin & hướng dẫn" },
   { href: "/community", label: "Bảng tin" },
+  { href: "/squads", label: "Tìm đồng đội" },
   { href: "/login", label: "Tài khoản" },
 ];
 
