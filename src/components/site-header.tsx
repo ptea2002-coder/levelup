@@ -4,6 +4,7 @@ const navigation = [
   { href: "/games", label: "Khám phá game" },
   { href: "/news", label: "Tin & hướng dẫn" },
   { href: "/community", label: "Cộng đồng" },
+  { href: "/login", label: "Tài khoản" },
 ];
 
 export function SiteHeader() {
