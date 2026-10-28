@@ -17,9 +17,10 @@ LevelUP is being rebuilt from a single-file static website into a modern gaming 
 
 ## Not live yet
 
-- Supabase has not been connected to a hosted project.
-- Login, profiles, cloud favorites, reviews, comments, and admin/editor tools are not active.
-- The catalog and guide content currently come from typed files in `src/lib/`.
+- Supabase browser/server clients and an email/password login/register screen are wired into the app, but they need environment variables and the SQL schema before live use.
+- The game catalog reads from `public.games` when available and falls back to starter data if Supabase is not configured or the schema is not ready.
+- Cloud favorites, profile editing, reviews, comments, and admin/editor tools are not active yet.
+- Guide content currently comes from typed files in `src/lib/`.
 - News is not automatically synced from external feeds.
 - This branch has not replaced the current GitHub Pages deployment.
 
@@ -45,13 +46,15 @@ npm run typecheck
 npm run build
 ```
 
-## Configure Supabase later
+## Configure Supabase
 
 1. Create a Supabase project.
-2. Review `supabase/schema.sql` in a development project before applying it.
+2. In the Supabase SQL Editor, review and run `supabase/schema.sql` in the development project. This creates the starter tables and Row Level Security policies.
 3. Copy `.env.example` to `.env.local`.
-4. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-5. Never expose a Supabase service-role key to client-side code. Add and test server-side admin authorization before building CMS features.
+4. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. For older projects, the app also accepts `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+5. Restart the Next.js dev server after editing `.env.local`.
+6. In Supabase **Authentication → URL Configuration**, add the local URL (for example `http://localhost:3000/login`) to the allowed redirect URLs. Configure the production URL when a production host is selected.
+7. Do not expose service-role or secret keys in browser code. Keep RLS enabled and add server-side role checks before building CMS features.
 
 ## Deployment plan
 
