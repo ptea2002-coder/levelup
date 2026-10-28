@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { GameExplorer } from "@/components/game-explorer";
 import { articles } from "@/lib/articles";
-import { games } from "@/lib/games";
+import { getGames } from "@/lib/game-repository";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const games = await getGames();
+
   return (
     <main>
       <section className="hero">
