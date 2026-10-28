@@ -1,46 +1,62 @@
-# LEVELUP — Play hard. Level up.
+# LevelUP 2.0 — Play hard. Level up.
 
-> **Không chỉ chơi game. Chơi có gu.**
+LevelUP is being rebuilt from a single-file static website into a modern gaming discovery and editorial platform.
 
-LevelUP là website khám phá game theo phong cách **Code Gaming / Cyberpunk**, hướng tới game thủ muốn tìm tựa game phù hợp, đọc thông tin cơ bản và truy cập thẳng nguồn chính thức của nhà phát hành hoặc cửa hàng.
+> **Current status:** foundation code lives on the `v2-foundation` branch. The existing `main` branch and its GitHub Pages site are intentionally left unchanged until the new app has passed checks and a production host is configured.
 
-## ✨ Tính năng đang hoạt động
+## What's in this foundation
 
-- **Khám phá game:** danh sách game gồm Valorant, League of Legends, Counter-Strike 2, Apex Legends, Genshin Impact và Elden Ring.
-- **Tìm kiếm tức thì:** tìm theo tên, thể loại và nền tảng.
-- **Lọc thể loại:** FPS, MOBA, Battle Royale, RPG và danh sách game đã lưu.
-- **Game detail:** mở bảng thông tin từng game với thể loại, nền tảng và liên kết chính thức; một số game có thêm link Steam.
-- **Game đã lưu:** lưu/bỏ lưu game yêu thích và giữ lựa chọn trong trình duyệt bằng `localStorage` trên thiết bị hiện tại.
-- **Hiệu ứng Code Gaming:** nền code rain, terminal gõ chữ, scanline CRT, ánh sáng con trỏ, thanh tiến trình cuộn trang, viền neon và hiệu ứng nghiêng 3D cho thẻ game.
-- **Responsive:** bố cục cho máy tính và điện thoại; tôn trọng cài đặt giảm chuyển động của hệ điều hành.
+- Next.js App Router, React, and TypeScript.
+- Responsive dark/neon UI with custom design tokens and Tailwind CSS v4 installed.
+- Search and genre filtering across the starter game catalog.
+- Dedicated game profile routes with links to official publisher pages.
+- Three authored evergreen guides with individual article pages.
+- Community roadmap page that clearly labels future features instead of pretending they already work.
+- Supabase SQL starter for games, profiles, favorites, reviews, articles, and comments, including initial RLS policies and seed games.
+- GitHub Actions workflow for type-checking and building the app.
 
-## 🎨 Thiết kế
+## Not live yet
 
-- Nền tối với điểm nhấn neon xanh lime, cyan và tím.
-- Typography đậm chất gaming và các chi tiết HUD/terminal.
-- Hiệu ứng chuyển động có giới hạn để tránh chạy khi người dùng bật `prefers-reduced-motion`.
+- Supabase has not been connected to a hosted project.
+- Login, profiles, cloud favorites, reviews, comments, and admin/editor tools are not active.
+- The catalog and guide content currently come from typed files in `src/lib/`.
+- News is not automatically synced from external feeds.
+- This branch has not replaced the current GitHub Pages deployment.
 
-## 🧰 Công nghệ
+## Requirements
 
-- **HTML5** — cấu trúc nội dung.
-- **CSS3** — giao diện, responsive và animation.
-- **JavaScript thuần** — tìm kiếm, lọc, bảng chi tiết và game đã lưu.
-- **Canvas API** — hiệu ứng code rain.
-- **Web Storage API** — lưu game yêu thích trong trình duyệt.
-- **GitHub Pages** — triển khai website tĩnh.
+- Node.js 22.12 or newer.
+- npm.
+- A Supabase project only when starting backend integration.
 
-## 🌐 Website
+## Run locally
 
-https://ptea2002-coder.github.io/levelup/
+```bash
+npm install
+npm run dev
+```
 
-## ▶️ Chạy thử trên máy
+Open http://localhost:3000.
 
-1. Tải hoặc clone repository về máy.
-2. Mở `index.html` bằng trình duyệt.
-3. Cần kết nối Internet để tải font chữ và hình ảnh từ nguồn ngoài.
+To run the same checks as CI:
 
-Website chạy trực tiếp bằng HTML, CSS và JavaScript, không cần Node.js hay bước build.
+```bash
+npm run typecheck
+npm run build
+```
 
-## 📌 Giới hạn hiện tại
+## Configure Supabase later
 
-LevelUP là website tĩnh có các chức năng tương tác chạy trong trình duyệt. Hiện chưa có backend, tài khoản người dùng, đồng bộ game đã lưu giữa các thiết bị, diễn đàn cộng đồng, hệ thống quản trị hoặc nguồn tin game cập nhật tự động. Các lựa chọn đã lưu chỉ nằm trên trình duyệt/thiết bị mà người dùng đang sử dụng.
+1. Create a Supabase project.
+2. Review `supabase/schema.sql` in a development project before applying it.
+3. Copy `.env.example` to `.env.local`.
+4. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+5. Never expose a Supabase service-role key to client-side code. Add and test server-side admin authorization before building CMS features.
+
+## Deployment plan
+
+Use a Node-capable host such as Vercel for the Next.js app. Keep the current GitHub Pages site available until the new branch builds successfully and its environment configuration has been tested. See [docs/ROADMAP.md](docs/ROADMAP.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Current site
+
+The existing static site on `main` is still at https://ptea2002-coder.github.io/levelup/ until the new app is ready for cutover.
