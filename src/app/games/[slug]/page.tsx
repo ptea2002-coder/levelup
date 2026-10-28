@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { GameArtwork } from "@/components/game-artwork";
 import { GameCard } from "@/components/game-card";
 import { GameDetailContent } from "@/components/game-detail-content";
+import { SteamLiveMetrics } from "@/components/steam-live-metrics";
+import { steamTrackedGameSlugs } from "@/lib/steam-games";
 import { getGameArtworkUrl } from "@/lib/game-art";
 import { getGames } from "@/lib/game-repository";
 
@@ -125,6 +127,14 @@ export default async function GameDetailPage({ params }: GamePageProps) {
           </div>
         </div>
       </section>
+
+      {steamTrackedGameSlugs.some((slug) => slug === game.slug) ? (
+        <section className="section steam-detail-section">
+          <div className="container">
+            <SteamLiveMetrics game={{ slug: game.slug, title: game.title, category: game.category }} />
+          </div>
+        </section>
+      ) : null}
 
       <GameDetailContent game={game} />
 
