@@ -26,16 +26,21 @@ export async function generateMetadata({ params }: GamePageProps): Promise<Metad
   return {
     title: game.title,
     description: game.description,
+    alternates: { canonical: `/games/${game.slug}` },
     openGraph: {
+      type: "website",
+      url: `/games/${game.slug}`,
       title: `${game.title} | LevelUP`,
       description: game.description,
-      ...(image ? { images: [{ url: image, alt: `${game.title} artwork` }] } : {}),
+      images: image
+        ? [{ url: image, alt: `${game.title} artwork` }]
+        : [{ url: "/opengraph-image" }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${game.title} | LevelUP`,
       description: game.description,
-      ...(image ? { images: [image] } : {}),
+      images: image ? [image] : ["/opengraph-image"],
     },
   };
 }

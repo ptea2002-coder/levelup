@@ -4,6 +4,19 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Cộng đồng",
   description: "Theo dõi lộ trình xây dựng cộng đồng game thủ LevelUP.",
+  alternates: { canonical: "/community" },
+  openGraph: {
+    type: "website",
+    url: "/community",
+    title: "Cộng đồng | LevelUP",
+    description: "Theo dõi lộ trình xây dựng cộng đồng game thủ LevelUP.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cộng đồng | LevelUP",
+    description: "Theo dõi lộ trình xây dựng cộng đồng game thủ LevelUP.",
+    images: ["/opengraph-image"],
+  },
 };
 
 const roadmapItems = [

@@ -4,6 +4,20 @@ import { AuthForm } from "@/components/auth-form";
 export const metadata: Metadata = {
   title: "Tài khoản game thủ",
   description: "Đăng nhập hoặc tạo tài khoản LevelUP bằng Supabase Auth.",
+  alternates: { canonical: "/login" },
+  robots: { index: false, follow: true },
+  openGraph: {
+    type: "website",
+    url: "/login",
+    title: "Tài khoản game thủ | LevelUP",
+    description: "Đăng nhập hoặc tạo tài khoản LevelUP bằng Supabase Auth.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tài khoản game thủ | LevelUP",
+    description: "Đăng nhập hoặc tạo tài khoản LevelUP bằng Supabase Auth.",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function LoginPage() {

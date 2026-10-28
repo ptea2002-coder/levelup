@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { GameExplorer } from "@/components/game-explorer";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
 import { articles } from "@/lib/articles";
 import { getGames } from "@/lib/game-repository";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export const dynamic = "force-dynamic";
 

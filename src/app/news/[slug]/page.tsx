@@ -14,8 +14,25 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
   const article = articles.find((item) => item.slug === slug);
-  if (!article) return { title: "Không tìm thấy bài viết" };
-  return { title: article.title, description: article.excerpt };
+  if (!article) return { title: "Không tìm thấy bài viết", robots: { index: false, follow: false } };
+  return {
+    title: article.title,
+    description: article.excerpt,
+    alternates: { canonical: `/news/${article.slug}` },
+    openGraph: {
+      type: "article",
+      url: `/news/${article.slug}`,
+      title: `${article.title} | LevelUP`,
+      description: article.excerpt,
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "LevelUP — Play hard. Level up." }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${article.title} | LevelUP`,
+      description: article.excerpt,
+      images: ["/opengraph-image"],
+    },
+  };
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {

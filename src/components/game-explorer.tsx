@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { GameCard } from "@/components/game-card";
 import type { Game } from "@/lib/games";
 
@@ -13,6 +13,30 @@ type GameExplorerProps = {
 export function GameExplorer({ games }: GameExplorerProps) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      const target = event.target;
+      const isTyping = target instanceof HTMLElement && (
+        target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
+      );
+
+      if (event.key === "/" && !event.altKey && !event.ctrlKey && !event.metaKey && !isTyping) {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+
+      if (event.key === "Escape" && document.activeElement === searchInputRef.current) {
+        setQuery("");
+        searchInputRef.current?.blur();
+      }
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, []);
+
   const categories = useMemo(() => {
     const available = new Set(games.map((game) => game.category));
     const ordered = categoryOrder.filter((category) => available.has(category));
@@ -43,7 +67,7 @@ export function GameExplorer({ games }: GameExplorerProps) {
   return (
     <div className="game-explorer">
       <div className="game-tools">
-        <div className="filters" aria-label="Lọc theo thể loại">
+        <div className="filters" role="group" aria-label="Lọc theo thể loại">
           {categories.map((category) => (
             <button
               key={category}
@@ -60,12 +84,15 @@ export function GameExplorer({ games }: GameExplorerProps) {
           <span aria-hidden="true">⌕</span>
           <span className="sr-only">Tìm game</span>
           <input
+            ref={searchInputRef}
             type="search"
+            aria-keyshortcuts="/"
+            autoComplete="off"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Tìm game, thể loại, studio..."
           />
-          <kbd>/</kbd>
+          <kbd aria-hidden="true">/</kbd>
         </label>
       </div>
 

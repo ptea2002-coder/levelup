@@ -4,7 +4,20 @@ import { articles } from "@/lib/articles";
 
 export const metadata: Metadata = {
   title: "Tin tức & hướng dẫn",
-  description: "Hướng dẫn chọn game, tối ưu trải nghiệm và viết review hữu ích từ LevelUP.",
+  description: "Hướng dẫn chọn game, tối ưu trải nghiệm và đánh giá game hữu ích từ LevelUP.",
+  alternates: { canonical: "/news" },
+  openGraph: {
+    type: "website",
+    url: "/news",
+    title: "Tin tức & hướng dẫn | LevelUP",
+    description: "Hướng dẫn chọn game, tối ưu trải nghiệm và đánh giá game hữu ích từ LevelUP.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tin tức & hướng dẫn | LevelUP",
+    description: "Hướng dẫn chọn game, tối ưu trải nghiệm và đánh giá game hữu ích từ LevelUP.",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function NewsPage() {

@@ -27,7 +27,7 @@ export function SiteHeader() {
             Khám phá <span aria-hidden="true">↗</span>
           </Link>
           <details className="mobile-nav">
-            <summary aria-label="Mở menu">MENU</summary>
+            <summary aria-label="Mở menu điều hướng"><span className="mobile-menu-icon" aria-hidden="true">☰</span><span>MENU</span></summary>
             <nav aria-label="Điều hướng di động">
               {navigation.map((item) => (
                 <Link key={item.href} href={item.href}>{item.label}</Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import { getGameArtworkSources, type GameArtworkVariant } from "@/lib/game-art";
 
@@ -42,16 +43,18 @@ export function GameArtwork({
       data-image-loaded={loaded ? "true" : "false"}
     >
       {src ? (
-        // Native img keeps third-party artwork optional without requiring Next image host configuration.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           key={src}
           className="game-art-image"
           src={src}
           alt=""
           aria-hidden="true"
-          loading={isDetail ? "eager" : "lazy"}
-          decoding="async"
+          fill
+          sizes={isDetail
+            ? "(max-width: 700px) calc(100vw - 32px), (max-width: 980px) 90vw, 42vw"
+            : "(max-width: 539px) calc(100vw - 32px), (max-width: 700px) 45vw, (max-width: 980px) 50vw, 33vw"}
+          preload={isDetail}
+          loading={isDetail ? undefined : "lazy"}
           onLoad={() => setLoaded(true)}
           onError={() => {
             setLoaded(false);

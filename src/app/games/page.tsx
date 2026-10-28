@@ -6,7 +6,20 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Khám phá game",
-  description: "Tìm game theo tên, studio, thể loại và nền tảng trên LevelUP.",
+  description: "Tìm và khám phá game theo thể loại, nhà phát triển và nền tảng trên LevelUP.",
+  alternates: { canonical: "/games" },
+  openGraph: {
+    type: "website",
+    url: "/games",
+    title: "Khám phá game | LevelUP",
+    description: "Tìm và khám phá game theo thể loại, nhà phát triển và nền tảng trên LevelUP.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Khám phá game | LevelUP",
+    description: "Tìm và khám phá game theo thể loại, nhà phát triển và nền tảng trên LevelUP.",
+    images: ["/opengraph-image"],
+  },
 };
 
 export default async function GamesPage() {

@@ -56,6 +56,13 @@ npm run build
 6. In Supabase **Authentication → URL Configuration**, add the local URL (for example `http://localhost:3000/login`) to the allowed redirect URLs. Configure the production URL when a production host is selected.
 7. Do not expose service-role or secret keys in browser code. Keep RLS enabled and add server-side role checks before building CMS features.
 
+## SEO and performance
+
+- Metadata includes canonical URLs, Open Graph and Twitter cards, plus a generated 1200×630 share image and SVG app icon.
+- `/sitemap.xml` lists the homepage, game profiles and editorial guides; it refreshes hourly. `/robots.txt` blocks indexing on preview and development deployments.
+- Set `NEXT_PUBLIC_SITE_URL` to the canonical public origin when configuring a production domain. The default is `https://levelup-nine-flame.vercel.app`.
+- Game artwork uses Next.js Image optimization with AVIF/WebP support, responsive `sizes`, an allowlist of known image hosts and a seven-day optimization cache.
+
 ## Steam live data
 
 - `public.steam_game_metrics` caches Steam player counts and Vietnam-region store prices for supported Steam games.
