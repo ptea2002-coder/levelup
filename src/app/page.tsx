@@ -1,7 +1,6 @@
-import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { GameArtwork } from "@/components/game-artwork";
+import { HeroExperience } from "@/components/hero-experience";
 import { GameExplorer } from "@/components/game-explorer";
 import { GamerCommandCenter } from "@/components/gamer-command-center";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
@@ -14,22 +13,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-function KineticTitleLine({ text, className = "" }: { text: string; className?: string }) {
-  return (
-    <span className={`hero-title-line ${className}`} aria-hidden="true">
-      {Array.from(text).map((character, index) => (
-        <span
-          className="hero-title-char"
-          key={`${index}-${character}`}
-          style={{ "--char-index": index } as CSSProperties}
-        >
-          {character === " " ? "\u00a0" : character}
-        </span>
-      ))}
-    </span>
-  );
-}
-
 export default async function HomePage() {
   const games = await getGames();
   const featuredSlugs = ["valorant", "league-of-legends", "counter-strike-2", "apex-legends", "genshin-impact", "elden-ring"];
@@ -40,66 +23,7 @@ export default async function HomePage() {
 
   return (
     <main>
-      <section className="hero">
-        <div className="hero-grid" aria-hidden="true" />
-        <div className="container hero-layout">
-          <div className="hero-copy">
-            <p className="eyebrow"><span className="status-dot" /> GAMING CULTURE / VIETNAM</p>
-            <h1 aria-label="PLAY HARD. LEVEL UP."><KineticTitleLine text="PLAY" /><KineticTitleLine text="HARD." className="outline" /><KineticTitleLine text="LEVEL UP." className="accent" /></h1>
-            <p className="hero-description">
-              Không chỉ tìm game để chơi. Tìm tựa game hợp gu, học cách chơi tốt hơn và khám phá thế giới gaming theo cách của bạn.
-            </p>
-            <div className="hero-actions">
-              <Link className="btn btn-primary" href="/games">Khám phá thư viện <span aria-hidden="true">↗</span></Link>
-              <Link className="btn btn-secondary" href="/news">Đọc hướng dẫn <span aria-hidden="true">→</span></Link>
-            </div>
-            <div className="hero-stats">
-              <div><strong>{String(games.length).padStart(2, "0")}</strong><span>Game trong thư viện</span></div>
-              <div><strong>03</strong><span>Guide biên soạn</span></div>
-              <div><strong>V2.0</strong><span>Nền tảng mới</span></div>
-            </div>
-          </div>
-
-          <div className="hero-visual" aria-label="Minh họa giao diện LevelUP">
-            <div className="hero-orbit orbit-one" aria-hidden="true" />
-            <div className="hero-orbit orbit-two" aria-hidden="true" />
-            <div className="hero-panel">
-              <div className="panel-topline"><span>LEVELUP / DISCOVERY SYSTEM</span><span>SYS.ONLINE</span></div>
-              <div className="hero-panel-art hero-featured-art">
-                {heroGame ? (
-                  <GameArtwork
-                    slug={heroGame.slug}
-                    mark={heroGame.mark}
-                    category={heroGame.category}
-                    releaseYear={heroGame.releaseYear}
-                    artPrimary={heroGame.artPrimary}
-                    artSecondary={heroGame.artSecondary}
-                    variant="detail"
-                  />
-                ) : null}
-                <div className="hero-art-scrim" aria-hidden="true" />
-                <span className="hero-art-grid" aria-hidden="true" />
-                <span className="hero-panel-label">LEVELUP / FEATURED PICK</span>
-                <div className="hero-featured-title">
-                  <span>{heroGame ? `${heroGame.category} / ${heroGame.releaseYear}` : "GAME DISCOVERY"}</span>
-                  <strong>{heroGame?.title ?? "YOUR NEXT MAIN"}</strong>
-                  <span className="hero-featured-cta">EXPLORE THE GAMEVERSE <i aria-hidden="true">↗</i></span>
-                </div>
-                <span className="hero-panel-coordinate">LEVELUP / SELECTED 001</span>
-                <span className="hero-art-scanline" aria-hidden="true" />
-              </div>
-              <div className="panel-bottomline">
-                <div><span className="tiny-label">MODE</span><strong>DISCOVER</strong></div>
-                <div><span className="tiny-label">STATUS</span><strong className="text-lime">READY_</strong></div>
-                <span className="panel-arrow" aria-hidden="true">↗</span>
-              </div>
-            </div>
-            <div className="floating-chip chip-top"><span className="chip-dot" /> CURATED GAME LIBRARY <strong>{String(games.length).padStart(2, "0")} TITLES</strong></div>
-            <div className="floating-chip chip-bottom"><span className="chip-number">01</span><span>EDITOR’S<br />PICK</span></div>
-            <span className="visual-rail">DISCOVERY / CULTURE / COMMUNITY</span>
-          </div>
-        </div>
-      </section>
+      <HeroExperience games={games} articleCount={articles.length} />
 
       <div className="ticker" aria-label="Các chủ đề của LevelUP">
         <div className="ticker-track">
