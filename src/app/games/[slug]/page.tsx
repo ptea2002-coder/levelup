@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: GamePageProps): Promise<Metad
 
 export default async function GameDetailPage({ params }: GamePageProps) {
   const { slug } = await params;
-  const game = games.find((item) => item.slug === slug);
+  const game = await getGameBySlug(slug);
   if (!game) notFound();
 
   const artStyle = {
