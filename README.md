@@ -56,6 +56,16 @@ npm run build
 6. In Supabase **Authentication → URL Configuration**, add the local URL (for example `http://localhost:3000/login`) to the allowed redirect URLs. Configure the production URL when a production host is selected.
 7. Do not expose service-role or secret keys in browser code. Keep RLS enabled and add server-side role checks before building CMS features.
 
+## Steam live data
+
+- `public.steam_game_metrics` caches Steam player counts and Vietnam-region store prices for supported Steam games.
+- The homepage and supported game profiles subscribe to Supabase Realtime, so open pages update after a successful sync without reloading.
+- `supabase/functions/sync-steam-metrics/index.ts` syncs data server-side; the Supabase Cron job runs every five minutes.
+- Player counts use Steam's documented `GetNumberOfCurrentPlayers` Web API. Store prices use Steam Store app details as best-effort data; availability and refresh cadence are controlled by Steam.
+- Never scrape SteamDB. Do not put service-role keys or the cron token in Git. The cron token is generated and stored in Supabase Vault.
+
+For an existing project, run `supabase/steam-metrics.sql`, deploy the Edge Function, then run `supabase/steam-cron.sql` after replacing `__SUPABASE_PUBLISHABLE_KEY__` with the project's publishable key. These steps are already applied to the connected LevelUP Supabase project when deployment succeeds.
+
 ## Deployment plan
 
 Use a Node-capable host such as Vercel for the Next.js app. Keep the current GitHub Pages site available until the new branch builds successfully and its environment configuration has been tested. See [docs/ROADMAP.md](docs/ROADMAP.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
