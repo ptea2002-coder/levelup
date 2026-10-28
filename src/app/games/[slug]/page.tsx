@@ -1,8 +1,10 @@
-import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getGameBySlug } from "@/lib/game-repository";
+import { GameArtwork } from "@/components/game-artwork";
+import { GameCard } from "@/components/game-card";
+import { getGameArtworkUrl } from "@/lib/game-art";
+import { getGames } from "@/lib/game-repository";
 
 type GamePageProps = {
   params: Promise<{ slug: string }>;
@@ -12,56 +14,141 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: GamePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const game = await getGameBySlug(slug);
+  const games = await getGames();
+  const game = games.find((item) => item.slug === slug);
   if (!game) return { title: "Không tìm thấy game" };
+
+  const image = getGameArtworkUrl(game.slug, "detail");
+
   return {
     title: game.title,
     description: game.description,
-    openGraph: { title: `${game.title} | LevelUP`, description: game.description },
+    openGraph: {
+      title: `${game.title} | LevelUP`,
+      description: game.description,
+      ...(image ? { images: [{ url: image, alt: `${game.title} artwork` }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${game.title} | LevelUP`,
+      description: game.description,
+      ...(image ? { images: [image] } : {}),
+    },
   };
 }
 
 export default async function GameDetailPage({ params }: GamePageProps) {
   const { slug } = await params;
-  const game = await getGameBySlug(slug);
+  const games = await getGames();
+  const game = games.find((item) => item.slug === slug);
   if (!game) notFound();
 
-  const artStyle = {
-    "--art-primary": game.artPrimary,
-    "--art-secondary": game.artSecondary,
-  } as CSSProperties;
+  const relatedGames = games
+    .filter((candidate) => candidate.slug !== game.slug)
+    .map((candidate) => ({
+      candidate,
+      score:
+        (candidate.category === game.category ? 3 : 0) +
+        candidate.genres.filter((genre) => game.genres.includes(genre)).length,
+    }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || a.candidate.title.localeCompare(b.candidate.title))
+    .slice(0, 3)
+    .map((item) => item.candidate);
 
   return (
     <main className="page-main">
       <section className="section game-detail-section">
         <div className="container">
-          <Link href="/games" className="back-link">← Quay lại thư viện</Link>
+          <nav className="detail-breadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Trang chủ</Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/games">Thư viện game</Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{game.title}</span>
+          </nav>
+
           <div className="game-detail-layout">
-            <div className="detail-art" style={artStyle}>
-              <span className="game-art-kicker">LEVELUP / GAME PROFILE</span>
-              <span className="detail-mark" aria-hidden="true">{game.mark}</span>
-              <span className="detail-art-caption">{game.category} / RELEASE {game.releaseYear}</span>
-            </div>
+            <GameArtwork
+              slug={game.slug}
+              title={game.title}
+              mark={game.mark}
+              category={game.category}
+              releaseYear={game.releaseYear}
+              artPrimary={game.artPrimary}
+              artSecondary={game.artSecondary}
+              variant="detail"
+            />
+
             <div className="detail-copy">
               <p className="eyebrow">GAME PROFILE / {game.category.toUpperCase()}</p>
               <h1>{game.title}<span>.</span></h1>
               <p className="detail-description">{game.description}</p>
-              <div className="detail-tags">
+
+              <div className="detail-tags" aria-label="Thể loại game">
                 {game.genres.map((genre) => <span key={genre}>{genre}</span>)}
               </div>
+
               <dl className="detail-facts">
-                <div><dt>Nhà phát triển</dt><dd>{game.developer}</dd></div>
-                <div><dt>Năm phát hành</dt><dd>{game.releaseYear}</dd></div>
-                <div><dt>Nền tảng</dt><dd>{game.platforms.join(" · ")}</dd></div>
+                <div>
+                  <dt>Nhà phát triển</dt>
+                  <dd>{game.developer}</dd>
+                </div>
+                <div>
+                  <dt>Năm phát hành</dt>
+                  <dd>{game.releaseYear}</dd>
+                </div>
+                <div>
+                  <dt>Thể loại chính</dt>
+                  <dd>{game.category}</dd>
+                </div>
+                <div>
+                  <dt>Nền tảng</dt>
+                  <dd className="detail-platforms">
+                    {game.platforms.map((platform) => <span key={platform}>{platform}</span>)}
+                  </dd>
+                </div>
               </dl>
-              <a className="btn btn-primary" href={game.officialUrl} target="_blank" rel="noreferrer">
-                Trang chính thức <span aria-hidden="true">↗</span>
-              </a>
-              <p className="data-note">Thông tin được cung cấp để khám phá; hãy kiểm tra trang chính thức để xem chi tiết mới nhất.</p>
+
+              <div className="detail-actions">
+                <a className="btn btn-primary" href={game.officialUrl} target="_blank" rel="noopener noreferrer">
+                  Trang chính thức <span aria-hidden="true">↗</span>
+                </a>
+                <Link className="btn btn-secondary" href="/games">
+                  Khám phá game khác <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+              <p className="data-note">
+                Thông tin giúp bạn khám phá nhanh. Hãy kiểm tra trang chính thức để xem yêu cầu hệ thống và cập nhật mới nhất.
+              </p>
             </div>
           </div>
         </div>
       </section>
+
+      {relatedGames.length > 0 ? (
+        <section className="section related-games-section">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <p className="eyebrow">MORE TO EXPLORE / 002</p>
+                <h2>GAME CÙNG<br /><span>CHIẾN TUYẾN.</span></h2>
+              </div>
+              <p className="section-aside">
+                Một vài lựa chọn có thể hợp gu bạn, dựa trên thể loại và phong cách chơi tương tự.
+              </p>
+            </div>
+            <div className="game-grid related-game-grid">
+              {relatedGames.map((related, index) => (
+                <GameCard key={related.slug} game={related} index={index} />
+              ))}
+            </div>
+            <div className="related-footer">
+              <Link className="text-link" href="/games">Xem toàn bộ thư viện <span aria-hidden="true">→</span></Link>
+            </div>
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
