@@ -9,21 +9,21 @@ import "./globals.css";
 const vietnameseFont = Be_Vietnam_Pro({
   variable: "--font-vietnam",
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: "variable",
   display: "swap",
 });
 
 const gamingFont = Orbitron({
   variable: "--font-orbitron",
   subsets: ["latin"],
-  weight: ["400", "700", "900"],
+  weight: "variable",
   display: "swap",
 });
 
 const codeFont = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "700"],
   display: "swap",
 });
 
