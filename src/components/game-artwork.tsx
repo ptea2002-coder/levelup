@@ -6,7 +6,6 @@ import { getGameArtworkSources, type GameArtworkVariant } from "@/lib/game-art";
 
 type GameArtworkProps = {
   slug: string;
-  title: string;
   mark: string;
   category: string;
   releaseYear: number;
@@ -18,7 +17,6 @@ type GameArtworkProps = {
 
 export function GameArtwork({
   slug,
-  title,
   mark,
   category,
   releaseYear,
