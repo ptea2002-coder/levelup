@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { GameCard } from "@/components/game-card";
 import type { Game } from "@/lib/games";
 
-const categories = ["Tất cả", "FPS", "MOBA", "Battle Royale", "Action RPG"];
+const categoryOrder = ["FPS", "MOBA", "Battle Royale", "Action RPG", "Hero Shooter", "Sandbox", "Turn-based RPG", "Simulation", "Sports", "MMORPG", "Co-op Shooter"];
 
 type GameExplorerProps = {
   games: Game[];
@@ -13,6 +13,14 @@ type GameExplorerProps = {
 export function GameExplorer({ games }: GameExplorerProps) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const categories = useMemo(() => {
+    const available = new Set(games.map((game) => game.category));
+    const ordered = categoryOrder.filter((category) => available.has(category));
+    const remaining = Array.from(available)
+      .filter((category) => !categoryOrder.includes(category))
+      .sort((a, b) => a.localeCompare(b, "vi"));
+    return ["Tất cả", ...ordered, ...remaining];
+  }, [games]);
 
   const filteredGames = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("vi");
@@ -62,7 +70,7 @@ export function GameExplorer({ games }: GameExplorerProps) {
       </div>
 
       <p className="results-count" role="status">
-        {filteredGames.length} tựa game trong thư viện khởi đầu
+        {filteredGames.length} tựa game phù hợp
       </p>
 
       <div className="game-grid">
