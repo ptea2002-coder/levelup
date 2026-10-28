@@ -88,24 +88,31 @@ alter table public.content_reports enable row level security;
 
 drop policy if exists "Published posts are public" on public.posts;
 create policy "Published posts are public" on public.posts for select to anon, authenticated
-using (status = 'published' or author_id = (select auth.uid()) or (select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+using (status = 'published' or author_id = (select auth.uid()) or ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin');
 drop policy if exists "Authenticated users create their own posts" on public.posts;
 create policy "Authenticated users create their own posts" on public.posts for insert to authenticated
 with check (author_id = (select auth.uid()) and status = 'published');
-drop policy if exists "Authors edit their published posts" on public.posts;
-create policy "Authors edit their published posts" on public.posts for update to authenticated
-using (author_id = (select auth.uid()) and status = 'published')
-with check (author_id = (select auth.uid()) and status = 'published');
 drop policy if exists "Admins moderate posts" on public.posts;
-create policy "Admins moderate posts" on public.posts for update to authenticated
-using ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
-with check ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
-drop policy if exists "Authors delete their posts" on public.posts;
-create policy "Authors delete their posts" on public.posts for delete to authenticated
-using (author_id = (select auth.uid()));
+drop policy if exists "Authors edit their published posts" on public.posts;
+drop policy if exists "Authors and admins update posts" on public.posts;
+create policy "Authors and admins update posts" on public.posts for update to authenticated
+using (
+  (author_id = (select auth.uid()) and status = 'published')
+  or ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+)
+with check (
+  (author_id = (select auth.uid()) and status = 'published')
+  or ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+);
+
 drop policy if exists "Admins delete posts" on public.posts;
-create policy "Admins delete posts" on public.posts for delete to authenticated
-using ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+drop policy if exists "Authors delete their posts" on public.posts;
+drop policy if exists "Authors and admins delete posts" on public.posts;
+create policy "Authors and admins delete posts" on public.posts for delete to authenticated
+using (
+  author_id = (select auth.uid())
+  or ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+);
 
 drop policy if exists "Likes on public posts are readable" on public.post_likes;
 create policy "Likes on public posts are readable" on public.post_likes for select to anon, authenticated
@@ -115,7 +122,7 @@ using (
     where p.id = post_likes.post_id and (
       p.status = 'published'
       or p.author_id = (select auth.uid())
-      or (select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+      or ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
     )
   )
 );
@@ -128,7 +135,7 @@ using (user_id = (select auth.uid()));
 
 drop policy if exists "Comments on visible posts are readable" on public.post_comments;
 create policy "Comments on visible posts are readable" on public.post_comments for select to anon, authenticated
-using (author_id = (select auth.uid()) or (select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+using (author_id = (select auth.uid()) or ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
   or (status = 'published' and exists (select 1 from public.posts p where p.id = post_comments.post_id and p.status = 'published')));
 drop policy if exists "Users comment as themselves on published posts" on public.post_comments;
 create policy "Users comment as themselves on published posts" on public.post_comments for insert to authenticated
@@ -139,8 +146,8 @@ create policy "Authors delete their comments" on public.post_comments for delete
 using (author_id = (select auth.uid()));
 drop policy if exists "Admins moderate comments" on public.post_comments;
 create policy "Admins moderate comments" on public.post_comments for update to authenticated
-using ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
-with check ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+using (((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin')
+with check (((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin');
 
 drop policy if exists "Follows are publicly readable" on public.follows;
 create policy "Follows are publicly readable" on public.follows for select to anon, authenticated using (true);
@@ -163,11 +170,11 @@ create policy "Users submit their own content reports" on public.content_reports
 with check (reporter_id = (select auth.uid()) and status = 'open' and (target_profile_id is null or target_profile_id <> (select auth.uid())));
 drop policy if exists "Users read own reports and admins read all" on public.content_reports;
 create policy "Users read own reports and admins read all" on public.content_reports for select to authenticated
-using (reporter_id = (select auth.uid()) or (select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+using (reporter_id = (select auth.uid()) or ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin');
 drop policy if exists "Admins review content reports" on public.content_reports;
 create policy "Admins review content reports" on public.content_reports for update to authenticated
-using ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
-with check ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+using (((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin')
+with check (((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin');
 
 create or replace function private.handle_new_user()
 returns trigger language plpgsql security definer set search_path = ''
