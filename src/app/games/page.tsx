@@ -1,20 +1,24 @@
 import type { Metadata } from "next";
 import { GameExplorer } from "@/components/game-explorer";
-import { games } from "@/lib/games";
+import { getGames } from "@/lib/game-repository";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Khám phá game",
   description: "Tìm game theo tên, studio, thể loại và nền tảng trên LevelUP.",
 };
 
-export default function GamesPage() {
+export default async function GamesPage() {
+  const games = await getGames();
+
   return (
     <main className="page-main">
       <section className="page-hero">
         <div className="container">
           <p className="eyebrow">DATABASE / 001</p>
           <h1>GAME<br /><span>LIBRARY.</span></h1>
-          <p>Thư viện khởi đầu của LevelUP. Dữ liệu hiện được quản lý trong source code; kết nối database sẽ là bước tiếp theo.</p>
+          <p>Thư viện khởi đầu của LevelUP. Dữ liệu được tải từ database khi Supabase đã sẵn sàng; bộ dữ liệu khởi đầu sẽ được dùng làm dự phòng nếu chưa cấu hình.</p>
         </div>
       </section>
       <section className="section">
