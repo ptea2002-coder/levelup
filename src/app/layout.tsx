@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Be_Vietnam_Pro, IBM_Plex_Mono, Orbitron } from "next/font/google";
+import { Be_Vietnam_Pro, IBM_Plex_Mono } from "next/font/google";
 import { isPublicProduction, siteUrl } from "@/lib/site";
 import { MotionEffects } from "@/components/motion-effects";
 import { SiteFooter } from "@/components/site-footer";
@@ -11,13 +11,6 @@ const vietnameseFont = Be_Vietnam_Pro({
   variable: "--font-vietnam",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800", "900"],
-  display: "swap",
-});
-
-const gamingFont = Orbitron({
-  variable: "--font-orbitron",
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
   display: "swap",
 });
 
@@ -73,7 +66,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" className={`${vietnameseFont.variable} ${gamingFont.variable} ${codeFont.variable}`}>
+    <html lang="vi" className={`${vietnameseFont.variable} ${codeFont.variable}`}>
       <body>
         <div className="site-shell">
           <a className="skip-link" href="#main-content">Bỏ qua điều hướng, đến nội dung chính</a>
