@@ -253,7 +253,7 @@ on conflict (game_slug) do update set
   store_url = excluded.store_url,
   updated_at = now();
 
-do $
+do $$
 begin
   if not exists (
     select 1 from pg_publication_tables
@@ -264,7 +264,7 @@ begin
     alter publication supabase_realtime add table public.steam_game_metrics;
   end if;
 end;
-$;
+$$;
 
 
 -- Important: no admin/editor write policy is included yet. Do not expose a service-role key
