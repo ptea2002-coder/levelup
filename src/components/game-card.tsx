@@ -13,7 +13,6 @@ export function GameCard({ game, index }: GameCardProps) {
       <Link href={`/games/${game.slug}`} className="game-card-link" aria-label={`Xem thông tin ${game.title}`}>
         <GameArtwork
           slug={game.slug}
-          title={game.title}
           mark={game.mark}
           category={game.category}
           releaseYear={game.releaseYear}
