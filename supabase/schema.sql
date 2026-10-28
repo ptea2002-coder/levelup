@@ -15,6 +15,9 @@ create table if not exists public.games (
   id uuid primary key default gen_random_uuid(),
   slug text unique not null,
   title text not null,
+  category text not null default 'Other',
+  release_year smallint not null default 0,
+  mark text not null default '',
   description text not null default '',
   genres text[] not null default '{}',
   platforms text[] not null default '{}',
@@ -25,6 +28,12 @@ create table if not exists public.games (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Keep the schema compatible when this file is re-applied to a project created from an
+-- earlier draft of the LevelUP schema.
+alter table public.games add column if not exists category text not null default 'Other';
+alter table public.games add column if not exists release_year smallint not null default 0;
+alter table public.games add column if not exists mark text not null default '';
 
 create table if not exists public.favorites (
   user_id uuid not null references public.profiles(id) on delete cascade,
@@ -162,16 +171,19 @@ grant select, insert, delete on public.reviews to authenticated;
 grant select, insert, delete on public.comments to authenticated;
 
 insert into public.games
-  (slug, title, description, genres, platforms, developer, official_url, art_primary, art_secondary)
+  (slug, title, category, release_year, mark, description, genres, platforms, developer, official_url, art_primary, art_secondary)
 values
-  ('valorant', 'VALORANT', 'Tactical shooter 5v5 đặt nặng kỹ năng bắn, phối hợp đội hình và cách sử dụng đặc vụ.', array['FPS', 'Tactical'], array['PC', 'PlayStation 5', 'Xbox Series X|S'], 'Riot Games', 'https://playvalorant.com/vi-vn/', '#f04f66', '#22172f'),
-  ('league-of-legends', 'LEAGUE OF LEGENDS', 'MOBA 5v5 với hệ thống tướng đa dạng, chiến thuật bản đồ và giao tranh đồng đội.', array['MOBA', 'Strategy'], array['PC'], 'Riot Games', 'https://www.leagueoflegends.com/vi-vn/', '#c39b56', '#152e4a'),
-  ('counter-strike-2', 'COUNTER-STRIKE 2', 'FPS chiến thuật xoay quanh kỹ năng ngắm bắn, utility, quản lý kinh tế và phối hợp.', array['FPS', 'Tactical'], array['PC'], 'Valve', 'https://www.counter-strike.net/cs2', '#e7a24b', '#242c3c'),
-  ('apex-legends', 'APEX LEGENDS', 'Battle royale nhịp độ cao với movement linh hoạt, kỹ năng nhân vật và chiến thuật theo squad.', array['Battle Royale', 'FPS'], array['PC', 'PlayStation', 'Xbox'], 'Respawn Entertainment', 'https://www.ea.com/games/apex-legends', '#e65a4f', '#30203a'),
-  ('genshin-impact', 'GENSHIN IMPACT', 'Action RPG thế giới mở tập trung vào khám phá, phản ứng nguyên tố và câu chuyện nhân vật.', array['Action RPG', 'Open World'], array['PC', 'PlayStation', 'Mobile'], 'HoYoverse', 'https://genshin.hoyoverse.com/', '#63b9b1', '#29305d'),
-  ('elden-ring', 'ELDEN RING', 'Action RPG thử thách với thế giới mở rộng lớn, chiến đấu có chiều sâu và nhiều bí mật để khám phá.', array['Action RPG', 'Soulslike'], array['PC', 'PlayStation', 'Xbox'], 'FromSoftware', 'https://en.bandainamcoent.eu/elden-ring/elden-ring', '#d2ad63', '#253b37')
+  ('valorant', 'VALORANT', 'FPS', 2020, 'V', 'Tactical shooter 5v5 đặt nặng kỹ năng bắn, phối hợp đội hình và cách sử dụng đặc vụ.', array['FPS', 'Tactical'], array['PC', 'PlayStation 5', 'Xbox Series X|S'], 'Riot Games', 'https://playvalorant.com/vi-vn/', '#f04f66', '#22172f'),
+  ('league-of-legends', 'LEAGUE OF LEGENDS', 'MOBA', 2009, 'LoL', 'MOBA 5v5 với hệ thống tướng đa dạng, chiến thuật bản đồ và giao tranh đồng đội.', array['MOBA', 'Strategy'], array['PC'], 'Riot Games', 'https://www.leagueoflegends.com/vi-vn/', '#c39b56', '#152e4a'),
+  ('counter-strike-2', 'COUNTER-STRIKE 2', 'FPS', 2023, 'CS2', 'FPS chiến thuật xoay quanh kỹ năng ngắm bắn, utility, quản lý kinh tế và phối hợp.', array['FPS', 'Tactical'], array['PC'], 'Valve', 'https://www.counter-strike.net/cs2', '#e7a24b', '#242c3c'),
+  ('apex-legends', 'APEX LEGENDS', 'Battle Royale', 2019, 'APEX', 'Battle royale nhịp độ cao với movement linh hoạt, kỹ năng nhân vật và chiến thuật theo squad.', array['Battle Royale', 'FPS'], array['PC', 'PlayStation', 'Xbox'], 'Respawn Entertainment', 'https://www.ea.com/games/apex-legends', '#e65a4f', '#30203a'),
+  ('genshin-impact', 'GENSHIN IMPACT', 'Action RPG', 2020, 'G', 'Action RPG thế giới mở tập trung vào khám phá, phản ứng nguyên tố và câu chuyện nhân vật.', array['Action RPG', 'Open World'], array['PC', 'PlayStation', 'Mobile'], 'HoYoverse', 'https://genshin.hoyoverse.com/', '#63b9b1', '#29305d'),
+  ('elden-ring', 'ELDEN RING', 'Action RPG', 2022, 'ER', 'Action RPG thử thách với thế giới mở rộng lớn, chiến đấu có chiều sâu và nhiều bí mật để khám phá.', array['Action RPG', 'Soulslike'], array['PC', 'PlayStation', 'Xbox'], 'FromSoftware', 'https://en.bandainamcoent.eu/elden-ring/elden-ring', '#d2ad63', '#253b37')
 on conflict (slug) do update set
   title = excluded.title,
+  category = excluded.category,
+  release_year = excluded.release_year,
+  mark = excluded.mark,
   description = excluded.description,
   genres = excluded.genres,
   platforms = excluded.platforms,
