@@ -2,19 +2,17 @@ import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { games } from "@/lib/games";
+import { getGameBySlug } from "@/lib/game-repository";
 
 type GamePageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return games.map((game) => ({ slug: game.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: GamePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const game = games.find((item) => item.slug === slug);
+  const game = await getGameBySlug(slug);
   if (!game) return { title: "Không tìm thấy game" };
   return {
     title: game.title,
