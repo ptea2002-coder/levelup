@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GameArtwork } from "@/components/game-artwork";
@@ -12,6 +13,22 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
+
+function KineticTitleLine({ text, className = "" }: { text: string; className?: string }) {
+  return (
+    <span className={`hero-title-line ${className}`} aria-hidden="true">
+      {Array.from(text).map((character, index) => (
+        <span
+          className="hero-title-char"
+          key={`${index}-${character}`}
+          style={{ "--char-index": index } as CSSProperties}
+        >
+          {character === " " ? "\u00a0" : character}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 export default async function HomePage() {
   const games = await getGames();
@@ -28,7 +45,7 @@ export default async function HomePage() {
         <div className="container hero-layout">
           <div className="hero-copy">
             <p className="eyebrow"><span className="status-dot" /> GAMING CULTURE / VIETNAM</p>
-            <h1><span className="hero-title-line">PLAY</span><span className="hero-title-line outline">HARD.</span><span className="hero-title-line accent">LEVEL UP.</span></h1>
+            <h1 aria-label="PLAY HARD. LEVEL UP."><KineticTitleLine text="PLAY" /><KineticTitleLine text="HARD." className="outline" /><KineticTitleLine text="LEVEL UP." className="accent" /></h1>
             <p className="hero-description">
               Không chỉ tìm game để chơi. Tìm tựa game hợp gu, học cách chơi tốt hơn và khám phá thế giới gaming theo cách của bạn.
             </p>
