@@ -8,6 +8,7 @@ type ArtworkSources = {
 const steamArtwork = (appId: string): ArtworkSources => ({
   card: [`https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`],
   detail: [
+    `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_600x900.jpg`,
     `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_hero.jpg`,
     `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
   ],
