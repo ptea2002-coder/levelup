@@ -1,6 +1,6 @@
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import type { Game } from "@/lib/games";
+import { GameArtwork } from "@/components/game-artwork";
 
 type GameCardProps = {
   game: Game;
@@ -8,20 +8,19 @@ type GameCardProps = {
 };
 
 export function GameCard({ game, index }: GameCardProps) {
-  const artStyle = {
-    "--art-primary": game.artPrimary,
-    "--art-secondary": game.artSecondary,
-  } as CSSProperties;
-
   return (
     <article className="game-card">
       <Link href={`/games/${game.slug}`} className="game-card-link" aria-label={`Xem thông tin ${game.title}`}>
-        <div className="game-art" style={artStyle}>
-          <span className="game-art-kicker">LEVELUP / SELECTED</span>
-          <span className="game-art-index">{String((index ?? 0) + 1).padStart(2, "0")}</span>
-          <span className="game-art-mark" aria-hidden="true">{game.mark}</span>
-          <span className="game-art-bottom">{game.category}</span>
-        </div>
+        <GameArtwork
+          slug={game.slug}
+          title={game.title}
+          mark={game.mark}
+          category={game.category}
+          releaseYear={game.releaseYear}
+          artPrimary={game.artPrimary}
+          artSecondary={game.artSecondary}
+          index={index}
+        />
         <div className="game-body">
           <div className="game-title-row">
             <h3>{game.title}</h3>
