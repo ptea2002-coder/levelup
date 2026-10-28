@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GameExplorer } from "@/components/game-explorer";
+import { SteamLiveMetrics } from "@/components/steam-live-metrics";
 import { articles } from "@/lib/articles";
 import { getGames } from "@/lib/game-repository";
 
@@ -82,11 +83,27 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="section steam-live-section" id="steam-live">
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <p className="eyebrow">02 / STEAM LIVE DATA</p>
+              <h2>ĐANG CHƠI.<br /><span>NGAY LÚC NÀY.</span></h2>
+            </div>
+            <div className="section-aside">
+              <p>Số người chơi và giá khu vực Việt Nam được cache trên Supabase để tải nhanh, rồi tự cập nhật khi dữ liệu mới về.</p>
+              <a className="text-link" href="https://store.steampowered.com/" target="_blank" rel="noopener noreferrer">Nguồn dữ liệu: Steam <span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+          <SteamLiveMetrics games={games.map((game) => ({ slug: game.slug, title: game.title, category: game.category }))} />
+        </div>
+      </section>
+
       <section className="section section-muted" id="guides">
         <div className="container">
           <div className="section-head">
             <div>
-              <p className="eyebrow">02 / KNOW YOUR GAME</p>
+              <p className="eyebrow">03 / KNOW YOUR GAME</p>
               <h2>CHƠI HAY HƠN.<br /><span>HIỂU SÂU HƠN.</span></h2>
             </div>
             <div className="section-aside">
@@ -118,7 +135,7 @@ export default async function HomePage() {
         <div className="container community-panel">
           <div className="community-decoration" aria-hidden="true">LVL<br />UP_</div>
           <div className="community-copy">
-            <p className="eyebrow">03 / PLAYER COMMUNITY</p>
+            <p className="eyebrow">04 / PLAYER COMMUNITY</p>
             <h2>GAME TỐT HƠN<br />KHI CHƠI <span>CÙNG NHAU.</span></h2>
             <p>Hồ sơ game thủ, đánh giá, thảo luận và tìm đồng đội là những bước tiếp theo trong lộ trình LevelUP. Chúng tôi sẽ bật các tính năng này sau khi backend và kiểm duyệt được thiết lập.</p>
             <Link className="btn btn-primary" href="/community">Xem lộ trình cộng đồng <span aria-hidden="true">↗</span></Link>
