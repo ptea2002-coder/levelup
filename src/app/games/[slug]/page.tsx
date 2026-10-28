@@ -71,7 +71,6 @@ export default async function GameDetailPage({ params }: GamePageProps) {
           <div className="game-detail-layout">
             <GameArtwork
               slug={game.slug}
-              title={game.title}
               mark={game.mark}
               category={game.category}
               releaseYear={game.releaseYear}
