@@ -70,6 +70,14 @@ create index if not exists post_likes_user_idx on public.post_likes (user_id, po
 create index if not exists follows_following_idx on public.follows (following_id, follower_id);
 create index if not exists notifications_recipient_feed_idx on public.notifications (recipient_id, created_at desc);
 create index if not exists content_reports_status_idx on public.content_reports (status, created_at asc);
+create index if not exists posts_game_id_idx on public.posts (game_id);
+create index if not exists notifications_actor_id_idx on public.notifications (actor_id);
+create index if not exists notifications_post_id_idx on public.notifications (post_id);
+create index if not exists notifications_comment_id_idx on public.notifications (comment_id);
+create index if not exists content_reports_reporter_id_idx on public.content_reports (reporter_id);
+create index if not exists content_reports_target_post_id_idx on public.content_reports (target_post_id);
+create index if not exists content_reports_target_comment_id_idx on public.content_reports (target_comment_id);
+create index if not exists content_reports_target_profile_id_idx on public.content_reports (target_profile_id);
 
 alter table public.posts enable row level security;
 alter table public.post_likes enable row level security;
@@ -101,7 +109,16 @@ using ((select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 drop policy if exists "Likes on public posts are readable" on public.post_likes;
 create policy "Likes on public posts are readable" on public.post_likes for select to anon, authenticated
-using (exists (select 1 from public.posts p where p.id = post_likes.post_id and (p.status = 'published' or p.author_id = (select auth.uid()) or (select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'));
+using (
+  exists (
+    select 1 from public.posts p
+    where p.id = post_likes.post_id and (
+      p.status = 'published'
+      or p.author_id = (select auth.uid())
+      or (select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+    )
+  )
+);
 drop policy if exists "Users like posts as themselves" on public.post_likes;
 create policy "Users like posts as themselves" on public.post_likes for insert to authenticated
 with check (user_id = (select auth.uid()) and exists (select 1 from public.posts p where p.id = post_likes.post_id and p.status = 'published'));
