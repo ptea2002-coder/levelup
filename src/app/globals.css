@@ -11,10 +11,10 @@
   --lime: #c7ff46;
   --violet: #a78bfa;
   --cyan: #63e6df;
-  --display: var(--font-vietnam), "Segoe UI", sans-serif;
+  --display: var(--font-ibm-plex-mono), var(--font-vietnam), monospace;
   --body: var(--font-vietnam), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --mono: var(--font-ibm-plex-mono), "SFMono-Regular", Consolas, monospace;
-  --tech: var(--font-orbitron), var(--font-vietnam), sans-serif;
+  --tech: var(--font-ibm-plex-mono), var(--font-vietnam), monospace;
   --max: 1200px;
 }
 
@@ -2018,4 +2018,255 @@ button.social-post-action { cursor: pointer; }
   .motion-reveal.is-visible {
     filter: none !important;
   }
+}
+
+
+/* LEVELUP / TERMINAL TYPOGRAPHY + CODE MOTION
+   IBM Plex Mono includes Vietnamese glyphs; Be Vietnam Pro remains the reading font. */
+:root {
+  --display: var(--font-ibm-plex-mono), var(--font-vietnam), monospace;
+  --tech: var(--font-ibm-plex-mono), var(--font-vietnam), monospace;
+}
+.hero h1,
+.page-hero h1,
+.not-found h1,
+.section-head h2,
+.community-copy h2,
+.community-intro h2,
+.inline-cta h2,
+.gamer-command-top h2,
+.game-title-row h3,
+.article-card h3,
+.empty-state h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-synthesis: weight;
+  font-variant-numeric: tabular-nums;
+}
+.hero h1,
+.page-hero h1,
+.section-head h2,
+.community-copy h2,
+.community-intro h2,
+.inline-cta h2,
+.gamer-command-top h2 {
+  letter-spacing: -.065em;
+}
+.hero h1 .accent::after {
+  content: "_";
+  display: inline-block;
+  margin-left: .035em;
+  color: var(--lime);
+  font: 500 .62em/1 var(--mono);
+  vertical-align: .02em;
+  animation: levelup-terminal-caret 1.05s steps(2, end) infinite;
+}
+.eyebrow::before {
+  content: "//";
+  color: var(--violet);
+  margin-right: 2px;
+  font: 500 1em/1 var(--mono);
+  letter-spacing: -.1em;
+}
+.hero-copy .eyebrow::before {
+  content: "$";
+  color: var(--cyan);
+  margin-right: 1px;
+  letter-spacing: 0;
+}
+.hero-description::before {
+  content: "// ";
+  color: var(--violet);
+  font: 500 .9em/1.5 var(--mono);
+}
+.btn,
+.nav-cta,
+.text-link,
+.filter-btn,
+.library-save-btn,
+.discovery-reset {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.btn {
+  position: relative;
+  overflow: hidden;
+  letter-spacing: .015em;
+}
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,.28) 48%, transparent 70%);
+  transform: translateX(-110%);
+}
+.btn:hover::after {
+  opacity: 1;
+  transform: translateX(110%);
+  transition: transform .55s cubic-bezier(.2,.7,.2,1), opacity .15s ease;
+}
+.hero-grid {
+  animation: levelup-grid-drift 28s linear infinite;
+  will-change: background-position;
+}
+.hero-panel {
+  outline: 1px solid rgba(199,255,70,.04);
+  outline-offset: 5px;
+}
+.hero-panel-art {
+  background-size: 100% 100%;
+}
+.hero-featured-art::after {
+  content: "const player = 'YOU';\\A await levelup.boot();\\A status: READY_";
+  display: block;
+  position: absolute;
+  z-index: 2;
+  top: 21%;
+  right: 5%;
+  width: 47%;
+  padding: 9px 0 9px 11px;
+  border-left: 1px solid rgba(199,255,70,.42);
+  color: rgba(199,255,70,.78);
+  font: 500 clamp(.44rem, .65vw, .62rem)/1.9 var(--mono);
+  letter-spacing: .015em;
+  white-space: pre;
+  text-shadow: 0 0 18px rgba(199,255,70,.16);
+  background: linear-gradient(90deg, rgba(9,10,18,.16), transparent);
+  pointer-events: none;
+  opacity: .46;
+  animation: levelup-code-flicker 8s steps(1, end) infinite;
+}
+.panel-topline span:last-child {
+  font-variant-numeric: tabular-nums;
+}
+.panel-bottomline strong,
+.hero-stats strong,
+.steam-live-card-stats strong,
+.steam-detail-stat strong {
+  font-variant-numeric: tabular-nums;
+}
+.status-line::before,
+.status-line::after {
+  color: var(--violet);
+  font-family: var(--mono);
+}
+.status-line::before { content: "["; margin-right: -6px; }
+.status-line::after { content: "]"; margin-left: -6px; }
+.game-card,
+.article-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.game-card::before,
+.article-card::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(320px circle at var(--card-x, 50%) var(--card-y, 50%), rgba(199,255,70,.11), transparent 55%);
+  transition: opacity .2s ease;
+}
+.game-card::after,
+.article-card::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 34%;
+  border-top: 1px solid rgba(199,255,70,.2);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-110%);
+  background: linear-gradient(180deg, transparent, rgba(199,255,70,.08), rgba(99,230,223,.045), transparent);
+}
+.game-card:hover::before,
+.article-card:hover::before,
+.game-card.is-tilting::before,
+.article-card.is-tilting::before {
+  opacity: 1;
+}
+.game-card:hover::after,
+.article-card:hover::after,
+.game-card.is-tilting::after,
+.article-card.is-tilting::after {
+  opacity: 1;
+  animation: levelup-code-scan 1.8s linear infinite;
+}
+.game-card .game-art-kicker::after {
+  content: " _";
+  color: var(--lime);
+  animation: levelup-terminal-caret 1.05s steps(2, end) infinite;
+}
+.game-card,
+.article-card,
+.steam-live-card,
+.lfg-card {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+.filter-btn,
+.discovery-reset,
+.library-save-btn {
+  transition: color .18s ease, background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.filter-btn:hover:not(:disabled),
+.discovery-reset:hover:not(:disabled),
+.library-save-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+@keyframes levelup-terminal-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes levelup-grid-drift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 48px 48px, -48px 48px; }
+}
+@keyframes levelup-code-flicker {
+  0%, 92%, 100% { opacity: .46; }
+  93% { opacity: .2; }
+  95% { opacity: .54; }
+}
+@keyframes levelup-code-scan {
+  0% { transform: translateY(-110%); }
+  100% { transform: translateY(330%); }
+}
+@media (max-width: 700px) {
+  .hero-featured-art::after {
+    top: 19%;
+    right: 4%;
+    width: 55%;
+    font-size: .5rem;
+    opacity: .28;
+  }
+  .hero h1,
+  .page-hero h1,
+  .section-head h2,
+  .community-copy h2,
+  .community-intro h2,
+  .inline-cta h2,
+  .gamer-command-top h2 {
+    letter-spacing: -.055em;
+  }
+  .btn { font-size: .68rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-grid,
+  .hero h1 .accent::after,
+  .hero-featured-art::after,
+  .game-card::after,
+  .article-card::after,
+  .game-card .game-art-kicker::after {
+    animation: none !important;
+  }
+  .btn::after { display: none !important; }
+  .game-card::before,
+  .article-card::before { display: none !important; }
 }
