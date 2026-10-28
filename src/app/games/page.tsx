@@ -18,7 +18,7 @@ export default async function GamesPage() {
         <div className="container">
           <p className="eyebrow">DATABASE / 001</p>
           <h1>GAME<br /><span>LIBRARY.</span></h1>
-          <p>Thư viện khởi đầu của LevelUP. Dữ liệu được tải từ database khi Supabase đã sẵn sàng; bộ dữ liệu khởi đầu sẽ được dùng làm dự phòng nếu chưa cấu hình.</p>
+          <p>Khám phá game theo thể loại, studio và nền tảng. Dữ liệu được tải từ Supabase khi backend sẵn sàng, kèm bộ dữ liệu dự phòng để trang luôn hoạt động.</p>
         </div>
       </section>
       <section className="section">
