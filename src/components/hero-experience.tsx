@@ -138,7 +138,7 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
             <div className="hero-cinematic-stats" aria-label="Tổng quan LevelUP">
               <div className="hero-cinematic-stat">
                 <span className="hero-stat-label">GAME DATABASE</span>
-                <strong>{String(games.length).padStart(2, "0")}<i>+</i></strong>
+                <strong>{String(games.length).padStart(2, "0")}</strong>
                 <span className="hero-stat-foot">Tựa game được tuyển chọn</span>
               </div>
               <div className="hero-cinematic-stat">
@@ -155,7 +155,7 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
             <div className="hero-cinematic-scroll-hint">
               <span className="hero-scroll-line" aria-hidden="true" />
               <span>SCROLL TO EXPLORE</span>
-              <span className="hero-scroll-coordinates">10°46' N / VN</span>
+              <span className="hero-scroll-coordinates">VIETNAM / UTC+7</span>
             </div>
           </div>
 
