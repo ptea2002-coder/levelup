@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { GameArtwork } from "@/components/game-artwork";
 import { GameExplorer } from "@/components/game-explorer";
 import { GamerCommandCenter } from "@/components/gamer-command-center";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
@@ -18,6 +19,7 @@ export default async function HomePage() {
   const featuredGames = games
     .filter((game) => featuredSlugs.includes(game.slug))
     .sort((a, b) => featuredSlugs.indexOf(a.slug) - featuredSlugs.indexOf(b.slug));
+  const heroGame = games.find((game) => game.slug === "elden-ring") ?? featuredGames[0] ?? games[0];
 
   return (
     <main>
@@ -26,7 +28,7 @@ export default async function HomePage() {
         <div className="container hero-layout">
           <div className="hero-copy">
             <p className="eyebrow"><span className="status-dot" /> GAMING CULTURE / VIETNAM</p>
-            <h1>PLAY<br /><span className="outline">HARD.</span><br /><span className="accent">LEVEL UP.</span></h1>
+            <h1><span className="hero-title-line">PLAY</span><span className="hero-title-line outline">HARD.</span><span className="hero-title-line accent">LEVEL UP.</span></h1>
             <p className="hero-description">
               Không chỉ tìm game để chơi. Tìm tựa game hợp gu, học cách chơi tốt hơn và khám phá thế giới gaming theo cách của bạn.
             </p>
@@ -46,10 +48,28 @@ export default async function HomePage() {
             <div className="hero-orbit orbit-two" aria-hidden="true" />
             <div className="hero-panel">
               <div className="panel-topline"><span>LEVELUP / DISCOVERY SYSTEM</span><span>SYS.ONLINE</span></div>
-              <div className="hero-panel-art">
-                <span className="hero-panel-label">YOUR NEXT<br />OBSESSION</span>
-                <span className="hero-panel-symbol" aria-hidden="true">L<span>U</span></span>
-                <span className="hero-panel-coordinate">10°46' N / 106°42' E</span>
+              <div className="hero-panel-art hero-featured-art">
+                {heroGame ? (
+                  <GameArtwork
+                    slug={heroGame.slug}
+                    mark={heroGame.mark}
+                    category={heroGame.category}
+                    releaseYear={heroGame.releaseYear}
+                    artPrimary={heroGame.artPrimary}
+                    artSecondary={heroGame.artSecondary}
+                    variant="detail"
+                  />
+                ) : null}
+                <div className="hero-art-scrim" aria-hidden="true" />
+                <span className="hero-art-grid" aria-hidden="true" />
+                <span className="hero-panel-label">LEVELUP / FEATURED PICK</span>
+                <div className="hero-featured-title">
+                  <span>{heroGame ? `${heroGame.category} / ${heroGame.releaseYear}` : "GAME DISCOVERY"}</span>
+                  <strong>{heroGame?.title ?? "YOUR NEXT MAIN"}</strong>
+                  <span className="hero-featured-cta">EXPLORE THE GAMEVERSE <i aria-hidden="true">↗</i></span>
+                </div>
+                <span className="hero-panel-coordinate">LEVELUP / SELECTED 001</span>
+                <span className="hero-art-scanline" aria-hidden="true" />
               </div>
               <div className="panel-bottomline">
                 <div><span className="tiny-label">MODE</span><strong>DISCOVER</strong></div>
@@ -57,8 +77,8 @@ export default async function HomePage() {
                 <span className="panel-arrow" aria-hidden="true">↗</span>
               </div>
             </div>
-            <div className="floating-chip chip-top"><span className="chip-dot" /> GAME DATABASE <strong>ONLINE</strong></div>
-            <div className="floating-chip chip-bottom"><span className="chip-number">01</span><span>FIND YOUR<br />NEXT MAIN</span></div>
+            <div className="floating-chip chip-top"><span className="chip-dot" /> CURATED GAME LIBRARY <strong>{String(games.length).padStart(2, "0")} TITLES</strong></div>
+            <div className="floating-chip chip-bottom"><span className="chip-number">01</span><span>EDITOR’S<br />PICK</span></div>
             <span className="visual-rail">DISCOVERY / CULTURE / COMMUNITY</span>
           </div>
         </div>
@@ -66,10 +86,18 @@ export default async function HomePage() {
 
       <div className="ticker" aria-label="Các chủ đề của LevelUP">
         <div className="ticker-track">
-          <span>GAME DISCOVERY <b>✳</b></span>
-          <span>PLAYER CULTURE <b>✳</b></span>
-          <span>GUIDES & REVIEWS <b>✳</b></span>
-          <span>COMMUNITY FIRST <b>✳</b></span>
+          <div className="ticker-group">
+            <span>GAME DISCOVERY <b>✳</b></span>
+            <span>PLAYER CULTURE <b>✳</b></span>
+            <span>GUIDES & REVIEWS <b>✳</b></span>
+            <span>COMMUNITY FIRST <b>✳</b></span>
+          </div>
+          <div className="ticker-group" aria-hidden="true">
+            <span>GAME DISCOVERY <b>✳</b></span>
+            <span>PLAYER CULTURE <b>✳</b></span>
+            <span>GUIDES & REVIEWS <b>✳</b></span>
+            <span>COMMUNITY FIRST <b>✳</b></span>
+          </div>
         </div>
       </div>
 
@@ -145,13 +173,13 @@ export default async function HomePage() {
           <div className="community-copy">
             <p className="eyebrow">04 / PLAYER COMMUNITY</p>
             <h2>GAME TỐT HƠN<br />KHI CHƠI <span>CÙNG NHAU.</span></h2>
-            <p>Hồ sơ game thủ, đánh giá, thảo luận và tìm đồng đội là những bước tiếp theo trong lộ trình LevelUP. Chúng tôi sẽ bật các tính năng này sau khi backend và kiểm duyệt được thiết lập.</p>
-            <Link className="btn btn-primary" href="/community">Xem lộ trình cộng đồng <span aria-hidden="true">↗</span></Link>
+            <p>Hồ sơ game thủ, bảng tin cộng đồng và tìm đồng đội đã có mặt trên LevelUP. Kết nối với người chơi cùng gu, chia sẻ góc nhìn và lập squad phù hợp để vào game nhanh hơn.</p>
+            <Link className="btn btn-primary" href="/squads">Tìm đồng đội <span aria-hidden="true">↗</span></Link>
           </div>
           <div className="community-status">
             <span className="status-line"><i /> PHASE 01 / DISCOVERY</span>
-            <span className="status-line pending"><i /> PHASE 02 / PROFILES</span>
-            <span className="status-line pending"><i /> PHASE 03 / COMMUNITY</span>
+            <span className="status-line"><i /> PHASE 02 / PLAYER PROFILES</span>
+            <span className="status-line"><i /> PHASE 03 / SOCIAL FEED + LFG</span>
             <span className="status-line pending"><i /> PHASE 04 / PERSONALIZATION</span>
           </div>
         </div>
