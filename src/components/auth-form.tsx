@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -120,7 +121,11 @@ export function AuthForm() {
         <p className="eyebrow">PLAYER ACCOUNT / ACTIVE</p>
         <h2>Chào mừng trở lại.</h2>
         <p className="auth-description">Bạn đang đăng nhập bằng tài khoản <strong>{user.email}</strong>.</p>
-        <button className="btn btn-primary" type="button" onClick={handleSignOut} disabled={busy}>
+        <div className="auth-quick-links">
+          <Link href="/community" className="btn btn-primary">Vào bảng tin <span aria-hidden="true">↗</span></Link>
+          <Link href="/locker" className="btn btn-secondary">Mở Game Locker <span aria-hidden="true">↗</span></Link>
+        </div>
+        <button className="btn btn-primary auth-signout" type="button" onClick={handleSignOut} disabled={busy}>
           {busy ? "ĐANG XỬ LÝ..." : "Đăng xuất"}
         </button>
         {message && <p className={`auth-message${isError ? " is-error" : ""}`} role="status">{message}</p>}

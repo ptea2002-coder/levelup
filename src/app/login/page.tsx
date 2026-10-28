@@ -35,11 +35,12 @@ export default function LoginPage() {
           <div className="auth-aside">
             <p className="eyebrow">LEVELUP / ACCOUNT SYSTEM</p>
             <h2>Mỗi người chơi.<br /><span>Một hành trình.</span></h2>
-            <p>Đăng nhập hiện hỗ trợ email và mật khẩu qua Supabase Auth. Hồ sơ công khai, đồng bộ game yêu thích và các tính năng cộng đồng sẽ được bật ở các bước tiếp theo.</p>
+            <p>Đăng nhập bằng Supabase Auth để tham gia bảng tin, đăng bài, theo dõi game thủ, bình luận, nhận thông báo và quản lý Game Locker của bạn.</p>
             <div className="auth-checklist">
               <span><i /> Đăng ký bằng email</span>
               <span><i /> Đăng nhập an toàn qua Supabase</span>
               <span><i /> Không cần cung cấp khóa bí mật</span>
+              <span><i /> Bài đăng, theo dõi và thông báo dùng dữ liệu thật</span>
             </div>
           </div>
           <AuthForm />

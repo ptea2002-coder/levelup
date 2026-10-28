@@ -1754,3 +1754,13 @@ button.social-post-action { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .social-loader { animation: none; }
 }
+
+
+/* Signed-in account quick actions */
+.auth-quick-links { display: flex; flex-wrap: wrap; gap: 9px; margin: 18px 0 12px; }
+.auth-quick-links .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; }
+.auth-signout { margin-top: 5px; }
+@media (max-width: 520px) {
+  .auth-quick-links { flex-direction: column; align-items: stretch; }
+  .auth-quick-links .btn { width: 100%; }
+}
