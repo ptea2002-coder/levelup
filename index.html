@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080b10">
-  <meta name="description" content="LevelUP — điểm hẹn gaming cho game thủ Việt. Khám phá game, văn hóa gaming, góc setup và những ý tưởng giúp bạn lên trình.">
+  <meta name="description" content="LevelUP — khám phá game theo thể loại, tìm thông tin tựa game, lưu game yêu thích trên thiết bị và mở trang chính thức của nhà phát hành.">
   <meta property="og:title" content="LevelUP — Play hard. Level up.">
-  <meta property="og:description" content="Không chỉ chơi game. Làm chủ cuộc chơi.">
+  <meta property="og:description" content="Khám phá game, lưu lựa chọn yêu thích và truy cập nguồn chính thức.">
   <meta property="og:type" content="website">
   <title>LevelUP — Play hard. Level up.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -164,16 +164,80 @@
       body>.code-rain-layer{display:none!important}
     }
 
+  
+    /* === LEVELUP // INTERACTIVE GAME HUB === */
+    .scroll-progress{position:fixed;top:0;left:0;width:100%;height:2px;z-index:1001;pointer-events:none;background:linear-gradient(90deg,var(--lvl-neon),var(--lvl-cyan),var(--lvl-purple));box-shadow:0 0 14px rgba(98,231,226,.48);transform:scaleX(0);transform-origin:left center}
+    #cursorAura{position:fixed;left:-1000px;top:-1000px;width:440px;height:440px;border-radius:50%;z-index:0;pointer-events:none;opacity:.75;mix-blend-mode:screen;background:radial-gradient(circle,rgba(199,255,61,.075) 0%,rgba(98,231,226,.045) 24%,rgba(169,139,255,.025) 42%,transparent 70%);transition:opacity .25s}
+    .game-results-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:-14px 0 20px;color:var(--muted);font:500 .58rem/1.5 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+    #gameResultCount{color:var(--lvl-neon)}
+    .saved-filter span{display:inline-grid;place-items:center;min-width:17px;height:17px;margin-left:4px;padding:0 4px;border:1px solid currentColor;border-radius:999px;font-size:.58rem}
+    .game-card{position:relative;transform-style:preserve-3d;will-change:transform;transition:transform .22s ease,box-shadow .28s ease,border-color .28s ease}
+    .game-card:after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;background:radial-gradient(260px circle at var(--spot-x,50%) var(--spot-y,50%),rgba(199,255,61,.09),transparent 72%);transition:opacity .25s}
+    .game-card>*{position:relative;z-index:1}
+    .game-card:hover:after{opacity:1}
+    .game-card:hover{transform:perspective(900px) rotateX(var(--tilt-y,0deg)) rotateY(var(--tilt-x,0deg)) translateY(-4px);box-shadow:0 20px 56px rgba(0,0,0,.32),0 0 28px rgba(199,255,61,.07)}
+    .game-card[hidden]{display:none!important}
+    .game-art{position:relative;overflow:hidden}
+    .favorite-btn{position:absolute;top:12px;right:12px;z-index:8;display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid rgba(199,255,61,.3);border-radius:4px;color:#eaf3df;background:rgba(6,10,14,.82);font:500 .61rem/1 var(--mono);letter-spacing:.04em;backdrop-filter:blur(12px);cursor:pointer;transition:background .2s,border-color .2s,color .2s,transform .2s,box-shadow .2s}
+    .favorite-btn>span:first-child{font-size:1rem;line-height:.8;color:var(--lvl-neon)}
+    .favorite-btn:hover,.favorite-btn.is-saved{border-color:var(--lvl-neon);color:var(--lvl-neon);background:rgba(19,27,16,.94);box-shadow:0 0 22px rgba(199,255,61,.12);transform:translateY(-1px)}
+    .favorite-btn.is-saved>span:first-child{color:var(--lvl-neon);text-shadow:0 0 12px rgba(199,255,61,.48)}
+    .game-details-trigger{border:0;padding:0;background:transparent;color:var(--lvl-neon);font:inherit;cursor:pointer;transition:color .2s,text-shadow .2s;white-space:nowrap}
+    .game-details-trigger:hover{color:#f4ffd9;text-shadow:0 0 14px rgba(199,255,61,.38)}
+    .game-details-trigger:focus-visible,.favorite-btn:focus-visible,.dialog-link:focus-visible,.dialog-close:focus-visible{outline:2px solid var(--lvl-cyan);outline-offset:4px}
+    .game-dialog{width:min(920px,calc(100% - 28px));max-width:none;max-height:min(88vh,850px);padding:0;overflow:auto;border:1px solid rgba(199,255,61,.38);border-radius:14px;color:#edf4e7;background:#080d12;box-shadow:0 28px 100px rgba(0,0,0,.7),0 0 48px rgba(98,231,226,.08)}
+    .game-dialog::backdrop{background:rgba(2,4,8,.82);backdrop-filter:blur(9px)}
+    .dialog-shell{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);min-height:390px}
+    .dialog-art{position:relative;min-height:390px;overflow:hidden;background:linear-gradient(135deg,#17231a,#101421)}
+    .dialog-art:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,10,14,.85),transparent 58%),linear-gradient(120deg,rgba(199,255,61,.08),transparent 55%)}
+    .dialog-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.85) contrast(1.05)}
+    .dialog-content{position:relative;padding:clamp(24px,4vw,42px);align-self:center}
+    .dialog-close{position:absolute;top:12px;right:12px;z-index:3;width:36px;height:36px;border:1px solid rgba(199,255,61,.25);border-radius:50%;color:#eff9e5;background:rgba(9,14,19,.9);font-size:1.35rem;line-height:1;cursor:pointer}
+    .dialog-content .eyebrow{padding-right:35px;color:var(--lvl-cyan)}
+    .dialog-content h2{margin:12px 0 14px;font-family:var(--display);font-size:clamp(2rem,4vw,3.25rem);line-height:.95;letter-spacing:-.02em}
+    .dialog-content>p:not(.dialog-note){color:#b9c5c3;line-height:1.75;font-size:.9rem}
+    .dialog-facts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:26px 0}
+    .dialog-facts>div{padding-top:12px;border-top:1px solid rgba(255,255,255,.12)}
+    .dialog-facts dt{color:#8b9b9b;font:500 .56rem/1.4 var(--mono);letter-spacing:.1em}
+    .dialog-facts dd{margin:7px 0 0;color:#e8f0e4;font-size:.78rem;line-height:1.5}
+    .dialog-actions{display:flex;flex-wrap:wrap;gap:9px}
+    .dialog-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px 13px;border:1px solid rgba(255,255,255,.17);border-radius:3px;color:#e9f2e3;background:rgba(255,255,255,.035);text-decoration:none;font:500 .65rem/1.25 var(--mono);cursor:pointer;transition:background .2s,border-color .2s,color .2s,transform .2s}
+    .dialog-link:hover{border-color:rgba(98,231,226,.58);color:var(--lvl-cyan);transform:translateY(-1px)}
+    .dialog-link-primary{border-color:var(--lvl-neon);color:#0a0d08;background:var(--lvl-neon)}
+    .dialog-link-primary:hover{border-color:#e6ff9b;color:#080b06;background:#e6ff9b}
+    .dialog-save[aria-pressed="true"]{border-color:var(--lvl-neon);color:var(--lvl-neon)}
+    .dialog-note{margin-top:20px!important;color:#758483!important;font-size:.66rem!important;line-height:1.6!important}
+    #communitySavedButton{font-family:inherit;cursor:pointer}
+    .community-actions .btn{border-radius:3px}
+    @media(max-width:700px){
+      #cursorAura{display:none}
+      .game-results-meta{align-items:flex-start;flex-direction:column;gap:5px;margin:-10px 0 18px}
+      .dialog-shell{grid-template-columns:1fr}
+      .dialog-art{min-height:175px;height:175px}
+      .dialog-content{padding:24px 20px}
+      .dialog-facts{margin:20px 0}
+      .dialog-actions{display:grid;grid-template-columns:1fr}
+      .dialog-link{width:100%}
+      .game-dialog{max-height:90vh}
+    }
+    @media(prefers-reduced-motion:reduce){
+      #cursorAura{display:none!important}
+      .game-card,.favorite-btn,.game-details-trigger,.dialog-link{transition:none!important}
+      .game-card:hover{transform:none!important}
+    }
+
   </style>
 </head>
 <body>
   <canvas id="codeRain" class="code-rain-layer" aria-hidden="true"></canvas>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <div id="cursorAura" aria-hidden="true"></div>
   <div class="topline"><div class="topline-left"><span class="live-dot"></span><span>LEVELUP / GAMING CULTURE NETWORK</span></div><span class="topline-right">PLAY HARD · THINK FAST · LEVEL UP</span></div>
   <header class="site-header">
     <div class="wrap nav">
       <a class="brand" href="#home" aria-label="LevelUP — về đầu trang"><span class="brand-mark">LU</span><span class="brand-word">LEVEL<span>UP</span></span></a>
       <nav class="nav-links" id="navLinks" aria-label="Điều hướng chính">
-        <a href="#games">Game hub</a><a href="#signals">Gaming signals</a><a href="#community">Cộng đồng</a>
+        <a href="#games">Game hub</a><a href="#signals">Gaming signals</a><a href="#community">Về LevelUP</a>
       </nav>
       <div class="nav-actions"><a class="nav-cta" href="#games">Khám phá ngay <span class="arrow">↗</span></a><button class="menu-toggle" id="menuToggle" aria-label="Mở menu" aria-expanded="false">☰</button></div>
     </div>
@@ -195,10 +259,10 @@
           <div class="hero-frame"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85" alt="Không khí giải đấu gaming với màn hình và ánh sáng sân khấu" fetchpriority="high"><div class="frame-corner">SIGNAL FOUND / 001</div><div class="hero-frame-caption"><div class="mono">// Gaming culture, upgraded</div><h2>Find your<br>next obsession.</h2><p>Game mới. Góc nhìn mới. Một level hoàn toàn khác.</p></div></div>
           <div class="visual-tag tag-top"><strong>LEVEL_01</strong><span>START EXPLORING</span></div><div class="visual-tag tag-bottom"><strong>GG / WP</strong><span>GOOD GAME. BETTER YOU.</span></div><div class="side-rail">INSERT COIN · BREAK LIMITS · REPEAT</div>
           <div class="code-console" aria-label="Trạng thái hệ thống LevelUP">
-            <div class="console-head"><span class="console-lamps"><i></i><i></i><i></i></span><span>LEVELUP_RUNTIME / SYS</span><span class="console-live">● LIVE</span></div>
-            <div class="console-line"><span class="console-prompt">&gt;</span><span>INITIALIZING MATRIX...</span><b>OK</b></div>
-            <div class="console-line"><span class="console-prompt">&gt;</span><span>LOADING GAME_DATA / 06</span><b>OK</b></div>
-            <div class="console-line"><span class="console-prompt">&gt;</span><span>PLAYER_STATUS</span><b class="console-online">ONLINE</b></div>
+            <div class="console-head"><span class="console-lamps"><i></i><i></i><i></i></span><span>LEVELUP_RUNTIME / SYS</span><span class="console-live">● SYSTEM</span></div>
+            <div class="console-line"><span class="console-prompt">&gt;</span><span data-typewriter="INITIALIZING MATRIX...">INITIALIZING MATRIX...</span><b>OK</b></div>
+            <div class="console-line"><span class="console-prompt">&gt;</span><span>LOADING GAME_CATALOG / 06</span><b>OK</b></div>
+            <div class="console-line"><span class="console-prompt">&gt;</span><span>LOCAL_RADAR</span><b class="console-online">READY</b></div>
             <div class="console-progress"><span></span></div>
           </div>
         </div>
@@ -210,15 +274,16 @@
     <section class="section games-section" id="games">
       <div class="wrap">
         <div class="section-head reveal"><div><div class="eyebrow">01 / Game database</div><h2>TÌM GAME.<br>TÌM <span>CHẤT RIÊNG.</span></h2></div><p>Từ những trận rank căng thẳng đến thế giới để chill hàng giờ. Chọn hệ của bạn và bắt đầu khám phá.</p></div>
-        <div class="game-tools reveal"><div class="filters" role="group" aria-label="Lọc theo thể loại"><button class="filter-btn active" data-filter="all" aria-pressed="true">Tất cả</button><button class="filter-btn" data-filter="fps" aria-pressed="false">FPS</button><button class="filter-btn" data-filter="moba" aria-pressed="false">MOBA</button><button class="filter-btn" data-filter="br" aria-pressed="false">Battle royale</button><button class="filter-btn" data-filter="rpg" aria-pressed="false">RPG</button></div><label class="search-box"><span>⌕</span><input id="gameSearch" type="search" placeholder="Tìm tựa game..." aria-label="Tìm tựa game"></label></div>
+        <div class="game-tools reveal"><div class="filters" role="group" aria-label="Lọc theo thể loại"><button class="filter-btn active" data-filter="all" aria-pressed="true">Tất cả</button><button class="filter-btn" data-filter="fps" aria-pressed="false">FPS</button><button class="filter-btn" data-filter="moba" aria-pressed="false">MOBA</button><button class="filter-btn" data-filter="br" aria-pressed="false">Battle royale</button><button class="filter-btn" data-filter="rpg" aria-pressed="false">RPG</button><button class="filter-btn saved-filter" data-filter="saved" aria-pressed="false">Đã lưu <span id="savedCount">0</span></button></div><label class="search-box"><span>⌕</span><input id="gameSearch" type="search" placeholder="Tìm tựa game..." aria-label="Tìm tựa game"></label></div>
+        <div class="game-results-meta"><span id="gameResultCount" aria-live="polite">6 tựa game</span><span>RADAR ĐƯỢC LƯU TRÊN THIẾT BỊ NÀY</span></div>
         <div class="game-grid" id="gameGrid">
-          <article class="game-card reveal" data-category="fps" data-name="valorant tactical fps"><div class="game-art"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" alt="Sân khấu thi đấu esports" loading="lazy"><span class="game-index">GAME / 001</span><span class="game-type">TACTICAL FPS</span></div><div class="game-body"><div class="game-title-row"><h3>Valorant</h3><span class="game-symbol">↗</span></div><p>Đọc tình huống, phối hợp đội hình và biến từng round thành lợi thế.</p><div class="card-foot"><span>Precision · Teamplay</span><a href="#signals">Khám phá ↗</a></div></div></article>
-          <article class="game-card reveal" data-category="moba" data-name="league of legends liên minh huyền thoại moba"><div class="game-art"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" alt="Tay cầm chơi game trong không gian tối" loading="lazy"><span class="game-index">GAME / 002</span><span class="game-type">MOBA</span></div><div class="game-body"><div class="game-title-row"><h3>League of Legends</h3><span class="game-symbol">↗</span></div><p>Macro, giao tranh và phối hợp đồng đội — mỗi quyết định đều có giá trị.</p><div class="card-foot"><span>Strategy · Teamplay</span><a href="#signals">Khám phá ↗</a></div></div></article>
-          <article class="game-card reveal" data-category="fps" data-name="counter strike 2 cs2 fps tactical"><div class="game-art"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=800&q=80" alt="Bộ máy tính gaming với ánh sáng RGB" loading="lazy"><span class="game-index">GAME / 003</span><span class="game-type">COMPETITIVE FPS</span></div><div class="game-body"><div class="game-title-row"><h3>Counter-Strike 2</h3><span class="game-symbol">↗</span></div><p>Kỹ năng cơ bản, giao tiếp rõ ràng và những pha clutch không tưởng.</p><div class="card-foot"><span>Aim · Tactics</span><a href="#signals">Khám phá ↗</a></div></div></article>
-          <article class="game-card reveal" data-category="br" data-name="apex legends battle royale fps"><div class="game-art"><img src="https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=800&q=80" alt="Bộ điều khiển và phụ kiện chơi game" loading="lazy"><span class="game-index">GAME / 004</span><span class="game-type">BATTLE ROYALE</span></div><div class="game-body"><div class="game-title-row"><h3>Apex Legends</h3><span class="game-symbol">↗</span></div><p>Di chuyển thông minh, chọn vị trí chuẩn và tạo lợi thế cho squad.</p><div class="card-foot"><span>Movement · Squad</span><a href="#signals">Khám phá ↗</a></div></div></article>
-          <article class="game-card reveal" data-category="rpg" data-name="genshin impact action rpg open world"><div class="game-art"><img src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=800&q=80" alt="Không gian công nghệ với ánh sáng nhiều màu" loading="lazy"><span class="game-index">GAME / 005</span><span class="game-type">ACTION RPG</span></div><div class="game-body"><div class="game-title-row"><h3>Genshin Impact</h3><span class="game-symbol">↗</span></div><p>Mở rộng thế giới, thử đội hình và tận hưởng hành trình theo nhịp riêng.</p><div class="card-foot"><span>Explore · Build</span><a href="#signals">Khám phá ↗</a></div></div></article>
-          <article class="game-card reveal" data-category="rpg" data-name="elden ring soulslike action rpg"><div class="game-art"><img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80" alt="Phong cảnh kỳ ảo phủ sương" loading="lazy"><span class="game-index">GAME / 006</span><span class="game-type">ACTION RPG</span></div><div class="game-body"><div class="game-title-row"><h3>Elden Ring</h3><span class="game-symbol">↗</span></div><p>Khám phá, thử thách giới hạn và tự viết nên hành trình của riêng mình.</p><div class="card-foot"><span>Explore · Challenge</span><a href="#signals">Khám phá ↗</a></div></div></article>
-          <div class="empty-state" id="emptyState">Không tìm thấy game phù hợp. Thử từ khóa hoặc thể loại khác nhé.</div>
+          <article class="game-card reveal" data-category="fps" data-name="valorant tactical fps" data-game="valorant" data-official="https://playvalorant.com/"><div class="game-art"><button class="favorite-btn" type="button" data-favorite="valorant" aria-pressed="false" aria-label="Lưu Valorant vào game đã lưu"><span aria-hidden="true">♡</span><span class="favorite-label">Lưu</span></button><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" alt="Sân khấu thi đấu esports" loading="lazy"><span class="game-index">GAME / 001</span><span class="game-type">TACTICAL FPS</span></div><div class="game-body"><div class="game-title-row"><h3>Valorant</h3><span class="game-symbol">↗</span></div><p>Đọc tình huống, phối hợp đội hình và biến từng round thành lợi thế.</p><div class="card-foot"><span>Precision · Teamplay</span><button class="game-details-trigger" type="button" data-game-details="valorant" aria-haspopup="dialog">Chi tiết ↗</button></div></div></article>
+          <article class="game-card reveal" data-category="moba" data-name="league of legends liên minh huyền thoại moba" data-game="lol" data-official="https://www.leagueoflegends.com/"><div class="game-art"><button class="favorite-btn" type="button" data-favorite="lol" aria-pressed="false" aria-label="Lưu League of Legends vào game đã lưu"><span aria-hidden="true">♡</span><span class="favorite-label">Lưu</span></button><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" alt="Tay cầm chơi game trong không gian tối" loading="lazy"><span class="game-index">GAME / 002</span><span class="game-type">MOBA</span></div><div class="game-body"><div class="game-title-row"><h3>League of Legends</h3><span class="game-symbol">↗</span></div><p>Macro, giao tranh và phối hợp đồng đội — mỗi quyết định đều có giá trị.</p><div class="card-foot"><span>Strategy · Teamplay</span><button class="game-details-trigger" type="button" data-game-details="lol" aria-haspopup="dialog">Chi tiết ↗</button></div></div></article>
+          <article class="game-card reveal" data-category="fps" data-name="counter strike 2 cs2 fps tactical" data-game="cs2" data-official="https://www.counter-strike.net/cs2"><div class="game-art"><button class="favorite-btn" type="button" data-favorite="cs2" aria-pressed="false" aria-label="Lưu Counter-Strike 2 vào game đã lưu"><span aria-hidden="true">♡</span><span class="favorite-label">Lưu</span></button><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=800&q=80" alt="Bộ máy tính gaming với ánh sáng RGB" loading="lazy"><span class="game-index">GAME / 003</span><span class="game-type">COMPETITIVE FPS</span></div><div class="game-body"><div class="game-title-row"><h3>Counter-Strike 2</h3><span class="game-symbol">↗</span></div><p>Kỹ năng cơ bản, giao tiếp rõ ràng và những pha clutch không tưởng.</p><div class="card-foot"><span>Aim · Tactics</span><button class="game-details-trigger" type="button" data-game-details="cs2" aria-haspopup="dialog">Chi tiết ↗</button></div></div></article>
+          <article class="game-card reveal" data-category="br" data-name="apex legends battle royale fps" data-game="apex" data-official="https://www.ea.com/games/apex-legends/apex-legends"><div class="game-art"><button class="favorite-btn" type="button" data-favorite="apex" aria-pressed="false" aria-label="Lưu Apex Legends vào game đã lưu"><span aria-hidden="true">♡</span><span class="favorite-label">Lưu</span></button><img src="https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=800&q=80" alt="Bộ điều khiển và phụ kiện chơi game" loading="lazy"><span class="game-index">GAME / 004</span><span class="game-type">BATTLE ROYALE</span></div><div class="game-body"><div class="game-title-row"><h3>Apex Legends</h3><span class="game-symbol">↗</span></div><p>Di chuyển thông minh, chọn vị trí chuẩn và tạo lợi thế cho squad.</p><div class="card-foot"><span>Movement · Squad</span><button class="game-details-trigger" type="button" data-game-details="apex" aria-haspopup="dialog">Chi tiết ↗</button></div></div></article>
+          <article class="game-card reveal" data-category="rpg" data-name="genshin impact action rpg open world" data-game="genshin" data-official="https://genshin.hoyoverse.com/"><div class="game-art"><button class="favorite-btn" type="button" data-favorite="genshin" aria-pressed="false" aria-label="Lưu Genshin Impact vào game đã lưu"><span aria-hidden="true">♡</span><span class="favorite-label">Lưu</span></button><img src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=800&q=80" alt="Không gian công nghệ với ánh sáng nhiều màu" loading="lazy"><span class="game-index">GAME / 005</span><span class="game-type">ACTION RPG</span></div><div class="game-body"><div class="game-title-row"><h3>Genshin Impact</h3><span class="game-symbol">↗</span></div><p>Mở rộng thế giới, thử đội hình và tận hưởng hành trình theo nhịp riêng.</p><div class="card-foot"><span>Explore · Build</span><button class="game-details-trigger" type="button" data-game-details="genshin" aria-haspopup="dialog">Chi tiết ↗</button></div></div></article>
+          <article class="game-card reveal" data-category="rpg" data-name="elden ring soulslike action rpg" data-game="elden-ring" data-official="https://en.bandainamcoent.eu/elden-ring/elden-ring"><div class="game-art"><button class="favorite-btn" type="button" data-favorite="elden-ring" aria-pressed="false" aria-label="Lưu Elden Ring vào game đã lưu"><span aria-hidden="true">♡</span><span class="favorite-label">Lưu</span></button><img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80" alt="Phong cảnh kỳ ảo phủ sương" loading="lazy"><span class="game-index">GAME / 006</span><span class="game-type">ACTION RPG</span></div><div class="game-body"><div class="game-title-row"><h3>Elden Ring</h3><span class="game-symbol">↗</span></div><p>Khám phá, thử thách giới hạn và tự viết nên hành trình của riêng mình.</p><div class="card-foot"><span>Explore · Challenge</span><button class="game-details-trigger" type="button" data-game-details="elden-ring" aria-haspopup="dialog">Chi tiết ↗</button></div></div></article>
+          <div class="empty-state" id="emptyState" aria-live="polite">Không tìm thấy game phù hợp. Thử từ khóa hoặc thể loại khác nhé.</div>
         </div>
       </div>
     </section>
@@ -231,17 +296,37 @@
           <article class="signal-card reveal" data-number="02"><div class="signal-top"><span class="signal-label">Setup lab / 002</span><span class="signal-icon">⌘</span></div><div class="signal-content"><h3>Setup đẹp.<br>Chơi thoải mái.</h3><p>Ánh sáng, tư thế, âm thanh và góc bàn có thể giúp những buổi chơi dài dễ chịu hơn.</p></div><div class="signal-bottom"><span>GAMING SPACE</span><a href="#community">Xem hướng đi ↗</a></div></article>
           <article class="signal-card reveal" data-number="03"><div class="signal-top"><span class="signal-label">Queue theory / 003</span><span class="signal-icon">⌖</span></div><div class="signal-content"><h3>Reset mental.<br>Reset trận.</h3><p>Biết lúc nào nên nghỉ, xem lại quyết định và quay lại với một kế hoạch rõ ràng.</p></div><div class="signal-bottom"><span>PLAYER MINDSET</span><a href="#community">Lên cấp tiếp ↗</a></div></article>
         </div>
-        <div class="section-note">NỘI DUNG KHỞI ĐẦU CỦA LEVELUP · SẼ ĐƯỢC MỞ RỘNG THEO CỘNG ĐỒNG</div>
+        <div class="section-note">GỢI Ý THỰC HÀNH · KHÁM PHÁ THÊM QUA CÁC NGUỒN CHÍNH THỨC</div>
       </div>
     </section>
 
     <section class="community" id="community">
-      <div class="wrap"><div class="community-panel reveal"><div><div class="eyebrow">03 / Your move</div><h2>READY TO<br>LEVEL UP?</h2><p>Game thủ không ngừng tiến bộ. LevelUP đang xây dựng một điểm hẹn cho những người thích khám phá game, nâng cấp trải nghiệm và chia sẻ văn hóa gaming.</p></div><div class="community-actions"><a class="btn btn-primary" href="#games">Bắt đầu khám phá <span class="arrow">↗</span></a><a class="btn btn-secondary" href="#signals">Đọc gaming signals <span class="arrow">↓</span></a><div class="community-code">// MORE FEATURES. MORE LEVELS. IN PROGRESS.</div></div></div></div>
+      <div class="wrap"><div class="community-panel reveal"><div><div class="eyebrow">03 / Your move</div><h2>READY TO<br>LEVEL UP?</h2><p>Tìm tựa game hợp gu, xem thông tin cơ bản, lưu lựa chọn yêu thích ngay trên thiết bị và mở trang chính thức để tìm hiểu hoặc tải game.</p></div><div class="community-actions"><a class="btn btn-primary" href="#games">Khám phá game <span class="arrow">↗</span></a><button class="btn btn-secondary" type="button" id="communitySavedButton">Mở game đã lưu <span class="arrow">↗</span></button><div class="community-code">// DISCOVER. SAVE YOUR PICKS. OPEN OFFICIAL SOURCES.</div></div></div></div>
     </section>
   </main>
 
+  
+  <dialog class="game-dialog" id="gameDialog" aria-labelledby="dialogTitle">
+    <div class="dialog-shell">
+      <div class="dialog-art"><img id="dialogArt" alt="" src=""></div>
+      <div class="dialog-content">
+        <button class="dialog-close" id="dialogClose" type="button" aria-label="Đóng cửa sổ">×</button>
+        <div class="eyebrow" id="dialogEyebrow">GAME DATABASE / DETAILS</div>
+        <h2 id="dialogTitle">Game title</h2>
+        <p id="dialogDescription"></p>
+        <dl class="dialog-facts"><div><dt>THỂ LOẠI</dt><dd id="dialogCategory"></dd></div><div><dt>NỀN TẢNG</dt><dd id="dialogPlatforms"></dd></div></dl>
+        <div class="dialog-actions">
+          <a class="dialog-link dialog-link-primary" id="dialogOfficial" href="#" target="_blank" rel="noopener noreferrer">Trang chính thức ↗</a>
+          <a class="dialog-link" id="dialogStore" href="#" target="_blank" rel="noopener noreferrer" hidden>Trang cửa hàng ↗</a>
+          <button class="dialog-link dialog-save" id="dialogFavorite" type="button">♡ Lưu vào radar</button>
+        </div>
+        <p class="dialog-note">Liên kết mở trang chính thức của nhà phát hành hoặc cửa hàng. Game được lưu trong trình duyệt trên thiết bị này.</p>
+      </div>
+    </div>
+  </dialog>
+
   <footer>
-    <div class="wrap"><div class="footer-main"><div class="footer-brand"><a class="brand" href="#home"><span class="brand-mark">LU</span><span class="brand-word">LEVEL<span>UP</span></span></a><p>Không chỉ chơi game. Làm chủ cuộc chơi. Gaming culture for the next level.</p></div><div class="footer-links"><a href="#games">Game hub</a><a href="#signals">Gaming signals</a><a href="#community">Cộng đồng</a><a href="#home">Về đầu trang ↑</a></div></div><div class="footer-bottom"><span>© <span id="year"></span> LEVELUP / GAMING CULTURE</span><span>BUILT FOR PLAYERS, BY PLAYERS-AT-HEART</span><span class="status">● SYSTEM READY</span></div></div>
+    <div class="wrap"><div class="footer-main"><div class="footer-brand"><a class="brand" href="#home"><span class="brand-mark">LU</span><span class="brand-word">LEVEL<span>UP</span></span></a><p>Không chỉ chơi game. Làm chủ cuộc chơi. Gaming culture for the next level.</p></div><div class="footer-links"><a href="#games">Game hub</a><a href="#signals">Gaming signals</a><a href="#community">Về LevelUP</a><a href="#home">Về đầu trang ↑</a></div></div><div class="footer-bottom"><span>© <span id="year"></span> LEVELUP / GAMING CULTURE</span><span>BUILT FOR PLAYERS, BY PLAYERS-AT-HEART</span><span class="status">● SYSTEM READY</span></div></div>
   </footer>
 
   <script>
@@ -272,9 +357,7 @@
       var ctx=canvas.getContext('2d');
       if(!ctx)return;
       var width=0,height=0,dpr=1,columns=0,drops=[],raf=null,last=0;
-      var chars='01ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]{}/*+=#
-</html>
-;
+      var chars='01ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]{}/*+=#$';
       function resize(){
         dpr=Math.min(window.devicePixelRatio||1,1.5);
         width=window.innerWidth;height=window.innerHeight;
@@ -310,5 +393,103 @@
       document.addEventListener('visibilitychange',function(){if(document.hidden)stop();else start();});
     })();
   </script>
+
+  <script>
+    (function(){
+      'use strict';
+      var games = {
+        'valorant': {title:'Valorant',category:'Tactical FPS',platforms:'PC (Windows)',description:'Game bắn súng chiến thuật 5v5 của Riot Games, kết hợp kỹ năng ngắm bắn với bộ kỹ năng riêng của từng đặc vụ.',official:'https://playvalorant.com/',store:''},
+        'lol': {title:'League of Legends',category:'MOBA',platforms:'PC (Windows, macOS)',description:'MOBA 5v5 của Riot Games, tập trung vào chọn tướng, kiểm soát mục tiêu, phối hợp đội hình và ra quyết định trong trận.',official:'https://www.leagueoflegends.com/',store:''},
+        'cs2': {title:'Counter-Strike 2',category:'Competitive FPS',platforms:'PC (Windows, Linux)',description:'Game FPS chiến thuật theo vòng đấu, nơi kỹ năng ngắm bắn, kinh tế đội và phối hợp chiến thuật quyết định kết quả.',official:'https://www.counter-strike.net/cs2',store:'https://store.steampowered.com/app/730/CounterStrike_2/'},
+        'apex': {title:'Apex Legends',category:'Battle Royale / FPS',platforms:'PC, PlayStation, Xbox',description:'Battle royale theo đội với các Legend có kỹ năng riêng, nhấn mạnh di chuyển, giao tiếp và phối hợp giao tranh.',official:'https://www.ea.com/games/apex-legends/apex-legends',store:'https://store.steampowered.com/app/1172470/Apex_Legends/'},
+        'genshin': {title:'Genshin Impact',category:'Open-world Action RPG',platforms:'PC, PlayStation, Xbox, iOS, Android',description:'Action RPG thế giới mở của HoYoverse, tập trung khám phá Teyvat, xây dựng đội hình nguyên tố và hoàn thành nhiệm vụ.',official:'https://genshin.hoyoverse.com/',store:''},
+        'elden-ring': {title:'Elden Ring',category:'Action RPG / Soulslike',platforms:'PC, PlayStation, Xbox',description:'Action RPG thế giới mở của FromSoftware, nổi bật với chiến đấu thử thách, khám phá và xây dựng nhân vật linh hoạt.',official:'https://en.bandainamcoent.eu/elden-ring/elden-ring',store:'https://store.steampowered.com/app/1245620/ELDEN_RING/'}
+      };
+      var storageKey='levelup:saved-games:v1',savedGames=new Set(),cards=Array.prototype.slice.call(document.querySelectorAll('.game-card[data-game]'));
+      var filterButtons=Array.prototype.slice.call(document.querySelectorAll('.filter-btn')),search=document.getElementById('gameSearch');
+      var empty=document.getElementById('emptyState'),resultCount=document.getElementById('gameResultCount'),savedCount=document.getElementById('savedCount');
+      var activeFilter='all',currentGame='',dialog=document.getElementById('gameDialog');
+      var dialogTitle=document.getElementById('dialogTitle'),dialogDescription=document.getElementById('dialogDescription'),dialogCategory=document.getElementById('dialogCategory'),dialogPlatforms=document.getElementById('dialogPlatforms');
+      var dialogArt=document.getElementById('dialogArt'),dialogOfficial=document.getElementById('dialogOfficial'),dialogStore=document.getElementById('dialogStore'),dialogFavorite=document.getElementById('dialogFavorite');
+      var communitySavedButton=document.getElementById('communitySavedButton');
+      function loadSaved(){try{var value=JSON.parse(window.localStorage.getItem(storageKey)||'[]');return Array.isArray(value)?value.filter(function(id){return !!games[id];}):[];}catch(error){return [];}}
+      function persistSaved(){try{window.localStorage.setItem(storageKey,JSON.stringify(Array.from(savedGames)));}catch(error){/* Site remains usable if local storage is blocked. */}}
+      function renderFavorites(){
+        cards.forEach(function(card){
+          var id=card.getAttribute('data-game'),button=card.querySelector('.favorite-btn'),isSaved=savedGames.has(id);
+          if(button){
+            button.classList.toggle('is-saved',isSaved);button.setAttribute('aria-pressed',String(isSaved));
+            button.setAttribute('aria-label',(isSaved?'Bỏ lưu ':'Lưu ')+(games[id]||{}).title+' '+(isSaved?'khỏi':'vào')+' game đã lưu');
+            button.innerHTML=isSaved?'<span aria-hidden="true">♥</span><span class="favorite-label">Đã lưu</span>':'<span aria-hidden="true">♡</span><span class="favorite-label">Lưu</span>';
+          }
+        });
+        if(savedCount)savedCount.textContent=String(savedGames.size);
+        if(dialogFavorite&&currentGame){var isCurrentSaved=savedGames.has(currentGame);dialogFavorite.setAttribute('aria-pressed',String(isCurrentSaved));dialogFavorite.innerHTML=isCurrentSaved?'♥ Đã lưu vào radar':'♡ Lưu vào radar';}
+      }
+      function setActiveFilter(nextFilter){
+        activeFilter=nextFilter;
+        filterButtons.forEach(function(button){var active=button.getAttribute('data-filter')===activeFilter;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));});
+        filterGames();
+      }
+      function filterGames(){
+        var query=search?search.value.trim().toLocaleLowerCase('vi-VN'):'',visible=0;
+        cards.forEach(function(card){
+          var id=card.getAttribute('data-game'),game=games[id]||{};
+          var searchText=((card.getAttribute('data-name')||'')+' '+game.title+' '+game.category+' '+game.platforms).toLocaleLowerCase('vi-VN');
+          var matchesQuery=!query||searchText.indexOf(query)>-1;
+          var matchesCategory=activeFilter==='all'||(activeFilter==='saved'?savedGames.has(id):card.getAttribute('data-category')===activeFilter);
+          var show=matchesQuery&&matchesCategory;card.hidden=!show;if(show)visible++;
+        });
+        if(empty){empty.style.display=visible?'none':'block';empty.textContent=activeFilter==='saved'&&!savedGames.size?'Radar của bạn đang trống. Nhấn ♡ trên thẻ game để lưu tựa bạn muốn khám phá.':'Không tìm thấy game phù hợp. Thử từ khóa hoặc thể loại khác nhé.';}
+        if(resultCount)resultCount.textContent=visible+' / '+cards.length+' TỰA GAME HIỂN THỊ';
+      }
+      function toggleFavorite(id){if(!games[id])return;if(savedGames.has(id))savedGames.delete(id);else savedGames.add(id);persistSaved();renderFavorites();filterGames();}
+      function openDetails(id){
+        var game=games[id],card=cards.find(function(item){return item.getAttribute('data-game')===id;});
+        if(!game||!card||!dialog)return;
+        currentGame=id;dialogTitle.textContent=game.title;dialogDescription.textContent=game.description;dialogCategory.textContent=game.category;dialogPlatforms.textContent=game.platforms;
+        var image=card.querySelector('.game-art img');if(image){dialogArt.src=image.currentSrc||image.src;dialogArt.alt='Ảnh đại diện cho '+game.title;}
+        var index=card.querySelector('.game-index');document.getElementById('dialogEyebrow').textContent=(index?index.textContent:'GAME')+' / DETAILS';
+        dialogOfficial.href=game.official;dialogStore.hidden=!game.store;if(game.store)dialogStore.href=game.store;
+        renderFavorites();if(typeof dialog.showModal==='function')dialog.showModal();else dialog.setAttribute('open','');
+      }
+      function closeDetails(){if(dialog&&typeof dialog.close==='function'&&dialog.open)dialog.close();else if(dialog)dialog.removeAttribute('open');}
+      cards.forEach(function(card){
+        card.addEventListener('click',function(event){
+          var favorite=event.target.closest('.favorite-btn');
+          if(favorite){event.preventDefault();event.stopPropagation();toggleFavorite(favorite.getAttribute('data-favorite'));return;}
+          var details=event.target.closest('.game-details-trigger');if(details)openDetails(details.getAttribute('data-game-details'));
+        });
+        card.addEventListener('pointermove',function(event){
+          if(event.pointerType==='touch'||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+          var rect=card.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top;
+          card.style.setProperty('--spot-x',x+'px');card.style.setProperty('--spot-y',y+'px');
+          if(window.matchMedia('(hover:hover) and (pointer:fine)').matches){card.style.setProperty('--tilt-x',(((x/rect.width)-.5)*7).toFixed(2)+'deg');card.style.setProperty('--tilt-y',((.5-y/rect.height)*6).toFixed(2)+'deg');}
+        },{passive:true});
+        card.addEventListener('pointerleave',function(){card.style.setProperty('--tilt-x','0deg');card.style.setProperty('--tilt-y','0deg');});
+      });
+      filterButtons.forEach(function(button){button.addEventListener('click',function(){setActiveFilter(button.getAttribute('data-filter'));});});
+      if(search)search.addEventListener('input',filterGames);
+      if(dialog){
+        document.getElementById('dialogClose').addEventListener('click',closeDetails);
+        dialog.addEventListener('click',function(event){if(event.target===dialog)closeDetails();});
+        dialogFavorite.addEventListener('click',function(){toggleFavorite(currentGame);});
+      }
+      if(communitySavedButton)communitySavedButton.addEventListener('click',function(){setActiveFilter('saved');document.getElementById('games').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});});
+      var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches,aura=document.getElementById('cursorAura');
+      if(aura&&!reduceMotion&&window.matchMedia('(hover:hover) and (pointer:fine)').matches){window.addEventListener('pointermove',function(event){aura.style.left=event.clientX+'px';aura.style.top=event.clientY+'px';},{passive:true});}else if(aura)aura.remove();
+      var progress=document.getElementById('scrollProgress'),scrollPending=false;
+      function updateScrollProgress(){var max=document.documentElement.scrollHeight-window.innerHeight,value=max>0?Math.min(1,Math.max(0,window.scrollY/max)):0;if(progress)progress.style.transform='scaleX('+value+')';scrollPending=false;}
+      window.addEventListener('scroll',function(){if(!scrollPending){scrollPending=true;window.requestAnimationFrame(updateScrollProgress);}},{passive:true});
+      window.addEventListener('resize',updateScrollProgress,{passive:true});
+      var terminalLines=Array.prototype.slice.call(document.querySelectorAll('[data-typewriter]'));
+      if(!reduceMotion)terminalLines.forEach(function(line,index){
+        var finalText=line.getAttribute('data-typewriter')||line.textContent;line.textContent='';
+        window.setTimeout(function(){var pos=0;function typeNext(){if(pos>=finalText.length)return;line.textContent+=finalText.charAt(pos++);window.setTimeout(typeNext,24);}typeNext();},index*420+250);
+      });
+      savedGames=new Set(loadSaved());renderFavorites();filterGames();updateScrollProgress();
+    })();
+  </script>
+
 </body>
 </html>
