@@ -13,7 +13,7 @@ export type Game = {
   artSecondary: string;
 };
 
-export const games: Game[
+export const games: Game[] = [
   {
     slug: "valorant",
     title: "VALORANT",
