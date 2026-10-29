@@ -7,10 +7,11 @@ import { useGameLibrary } from "@/components/game-library-provider";
 import type { Game } from "@/lib/games";
 import { isGameLibraryEntryActive, type GameLibraryStatus } from "@/lib/game-library";
 
-type LockerFilter = "all" | GameLibraryStatus;
+type LockerFilter = "all" | "favorites" | GameLibraryStatus;
 
 const filterOptions: { value: LockerFilter; label: string }[] = [
   { value: "all", label: "Tất cả" },
+  { value: "favorites", label: "Yêu thích" },
   { value: "playing", label: "Đang chơi" },
   { value: "wishlist", label: "Muốn chơi" },
   { value: "completed", label: "Đã hoàn thành" },
@@ -86,11 +87,13 @@ export function GameLocker({ games }: GameLockerProps) {
   );
 
   const visibleGames = savedGames.filter((game) =>
-    activeFilter === "all" || library[game.slug]?.status === activeFilter
+    activeFilter === "all" || (activeFilter === "favorites" ? Boolean(library[game.slug]?.isFavorite) : library[game.slug]?.status === activeFilter)
   );
   const countByFilter = (filter: LockerFilter) => filter === "all"
     ? savedGames.length
-    : savedGames.filter((game) => library[game.slug]?.status === filter).length;
+    : filter === "favorites"
+      ? savedGames.filter((game) => Boolean(library[game.slug]?.isFavorite)).length
+      : savedGames.filter((game) => library[game.slug]?.status === filter).length;
 
   return (
     <section className="section game-locker-section">
