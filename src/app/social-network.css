@@ -247,3 +247,11 @@ button:not(:disabled) { touch-action: manipulation; }
 .catalog-load-more .btn {
   min-width: min(100%, 260px);
 }
+
+.catalog-source-note {
+  max-width: 72ch;
+  margin-top: 0.65rem;
+  color: var(--muted, #8d96a8);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}

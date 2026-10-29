@@ -33,6 +33,7 @@ export default async function GamesPage() {
           <h1>GAME<br /><span>LIBRARY.</span></h1>
           <p>Tra cứu kho game được đồng bộ từ nguồn dữ liệu thực. Tìm kiếm và lọc trực tiếp trên máy chủ; trình duyệt chỉ tải từng trang nhỏ để luôn nhanh kể cả khi kho có hàng trăm nghìn tựa game.</p>
           <p className="catalog-meta">{catalog.available ? catalog.total.toLocaleString("vi-VN") + " tựa game trong kho dữ liệu" : "Kho dữ liệu đang kết nối"}</p>
+          <p className="catalog-source-note">Nguồn hiện tại: SteamSpy / Steam (PC). Chỉ số người chơi và lượng sở hữu là ước tính; dữ liệu console và mobile cần nguồn đa nền tảng bổ sung.</p>
         </div>
       </section>
       <section className="section">
