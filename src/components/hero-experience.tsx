@@ -9,6 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { GameArtwork } from "@/components/game-artwork";
+import { HeroAtmosphere } from "@/components/hero-atmosphere";
 import type { Game } from "@/lib/games";
 
 const FEATURED_ORDER = [
@@ -187,6 +188,7 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
               <div className="hero-cinematic-vignette" aria-hidden="true" />
               <div className="hero-cinematic-grain" aria-hidden="true" />
               <div className="hero-stage-spotlight" aria-hidden="true" />
+              <HeroAtmosphere />
               <div className="hero-stage-topbar">
                 <span><i /> FEATURED SIGNAL / 00{Math.max(1, curatedGames.findIndex((game) => game.slug === activeGame.slug) + 1)}</span>
                 <span className="hero-stage-live">LIVE SELECT</span>
