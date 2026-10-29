@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { GameCard } from "@/components/game-card";
 import { useGameLibrary } from "@/components/game-library-provider";
 import { isGameLibraryEntryActive } from "@/lib/game-library";
@@ -50,7 +50,6 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
   const [error, setError] = useState("");
   const [savedProfileGames, setSavedProfileGames] = useState<Game[]>([]);
   const [retry, setRetry] = useState(0);
-  const firstRequest = useRef(true);
 
   const activeSavedSlugs = useMemo(
     () => Object.entries(library)
@@ -99,7 +98,6 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
   }, [platform, query, selectedGenres]);
 
   useEffect(() => {
-    if (firstRequest.current) firstRequest.current = false;
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       setLoading(true);
