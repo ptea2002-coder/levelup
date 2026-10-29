@@ -40,6 +40,12 @@ export type GameCatalogPage = {
   available: boolean;
 };
 
+export type GameCatalogFacets = {
+  categories: string[];
+  platforms: string[];
+  available: boolean;
+};
+
 export type GameCatalogQuery = {
   query?: string;
   category?: string;
@@ -175,6 +181,37 @@ export async function getGamesPage(params: GameCatalogQuery = {}): Promise<GameC
   };
 }
 
+export async function getGameCatalogFacets(): Promise<GameCatalogFacets> {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) {
+    if (process.env.NODE_ENV !== "development") {
+      return { categories: [], platforms: [], available: false };
+    }
+    return {
+      categories: [...new Set(starterGames.map((game) => game.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "vi")),
+      platforms: [...new Set(starterGames.flatMap((game) => game.platforms).filter(Boolean))].sort((a, b) => a.localeCompare(b, "vi")),
+      available: true,
+    };
+  }
+
+  const { data, error } = await supabase.rpc("get_game_catalog_facets");
+  if (error) {
+    if (process.env.NODE_ENV === "development") console.warn("LevelUP: catalog facets query failed.", error.message);
+    return { categories: [], platforms: [], available: false };
+  }
+
+  const result = data as { categories?: unknown; platforms?: unknown } | null;
+  const normalize = (value: unknown) => Array.isArray(value)
+    ? [...new Set(value.filter((item): item is string => typeof item === "string").map((item) => item.trim()).filter(Boolean))]
+    : [];
+
+  return {
+    categories: normalize(result?.categories),
+    platforms: normalize(result?.platforms),
+    available: true,
+  };
+}
+
 export async function getGameBySlug(slug: string): Promise<Game | undefined> {
   const supabase = getSupabaseServerClient();
   if (!supabase) {
@@ -214,6 +251,44 @@ export async function getRelatedGames(game: Game, limit = 3): Promise<Game[]> {
   return ((data ?? []) as unknown as GameRow[]).map(fromRow);
 }
 
-export async function getSitemapGames(limit = 5000): Promise<Game[]> {
-  return getGames(limit);
+export async function getSitemapGameSlugs(): Promise<string[]> {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) {
+    return process.env.NODE_ENV === "development" ? starterGames.map((game) => game.slug) : [];
+  }
+
+  const { count, error: countError } = await supabase
+    .from("games")
+    .select("slug", { count: "exact", head: true })
+    .eq("is_catalog_visible", true);
+
+  if (countError) {
+    if (process.env.NODE_ENV === "development") console.warn("LevelUP: sitemap count query failed.", countError.message);
+    return [];
+  }
+
+  const pageSize = 1000;
+  const offsets = Array.from({ length: Math.ceil((count ?? 0) / pageSize) }, (_, index) => index * pageSize);
+  const pages = await Promise.all(offsets.map(async (offset) => {
+    const result = await supabase
+      .from("games")
+      .select("slug")
+      .eq("is_catalog_visible", true)
+      .order("slug", { ascending: true })
+      .range(offset, offset + pageSize - 1);
+    return { offset, ...result };
+  }));
+
+  const failedPage = pages.find((page) => page.error);
+  if (failedPage) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("LevelUP: sitemap page query failed at offset " + failedPage.offset + ".", failedPage.error?.message);
+    }
+    return [];
+  }
+
+  return pages
+    .flatMap((page) => page.data ?? [])
+    .map((row) => row.slug)
+    .filter((slug): slug is string => typeof slug === "string" && slug.length > 0);
 }
