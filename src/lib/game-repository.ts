@@ -124,11 +124,14 @@ function localSearch(params: GameCatalogQuery): GameCatalogPage {
   if (params.sort === "name") results = [...results].sort((a, b) => a.title.localeCompare(b.title, "vi"));
   if (params.sort === "newest") results = [...results].sort((a, b) => b.releaseYear - a.releaseYear);
   if (params.sort === "positive") results = [...results].sort((a, b) => {
+    const score = (game: Game) => {
+      const positive = game.positiveReviews ?? 0;
+      const total = positive + (game.negativeReviews ?? 0);
+      return (positive + 1500 * 0.75) / (total + 1500);
+    };
     const totalA = (a.positiveReviews ?? 0) + (a.negativeReviews ?? 0);
     const totalB = (b.positiveReviews ?? 0) + (b.negativeReviews ?? 0);
-    const rateA = totalA > 0 ? (a.positiveReviews ?? 0) / totalA : -1;
-    const rateB = totalB > 0 ? (b.positiveReviews ?? 0) / totalB : -1;
-    return rateB - rateA || totalB - totalA || (b.positiveReviews ?? 0) - (a.positiveReviews ?? 0);
+    return score(b) - score(a) || totalB - totalA || (b.positiveReviews ?? 0) - (a.positiveReviews ?? 0);
   });
   if (params.sort === "recommended") results = [...results].sort((a, b) => {
     const score = (game: Game) => {
