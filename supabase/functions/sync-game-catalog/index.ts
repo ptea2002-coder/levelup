@@ -103,12 +103,12 @@ Deno.serve(async (request: Request) => {
     }
 
     const ids = apps.map((app) => String(app.appid));
-    const existingBySourceId = new Map<string, { slug: string }>();
+    const existingBySourceId = new Map<string, Record<string, unknown>>();
     for (let index = 0; index < ids.length; index += 200) {
-      const result = await supabase.from("games").select("slug,source_id")
+      const result = await supabase.from("games").select("slug,source_id,source_provider,source_metadata,igdb_id,igdb_synced_at,source_synced_at,category,genres,platforms,developer,release_year,description,official_url,mark,art_primary,art_secondary,cover_url,background_url,short_description")
         .eq("source_provider", "steamspy").in("source_id", ids.slice(index, index + 200));
       if (result.error) throw new Error("Could not load existing source IDs: " + result.error.message);
-      for (const row of result.data ?? []) existingBySourceId.set(String(row.source_id), { slug: row.slug });
+      for (const row of result.data ?? []) existingBySourceId.set(String(row.source_id), row as unknown as Record<string, unknown>);
     }
 
     const baseSlugs = apps.map((app) => curatedSlugByAppId[Number(app.appid)] ?? slugify(app.name));
@@ -131,7 +131,8 @@ Deno.serve(async (request: Request) => {
       const existingSource = existingBySourceId.get(String(appId));
       const curated = existingBySlug.get(baseSlug);
       const isCurated = Boolean(curated && (!curated.source_provider || curated.slug === curatedSlugByAppId[appId]));
-      let slug = existingSource?.slug ?? baseSlug;
+      const isIgdbEnriched = Boolean(existingSource?.igdb_id);
+      let slug = String(existingSource?.slug ?? baseSlug);
       if (!existingSource && !isCurated && (usedSlugs.has(baseSlug) || seenThisPage.has(baseSlug))) slug = baseSlug + "-steam-" + appId;
       if (seenThisPage.has(slug)) slug = baseSlug + "-steam-" + appId;
       seenThisPage.add(slug);
@@ -139,31 +140,77 @@ Deno.serve(async (request: Request) => {
 
       const coverUrl = "https://cdn.akamai.steamstatic.com/steam/apps/" + appId + "/header.jpg";
       const backgroundUrl = "https://cdn.akamai.steamstatic.com/steam/apps/" + appId + "/library_hero.jpg";
+      const existingGenres = Array.isArray(existingSource?.genres) ? existingSource.genres.filter((value): value is string => typeof value === "string") : [];
+      const curatedGenres = Array.isArray(curated?.genres) ? curated.genres.filter((value): value is string => typeof value === "string") : [];
+      const existingPlatforms = Array.isArray(existingSource?.platforms) ? existingSource.platforms.filter((value): value is string => typeof value === "string") : [];
+      const curatedPlatforms = Array.isArray(curated?.platforms) ? curated.platforms.filter((value): value is string => typeof value === "string") : [];
+      const metadata = existingSource?.source_metadata && typeof existingSource.source_metadata === "object" && !Array.isArray(existingSource.source_metadata)
+        ? existingSource.source_metadata as Record<string, unknown>
+        : {};
+
       return {
         ...(isCurated ? curated : {}),
         slug,
-        title: isCurated ? String(curated?.title ?? app.name) : app.name.trim(),
-        category: isCurated ? String(curated?.category ?? "PC Game") : "PC Game",
-        release_year: isCurated ? Number(curated?.release_year ?? 0) : 0,
-        mark: isCurated ? String(curated?.mark ?? makeMark(app.name)) : makeMark(app.name),
-        description: isCurated ? String(curated?.description ?? "") : "",
-        genres: isCurated ? (curated?.genres ?? []) : [],
-        platforms: isCurated ? (curated?.platforms ?? ["PC", "Steam"]) : ["PC", "Steam"],
-        developer: isCurated ? String(curated?.developer || app.developer || app.publisher || "Chưa cập nhật") : (app.developer || app.publisher || "Chưa cập nhật"),
-        official_url: isCurated ? String(curated?.official_url || "https://store.steampowered.com/app/" + appId + "/") : "https://store.steampowered.com/app/" + appId + "/",
-        art_primary: isCurated ? String(curated?.art_primary ?? "#7465ff") : "#7465ff",
-        art_secondary: isCurated ? String(curated?.art_secondary ?? "#111522") : "#111522",
+        title: isCurated
+          ? String(curated?.title ?? app.name)
+          : isIgdbEnriched
+            ? String(existingSource?.title ?? app.name)
+            : app.name.trim(),
+        category: isCurated
+          ? String(curated?.category ?? "PC Game")
+          : isIgdbEnriched
+            ? String(existingSource?.category ?? "PC Game")
+            : "PC Game",
+        release_year: isCurated
+          ? Number(curated?.release_year ?? 0)
+          : isIgdbEnriched
+            ? Number(existingSource?.release_year ?? 0)
+            : 0,
+        mark: isCurated
+          ? String(curated?.mark ?? makeMark(app.name))
+          : isIgdbEnriched
+            ? String(existingSource?.mark ?? makeMark(app.name))
+            : makeMark(app.name),
+        description: isCurated
+          ? String(curated?.description ?? "")
+          : isIgdbEnriched
+            ? String(existingSource?.description ?? "")
+            : "",
+        genres: isCurated
+          ? [...new Set([...curatedGenres, ...(isIgdbEnriched ? existingGenres : [])])]
+          : isIgdbEnriched ? existingGenres : [],
+        platforms: isCurated
+          ? [...new Set([...curatedPlatforms, ...(isIgdbEnriched ? existingPlatforms : [])])]
+          : isIgdbEnriched ? [...new Set([...existingPlatforms, "PC", "Steam"])] : ["PC", "Steam"],
+        developer: isCurated
+          ? String(curated?.developer || app.developer || app.publisher || "Chưa cập nhật")
+          : isIgdbEnriched
+            ? String(existingSource?.developer || app.developer || app.publisher || "Chưa cập nhật")
+            : (app.developer || app.publisher || "Chưa cập nhật"),
+        official_url: isCurated
+          ? String(curated?.official_url || "https://store.steampowered.com/app/" + appId + "/")
+          : isIgdbEnriched
+            ? String(existingSource?.official_url || "https://store.steampowered.com/app/" + appId + "/")
+            : "https://store.steampowered.com/app/" + appId + "/",
+        art_primary: isCurated
+          ? String(curated?.art_primary ?? "#7465ff")
+          : isIgdbEnriched ? String(existingSource?.art_primary ?? "#7465ff") : "#7465ff",
+        art_secondary: isCurated
+          ? String(curated?.art_secondary ?? "#111522")
+          : isIgdbEnriched ? String(existingSource?.art_secondary ?? "#111522") : "#111522",
         source_provider: "steamspy",
         source_id: String(appId),
-        cover_url: coverUrl,
-        background_url: backgroundUrl,
-        short_description: null,
+        cover_url: String(existingSource?.cover_url ?? coverUrl),
+        background_url: String(existingSource?.background_url ?? backgroundUrl),
+        short_description: isIgdbEnriched ? (existingSource?.short_description ?? null) : null,
         positive_reviews: Number(app.positive ?? 0),
         negative_reviews: Number(app.negative ?? 0),
         concurrent_players: Number(app.ccu ?? 0),
         owners_estimate: typeof app.owners === "string" ? app.owners : null,
         source_synced_at: syncedAt,
-        source_metadata: app,
+        igdb_id: isIgdbEnriched ? Number(existingSource?.igdb_id) : null,
+        igdb_synced_at: isIgdbEnriched ? (existingSource?.igdb_synced_at ?? null) : null,
+        source_metadata: { ...metadata, steamspy: app },
         is_catalog_visible: true,
       };
     });

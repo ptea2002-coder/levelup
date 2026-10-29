@@ -25,6 +25,9 @@ type GameRow = {
   concurrent_players?: number | null;
   owners_estimate?: string | null;
   source_synced_at?: string | null;
+  igdb_id?: number | null;
+  igdb_synced_at?: string | null;
+  source_metadata?: Record<string, unknown> | null;
 };
 
 const gameFields = [
@@ -32,6 +35,7 @@ const gameFields = [
   "genres", "platforms", "developer", "official_url", "art_primary", "art_secondary",
   "source_provider", "source_id", "cover_url", "background_url", "short_description",
   "positive_reviews", "negative_reviews", "concurrent_players", "owners_estimate", "source_synced_at",
+  "igdb_id", "igdb_synced_at",
 ].join(",");
 
 export type GameCatalogPage = {
@@ -79,6 +83,8 @@ function fromRow(row: GameRow): Game {
     concurrentPlayers: Number(row.concurrent_players ?? 0),
     ownersEstimate: row.owners_estimate ?? null,
     sourceSyncedAt: row.source_synced_at ?? null,
+    igdbId: row.igdb_id == null ? null : Number(row.igdb_id),
+    igdbSyncedAt: row.igdb_synced_at ?? null,
   };
 }
 
@@ -95,6 +101,21 @@ function localSearch(params: GameCatalogQuery): GameCatalogPage {
   });
   if (params.sort === "name") results = [...results].sort((a, b) => a.title.localeCompare(b.title, "vi"));
   if (params.sort === "newest") results = [...results].sort((a, b) => b.releaseYear - a.releaseYear);
+  if (params.sort === "positive") results = [...results].sort((a, b) => {
+    const totalA = (a.positiveReviews ?? 0) + (a.negativeReviews ?? 0);
+    const totalB = (b.positiveReviews ?? 0) + (b.negativeReviews ?? 0);
+    const rateA = totalA > 0 ? (a.positiveReviews ?? 0) / totalA : -1;
+    const rateB = totalB > 0 ? (b.positiveReviews ?? 0) / totalB : -1;
+    return rateB - rateA || totalB - totalA || (b.positiveReviews ?? 0) - (a.positiveReviews ?? 0);
+  });
+  if (params.sort === "recommended") results = [...results].sort((a, b) => {
+    const score = (game: Game) => {
+      const total = (game.positiveReviews ?? 0) + (game.negativeReviews ?? 0);
+      const ratio = total > 0 ? (game.positiveReviews ?? 0) / total : 0;
+      return ratio * 100 + Math.log10(total + 1) * 5 + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.5;
+    };
+    return score(b) - score(a) || a.title.localeCompare(b.title, "vi");
+  });
   const pageSize = Math.max(1, Math.min(params.pageSize ?? 24, 48));
   const page = Math.max(1, params.page ?? 1);
   const total = results.length;
@@ -228,28 +249,46 @@ export async function getGameBySlug(slug: string): Promise<Game | undefined> {
   return data ? fromRow(data as unknown as GameRow) : undefined;
 }
 
+function scoreRelatedGame(candidate: Game, base: Game): number {
+  const sharedGenres = base.genres.filter((genre) => candidate.genres.includes(genre)).length;
+  const sharedPlatforms = base.platforms.filter((platform) => platform !== "Steam" && candidate.platforms.includes(platform)).length;
+  const sameCategory = candidate.category === base.category ? 1 : 0;
+  const reviewCount = (candidate.positiveReviews ?? 0) + (candidate.negativeReviews ?? 0);
+  const reviewRate = reviewCount > 0 ? (candidate.positiveReviews ?? 0) / reviewCount : 0;
+  const popularity = Math.log10((candidate.concurrentPlayers ?? 0) + 1);
+  return sharedGenres * 12 + sameCategory * 7 + sharedPlatforms * 2 + reviewRate * 2 + Math.log10(reviewCount + 1) * 1.5 + popularity * 0.5;
+}
+
 export async function getRelatedGames(game: Game, limit = 3): Promise<Game[]> {
+  const safeLimit = Math.max(1, Math.min(limit, 12));
   const supabase = getSupabaseServerClient();
   if (!supabase) {
     return process.env.NODE_ENV === "development"
-      ? starterGames.filter((candidate) => candidate.slug !== game.slug && candidate.category === game.category).slice(0, limit)
+      ? starterGames.filter((candidate) => candidate.slug !== game.slug)
+        .sort((a, b) => scoreRelatedGame(b, game) - scoreRelatedGame(a, game) || a.title.localeCompare(b.title, "vi"))
+        .slice(0, safeLimit)
       : [];
   }
-
-  let query = supabase.from("games").select(gameFields).eq("is_catalog_visible", true).neq("slug", game.slug);
-  if (game.genres.length > 0) query = query.overlaps("genres", game.genres);
-  else query = query.eq("category", game.category);
-
-  const { data, error } = await query
-    .order("concurrent_players", { ascending: false, nullsFirst: false })
-    .order("title", { ascending: true })
-    .limit(Math.max(1, Math.min(limit, 12)));
-
-  if (error) {
-    if (process.env.NODE_ENV === "development") console.warn("LevelUP: related games query failed.", error.message);
+  const categoryQuery = supabase.from("games").select(gameFields)
+    .eq("is_catalog_visible", true).neq("slug", game.slug).eq("category", game.category)
+    .order("concurrent_players", { ascending: false, nullsFirst: false }).limit(60);
+  const genreQuery = game.genres.length > 0
+    ? supabase.from("games").select(gameFields)
+      .eq("is_catalog_visible", true).neq("slug", game.slug).overlaps("genres", game.genres)
+      .order("concurrent_players", { ascending: false, nullsFirst: false }).limit(60)
+    : Promise.resolve({ data: [], error: null });
+  const [byCategory, byGenre] = await Promise.all([categoryQuery, genreQuery]);
+  if (byCategory.error && byGenre.error) {
+    if (process.env.NODE_ENV === "development") console.warn("LevelUP: related games query failed.", byCategory.error.message, byGenre.error.message);
     return [];
   }
-  return ((data ?? []) as unknown as GameRow[]).map(fromRow);
+  const candidates = new Map<string, Game>();
+  for (const row of [...(byCategory.data ?? []), ...(byGenre.data ?? [])] as unknown as GameRow[]) {
+    if (row.slug && row.slug !== game.slug) candidates.set(row.slug, fromRow(row));
+  }
+  return [...candidates.values()]
+    .sort((a, b) => scoreRelatedGame(b, game) - scoreRelatedGame(a, game) || a.title.localeCompare(b.title, "vi"))
+    .slice(0, safeLimit);
 }
 
 export async function getSitemapGameSlugs(): Promise<string[]> {

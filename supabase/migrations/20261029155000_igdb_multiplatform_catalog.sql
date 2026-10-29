@@ -1,0 +1,167 @@
+create extension if not exists pg_cron with schema pg_catalog;
+create extension if not exists pg_net with schema extensions;
+
+alter table public.games
+  add column if not exists igdb_id bigint,
+  add column if not exists igdb_synced_at timestamptz;
+
+create unique index if not exists games_igdb_id_unique
+  on public.games (igdb_id)
+  where igdb_id is not null;
+
+create table if not exists public.game_igdb_sync_state (
+  id smallint primary key check (id = 1),
+  enabled boolean not null default false,
+  next_offset integer not null default 0 check (next_offset >= 0),
+  status text not null default 'idle' check (status in ('idle', 'running', 'retrying', 'complete')),
+  total_synced bigint not null default 0,
+  last_attempt_at timestamptz,
+  last_success_at timestamptz,
+  last_error text,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.game_igdb_sync_state enable row level security;
+revoke all on public.game_igdb_sync_state from public, anon, authenticated;
+grant all on public.game_igdb_sync_state to service_role;
+
+insert into public.game_igdb_sync_state (id, enabled, next_offset, status, total_synced)
+values (1, false, 0, 'idle', 0)
+on conflict (id) do nothing;
+
+create or replace function public.search_games_catalog(
+  p_query text default null,
+  p_category text default null,
+  p_platform text default null,
+  p_sort text default 'popular',
+  p_limit integer default 24,
+  p_offset integer default 0
+)
+returns jsonb
+language sql
+stable
+security invoker
+set search_path = public, extensions
+as $$
+  with filtered as materialized (
+    select
+      g.id, g.slug, g.title, g.category, g.genres, g.platforms, g.developer,
+      g.release_year, g.description, g.official_url, g.mark, g.art_primary,
+      g.art_secondary, g.source_provider, g.source_id, g.cover_url,
+      g.background_url, g.short_description, g.positive_reviews,
+      g.negative_reviews, g.concurrent_players, g.owners_estimate,
+      g.source_synced_at, g.igdb_id, g.igdb_synced_at
+    from public.games g
+    where g.is_catalog_visible = true
+      and (
+        coalesce(trim(p_query), '') = ''
+        or g.title ilike '%' || trim(p_query) || '%'
+        or coalesce(g.developer, '') ilike '%' || trim(p_query) || '%'
+        or coalesce(g.category, '') ilike '%' || trim(p_query) || '%'
+        or coalesce(g.description, '') ilike '%' || trim(p_query) || '%'
+        or coalesce(g.short_description, '') ilike '%' || trim(p_query) || '%'
+        or exists (
+          select 1 from unnest(coalesce(g.genres, '{}'::text[])) genre
+          where genre ilike '%' || trim(p_query) || '%'
+        )
+        or exists (
+          select 1 from unnest(coalesce(g.platforms, '{}'::text[])) p(platform_name)
+          where p.platform_name ilike '%' || trim(p_query) || '%'
+        )
+      )
+      and (
+        coalesce(trim(p_category), '') = ''
+        or g.category = trim(p_category)
+        or trim(p_category) = any(coalesce(g.genres, '{}'::text[]))
+      )
+      and (
+        coalesce(trim(p_platform), '') = ''
+        or trim(p_platform) = any(coalesce(g.platforms, '{}'::text[]))
+      )
+  ),
+  ranked as (
+    select filtered.*,
+      row_number() over (
+        order by
+          case when p_sort = 'newest' then nullif(release_year, 0) end desc nulls last,
+          case when p_sort in ('positive', 'recommended')
+            and (coalesce(positive_reviews, 0) + coalesce(negative_reviews, 0)) > 0
+            then positive_reviews::numeric / nullif(positive_reviews + negative_reviews, 0)
+          end desc nulls last,
+          case when p_sort in ('positive', 'recommended')
+            then positive_reviews + negative_reviews
+          end desc nulls last,
+          case when p_sort = 'popular' then concurrent_players end desc nulls last,
+          case when p_sort = 'recommended' then concurrent_players end desc nulls last,
+          case when p_sort <> 'name' then positive_reviews end desc nulls last,
+          title asc
+      ) as row_rank
+    from filtered
+  ),
+  page as (
+    select * from ranked
+    order by row_rank
+    limit greatest(1, least(coalesce(p_limit, 24), 48))
+    offset greatest(0, least(coalesce(p_offset, 0), 1000000))
+  )
+  select jsonb_build_object(
+    'items',
+    coalesce(
+      (select jsonb_agg(to_jsonb(page) - 'row_rank' order by page.row_rank) from page),
+      '[]'::jsonb
+    ),
+    'total', (select count(*) from filtered)
+  );
+$$;
+
+revoke all on function public.search_games_catalog(text, text, text, text, integer, integer) from public;
+grant execute on function public.search_games_catalog(text, text, text, text, integer, integer) to anon, authenticated;
+
+DO $$
+DECLARE
+  existing_job_id bigint;
+BEGIN
+  SELECT jobid INTO existing_job_id
+  FROM cron.job
+  WHERE jobname = 'levelup-igdb-catalog-sync';
+
+  IF existing_job_id IS NOT NULL THEN
+    PERFORM cron.unschedule(existing_job_id);
+  END IF;
+
+  PERFORM cron.schedule(
+    'levelup-igdb-catalog-sync',
+    '* * * * *',
+    $job$
+      WITH reset_completed AS (
+        UPDATE public.game_igdb_sync_state
+        SET status = 'idle',
+            next_offset = 0,
+            total_synced = 0,
+            last_attempt_at = NULL,
+            last_error = NULL,
+            updated_at = now()
+        WHERE id = 1
+          AND enabled = true
+          AND status = 'complete'
+          AND last_success_at < now() - interval '7 days'
+        RETURNING id
+      )
+      SELECT net.http_post(
+        url := 'https://ztzcpnyxgwhcdktpbxdq.supabase.co/functions/v1/sync-igdb-catalog',
+        headers := jsonb_build_object(
+          'Content-Type', 'application/json',
+          'x-catalog-sync-secret', (SELECT sync_secret FROM public.game_catalog_sync_state WHERE id = 1)
+        ),
+        body := '{}'::jsonb,
+        timeout_milliseconds := 60000
+      )
+      FROM public.game_igdb_sync_state
+      WHERE id = 1
+        AND enabled = true
+        AND status <> 'complete'
+        AND (last_attempt_at IS NULL OR last_attempt_at < now() - interval '55 seconds');
+    $job$
+  );
+END
+$$;

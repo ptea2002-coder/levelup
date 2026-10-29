@@ -21,6 +21,8 @@ export type Game = {
   concurrentPlayers?: number | null;
   ownersEstimate?: string | null;
   sourceSyncedAt?: string | null;
+  igdbId?: number | null;
+  igdbSyncedAt?: string | null;
 };
 
 export const games: Game[] = [

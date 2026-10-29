@@ -3529,3 +3529,17 @@ button.social-post-action { cursor: pointer; }
   }
   .gamer-command-shell::before { animation: none !important; }
 }
+
+
+/* P1 game profile metrics — source-aware and responsive */
+.detail-metrics-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; margin: 22px 0 24px; }
+.detail-metric-card { min-width: 0; display: flex; flex-direction: column; gap: 7px; padding: 14px; border: 1px solid var(--line); background: linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.012)); }
+.detail-metric-card > span { color: #8f98ac; font: 500 .58rem/1.5 var(--mono); letter-spacing: .08em; }
+.detail-metric-card strong { color: var(--lime); font: 800 clamp(1rem, 1.7vw, 1.45rem)/1.15 var(--display); overflow-wrap: anywhere; }
+.detail-metric-card small { color: #aeb5c6; font-size: .68rem; line-height: 1.55; overflow-wrap: anywhere; }
+@media (max-width: 539px) {
+  .detail-metrics-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .detail-metric-card { padding: 11px; }
+  .detail-metric-card > span { font-size: .52rem; }
+  .detail-metric-card strong { font-size: 1rem; }
+}

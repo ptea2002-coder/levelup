@@ -9,6 +9,8 @@ const migration = readFileSync(new URL("../supabase/migrations/20261029150000_ex
 const sync = readFileSync(new URL("../supabase/functions/sync-game-catalog/index.ts", import.meta.url), "utf8");
 const cron = readFileSync(new URL("../supabase/migrations/20261029151000_schedule_game_catalog_sync.sql", import.meta.url), "utf8");
 const facetsMigration = readFileSync(new URL("../supabase/migrations/20261029154000_catalog_facets.sql", import.meta.url), "utf8");
+const igdbMigration = readFileSync(new URL("../supabase/migrations/20261029155000_igdb_multiplatform_catalog.sql", import.meta.url), "utf8");
+const igdbSync = readFileSync(new URL("../supabase/functions/sync-igdb-catalog/index.ts", import.meta.url), "utf8");
 const sitemap = readFileSync(new URL("../src/app/sitemap.ts", import.meta.url), "utf8");
 const gameCard = readFileSync(new URL("../src/components/game-card.tsx", import.meta.url), "utf8");
 const gameDetail = readFileSync(new URL("../src/app/games/[slug]/page.tsx", import.meta.url), "utf8");
@@ -89,4 +91,27 @@ test("Game Locker resolves saved slugs outside its initial catalog page", () => 
   assert.match(api, /search\.get\("slugs"\)/);
   assert.match(locker, /api\/games\?slugs=/);
   assert.match(locker, /allGames/);
+});
+
+
+test("IGDB catalog enrichment is provider-linked, optional, and scheduled behind an explicit enable flag", () => {
+  assert.match(igdbMigration, /igdb_id bigint/);
+  assert.match(igdbMigration, /igdb_synced_at timestamptz/);
+  assert.match(igdbMigration, /enabled boolean not null default false/);
+  assert.match(igdbMigration, /levelup-igdb-catalog-sync/);
+  assert.match(igdbSync, /IGDB_CLIENT_ID/);
+  assert.match(igdbSync, /IGDB_CLIENT_SECRET/);
+  assert.match(igdbSync, /external_game_source\.name/);
+  assert.match(igdbSync, /igdb_id: game\.id/);
+  assert.match(sync, /Boolean\(existingSource\?\.igdb_id\)/);
+  assert.match(sync, /\{ \.\.\.metadata, steamspy: app \}/);
+});
+
+test("P1 discovery ranks community sentiment and related games instead of raw review counts alone", () => {
+  assert.match(igdbMigration, /positive_reviews::numeric \/ nullif\(positive_reviews \+ negative_reviews, 0\)/);
+  assert.match(igdbMigration, /platform_name ilike/);
+  assert.match(explorer, /Đề xuất cộng đồng/);
+  assert.match(repository, /scoreRelatedGame/);
+  assert.match(repository, /sharedGenres \* 12/);
+  assert.match(gameDetail, /detail-metrics-strip/);
 });

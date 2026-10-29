@@ -54,6 +54,11 @@ export default async function GameDetailPage({ params }: GamePageProps) {
   const sourceUpdatedAt = game.sourceSyncedAt
     ? new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(game.sourceSyncedAt))
     : null;
+  const igdbUpdatedAt = game.igdbSyncedAt
+    ? new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(game.igdbSyncedAt))
+    : null;
+  const reviewCount = (game.positiveReviews ?? 0) + (game.negativeReviews ?? 0);
+  const positiveRate = reviewCount > 0 ? Math.round(((game.positiveReviews ?? 0) / reviewCount) * 100) : null;
 
   return (
     <main className="page-main">
@@ -89,6 +94,42 @@ export default async function GameDetailPage({ params }: GamePageProps) {
                 {game.genres.map((genre) => <span key={genre}>{genre}</span>)}
               </div>
 
+              <div className="detail-metrics-strip" aria-label="Chỉ số và độ phủ dữ liệu">
+                {positiveRate !== null ? (
+                  <div className="detail-metric-card">
+                    <span>ĐÁNH GIÁ TÍCH CỰC</span>
+                    <strong>{positiveRate}%</strong>
+                    <small>{reviewCount.toLocaleString("vi-VN")} lượt · SteamSpy</small>
+                  </div>
+                ) : null}
+                {game.ownersEstimate ? (
+                  <div className="detail-metric-card">
+                    <span>ƯỚC TÍNH SỞ HỮU</span>
+                    <strong>{game.ownersEstimate}</strong>
+                    <small>Khoảng ước tính, không phải số người chơi trực tiếp</small>
+                  </div>
+                ) : null}
+                {game.sourceProvider === "steamspy" && (game.concurrentPlayers ?? 0) > 0 ? (
+                  <div className="detail-metric-card">
+                    <span>CCU THAM KHẢO</span>
+                    <strong>{game.concurrentPlayers!.toLocaleString("vi-VN")}</strong>
+                    <small>SteamSpy đồng bộ định kỳ · không phải live</small>
+                  </div>
+                ) : null}
+                <div className="detail-metric-card">
+                  <span>ĐỘ PHỦ NỀN TẢNG</span>
+                  <strong>{game.platforms.length.toLocaleString("vi-VN")}</strong>
+                  <small>{game.platforms.length > 0 ? game.platforms.join(" · ") : "Chưa có dữ liệu nền tảng"}</small>
+                </div>
+                {game.igdbId ? (
+                  <div className="detail-metric-card">
+                    <span>IGDB MATCH</span>
+                    <strong>#{game.igdbId}</strong>
+                    <small>{igdbUpdatedAt ? "Đối chiếu " + igdbUpdatedAt : "Đã liên kết hồ sơ IGDB"}</small>
+                  </div>
+                ) : null}
+              </div>
+
               <dl className="detail-facts">
                 <div>
                   <dt>Nhà phát triển</dt>
@@ -112,7 +153,7 @@ export default async function GameDetailPage({ params }: GamePageProps) {
 
               <div className="detail-actions">
                 <a className="btn btn-primary" href={game.officialUrl} target="_blank" rel="noopener noreferrer">
-                  {game.sourceProvider === "steamspy" ? "Xem trên Steam" : "Trang chính thức"} <span aria-hidden="true">↗</span>
+                  {game.sourceProvider === "steamspy" ? "Xem trên Steam" : game.officialUrl.includes("igdb.com/games/") ? "Mở hồ sơ nguồn" : "Trang chính thức"} <span aria-hidden="true">↗</span>
                 </a>
                 <Link className="btn btn-secondary" href="/games">
                   Khám phá game khác <span aria-hidden="true">→</span>
@@ -124,9 +165,14 @@ export default async function GameDetailPage({ params }: GamePageProps) {
               </div>
               <p className="data-note">
                 {game.sourceProvider === "steamspy"
-                  ? `Nguồn dữ liệu: SteamSpy · đồng bộ ${sourceUpdatedAt ?? "chưa rõ"}. Chỉ số CCU và lượng sở hữu là tham khảo, không phải feed live. `
+                  ? "Nguồn dữ liệu: SteamSpy / Steam · đồng bộ " + (sourceUpdatedAt ?? "chưa rõ") + ". Chỉ số CCU và lượng sở hữu là tham khảo, không phải feed live. "
+                  : game.sourceProvider === "igdb"
+                    ? "Nguồn hồ sơ: IGDB" + (igdbUpdatedAt ? " · đồng bộ " + igdbUpdatedAt : "") + ". "
+                    : ""}
+                {game.igdbId && game.sourceProvider === "steamspy"
+                  ? "Đã đối chiếu nền tảng với IGDB" + (igdbUpdatedAt ? " · cập nhật " + igdbUpdatedAt : "") + ". "
                   : ""}
-                Thông tin giúp bạn khám phá nhanh. Hãy kiểm tra trang chính thức để xem yêu cầu hệ thống và cập nhật mới nhất.
+                Thông tin giúp bạn khám phá nhanh. Hãy kiểm tra nguồn chính thức để xem yêu cầu hệ thống và cập nhật mới nhất.
               </p>
             </div>
           </div>
