@@ -65,10 +65,12 @@ npm run build
 
 ## Gamer Game Locker
 
-- The homepage includes a local player command center for a personal game backlog.
-- Save a game as `wishlist`, `playing`, or `completed`; the state is stored in the current browser's local storage and shared across open tabs.
-- The `/locker` page lets players filter their saved roster. It does not require login and is intentionally excluded from search indexing and the sitemap.
-- Saved games are device/browser-local; they are not synced to an account or to other devices yet.
+- The homepage includes a player command center for a personal game backlog and favorites.
+- Save a game as `wishlist`, `playing`, or `completed`, or add it to favorites. Changes are stored locally first for a responsive experience.
+- Guests keep a device-local library; signed-in players sync their game statuses and favorites to `public.user_game_library` across devices.
+- On the first successful sign-in, the guest library is merged into that account. Separate local storage keys keep one account's library from leaking into another account on a shared browser.
+- Removal tombstones synchronize too, so an offline removal is not silently restored by an older cloud copy. Row Level Security restricts library records to their owner.
+- The `/locker` page lets players filter their saved roster. It is intentionally excluded from search indexing and the sitemap.
 
 ## LevelUP Social Network
 

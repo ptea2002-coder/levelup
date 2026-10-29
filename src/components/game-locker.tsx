@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { GameCard } from "@/components/game-card";
 import { useGameLibrary } from "@/components/game-library-provider";
 import type { Game } from "@/lib/games";
-import type { GameLibraryStatus } from "@/lib/game-library";
+import { isGameLibraryEntryActive, type GameLibraryStatus } from "@/lib/game-library";
 
 type LockerFilter = "all" | GameLibraryStatus;
 
@@ -21,7 +21,7 @@ type GameLockerProps = {
 };
 
 export function GameLocker({ games }: GameLockerProps) {
-  const { library, ready, storageAvailable } = useGameLibrary();
+  const { library, ready, storageAvailable, signedIn, syncStatus } = useGameLibrary();
   const [activeFilter, setActiveFilter] = useState<LockerFilter>("all");
   const [additionalGames, setAdditionalGames] = useState<Game[]>([]);
   const [lookupState, setLookupState] = useState<"idle" | "loading" | "error">("idle");
@@ -29,7 +29,7 @@ export function GameLocker({ games }: GameLockerProps) {
   useEffect(() => {
     if (!ready) return;
     const knownSlugs = new Set(games.map((game) => game.slug));
-    const missingSlugs = Object.keys(library).filter((slug) => !knownSlugs.has(slug));
+    const missingSlugs = Object.entries(library).filter(([slug, entry]) => isGameLibraryEntryActive(entry) && !knownSlugs.has(slug)).map(([slug]) => slug);
 
     if (missingSlugs.length === 0) {
       setAdditionalGames([]);
@@ -80,7 +80,7 @@ export function GameLocker({ games }: GameLockerProps) {
 
   const savedGames = useMemo(
     () => allGames
-      .filter((game) => Boolean(library[game.slug]))
+      .filter((game) => isGameLibraryEntryActive(library[game.slug]))
       .sort((a, b) => (library[b.slug]?.updatedAt ?? 0) - (library[a.slug]?.updatedAt ?? 0)),
     [allGames, library],
   );
@@ -99,11 +99,12 @@ export function GameLocker({ games }: GameLockerProps) {
           <div>
             <p className="eyebrow">YOUR INVENTORY / {ready && lookupState !== "loading" ? String(savedGames.length).padStart(2, "0") : "--"} SAVED</p>
             <h2>THE <span>ROSTER.</span></h2>
-            <p>Ba trạng thái để quản lý backlog cá nhân. Thay đổi của bạn được lưu trên trình duyệt hiện tại.</p>
+            <p>Quản lý backlog và yêu thích. Lưu cục bộ ngay lập tức; đăng nhập để đồng bộ thư viện trên mọi thiết bị.</p>
           </div>
           <div className={`locker-storage-note${storageAvailable ? "" : " is-limited"}`}>
             <i aria-hidden="true" />
-            {storageAvailable ? "Lưu cục bộ đang bật" : "Không thể lưu bền vững trên trình duyệt này"}
+            {signedIn ? syncStatus === "syncing" ? "Đang đồng bộ tài khoản" : syncStatus === "error" ? "Đồng bộ bị gián đoạn" : "Đã đồng bộ tài khoản" : storageAvailable ? "Lưu trên thiết bị · chưa đồng bộ" : "Không thể lưu bền vững trên trình duyệt này"}
+            {!signedIn ? <Link className="locker-sync-link" href="/login">Đăng nhập để đồng bộ ↗</Link> : null}
           </div>
         </div>
 
@@ -139,10 +140,10 @@ export function GameLocker({ games }: GameLockerProps) {
             <h3>Chưa tải được các game đã lưu.</h3>
             <p>Bộ sưu tập trên trình duyệt vẫn được giữ nguyên. Hãy thử tải lại trang khi kết nối ổn định.</p>
           </div>
-        ) : savedGames.length === 0 && Object.keys(library).length > 0 ? (
+        ) : savedGames.length === 0 && Object.values(library).some((entry) => isGameLibraryEntryActive(entry)) ? (
           <div className="empty-state locker-empty-state">
             <p className="eyebrow">SAVED ITEMS / NOT IN CATALOG</p>
-            <h3>Có {Object.keys(library).length} mục đã lưu chưa khớp với catalog hiện tại.</h3>
+            <h3>Có {Object.values(library).filter((entry) => isGameLibraryEntryActive(entry)).length} mục đã lưu chưa khớp với catalog hiện tại.</h3>
             <p>Những game này có thể đã bị ẩn hoặc không còn trong nguồn dữ liệu. Dữ liệu lưu trên trình duyệt vẫn được giữ nguyên.</p>
           </div>
         ) : savedGames.length === 0 ? (

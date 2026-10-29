@@ -8,6 +8,7 @@ import { GameLibraryProvider } from "@/components/game-library-provider";
 import "./globals.css";
 import "./aaa-motion.css";
 import "./social-network.css";
+import "./game-library.css";
 
 const vietnameseFont = Be_Vietnam_Pro({
   variable: "--font-vietnam",

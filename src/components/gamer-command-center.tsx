@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { GameLibraryControl } from "@/components/game-library-control";
 import { useGameLibrary } from "@/components/game-library-provider";
 import type { Game } from "@/lib/games";
-import type { GameLibraryStatus } from "@/lib/game-library";
+import { isGameLibraryEntryActive, type GameLibraryStatus } from "@/lib/game-library";
 
 const statusLabels: Record<GameLibraryStatus, string> = {
   wishlist: "Muốn chơi",
@@ -19,15 +19,15 @@ type GamerCommandCenterProps = {
 };
 
 export function GamerCommandCenter({ games }: GamerCommandCenterProps) {
-  const { library, ready, storageAvailable } = useGameLibrary();
+  const { library, ready, storageAvailable, signedIn, syncStatus } = useGameLibrary();
   const savedGames = useMemo(
     () => games
-      .filter((game) => Boolean(library[game.slug]))
+      .filter((game) => isGameLibraryEntryActive(library[game.slug]))
       .sort((a, b) => (library[b.slug]?.updatedAt ?? 0) - (library[a.slug]?.updatedAt ?? 0)),
     [games, library],
   );
 
-  const savedCount = Object.keys(library).length;
+  const savedCount = Object.values(library).filter((entry) => isGameLibraryEntryActive(entry)).length;
   const countByStatus = (status: GameLibraryStatus) =>
     Object.values(library).filter((entry) => entry.status === status).length;
 
@@ -40,7 +40,7 @@ export function GamerCommandCenter({ games }: GamerCommandCenterProps) {
               <p className="eyebrow">PLAYER HUB / YOUR LOCAL SAVE</p>
               <h2 id="gamer-command-title">YOUR <span>LOADOUT.</span></h2>
               <p className="gamer-command-intro">
-                Tủ game cá nhân của bạn — lưu mục tiêu chơi, theo dõi game đang cày và đánh dấu những hành trình đã hoàn thành.
+                Tủ game cá nhân của bạn — lưu mục tiêu chơi, đánh dấu yêu thích và đồng bộ bộ sưu tập qua tài khoản LevelUP.
               </p>
             </div>
             <Link className="gamer-command-open" href="/locker">Mở Game Locker <span aria-hidden="true">↗</span></Link>
@@ -67,7 +67,7 @@ export function GamerCommandCenter({ games }: GamerCommandCenterProps) {
             <div className="gamer-command-empty">
               <span className="eyebrow">LOADOUT EMPTY / READY FOR YOUR NEXT MAIN</span>
               <h3>Mọi bộ sưu tập đều bắt đầu từ một game.</h3>
-              <p>Lưu game từ bất kỳ thẻ nào. Trạng thái được lưu trong trình duyệt này, không cần đăng nhập.</p>
+              <p>Lưu game từ bất kỳ thẻ nào. Bạn có thể dùng cục bộ hoặc đăng nhập để đồng bộ thư viện trên các thiết bị.</p>
               <Link className="btn btn-primary" href="/games">Chọn game đầu tiên <span aria-hidden="true">↗</span></Link>
             </div>
           ) : savedGames.length === 0 ? (
@@ -106,8 +106,9 @@ export function GamerCommandCenter({ games }: GamerCommandCenterProps) {
           )}
 
           <div className="gamer-command-foot">
-            <span><i aria-hidden="true" /> {storageAvailable ? "LOCAL SAVE / ĐỒNG BỘ TRÊN TRÌNH DUYỆT" : "SESSION SAVE / BỘ NHỚ TRÌNH DUYỆT BỊ HẠN CHẾ"}</span>
+            <span><i aria-hidden="true" /> {signedIn ? syncStatus === "syncing" ? "ACCOUNT SYNC / ĐANG ĐỒNG BỘ" : syncStatus === "error" ? "ACCOUNT SYNC / CẦN THỬ LẠI" : "ACCOUNT SYNC / ĐÃ ĐỒNG BỘ" : storageAvailable ? "LOCAL SAVE / ĐĂNG NHẬP ĐỂ ĐỒNG BỘ" : "SESSION SAVE / BỘ NHỚ TRÌNH DUYỆT BỊ HẠN CHẾ"}</span>
             <span>{savedCount} game đã lưu · hiển thị tối đa 3 game nổi bật</span>
+            {!signedIn ? <Link href="/login">Đăng nhập để đồng bộ ↗</Link> : null}
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@
 
 ## Phase 2 — User features
 
-- Cloud-synced favorites and personal game lists.
+- [x] Cloud-synced favorites and personal game lists (local-first Game Locker, per-account sync, removal tombstones, and owner-only RLS).
 - Reviews with ratings, pending moderation, and abuse reporting.
 - Comments with rate limits and moderation tools.
 - Profile editing and basic account controls.
