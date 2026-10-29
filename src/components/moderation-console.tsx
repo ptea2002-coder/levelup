@@ -8,10 +8,12 @@ import { formatSocialDate, firstRelation, type SocialProfile } from "@/lib/socia
 
 type ReportRow = {
   id: string;
-  target_type: "post" | "comment" | "profile";
+  target_type: "post" | "comment" | "profile" | "review" | "game_comment";
   target_post_id: string | null;
   target_comment_id: string | null;
   target_profile_id: string | null;
+  target_review_id: string | null;
+  target_game_comment_id: string | null;
   reason: string;
   details: string;
   status: "open" | "reviewed" | "actioned" | "dismissed";
@@ -20,6 +22,8 @@ type ReportRow = {
   post: { id: string; body: string; status: string } | { id: string; body: string; status: string }[] | null;
   comment: { id: string; body: string; status: string } | { id: string; body: string; status: string }[] | null;
   target_profile: SocialProfile | SocialProfile[] | null;
+  review: { id: string; rating: number; title: string; body: string; status: string } | { id: string; rating: number; title: string; body: string; status: string }[] | null;
+  game_comment: { id: string; body: string; status: string } | { id: string; body: string; status: string }[] | null;
 };
 
 export function ModerationConsole() {
@@ -69,7 +73,7 @@ export function ModerationConsole() {
     setError("");
     const { data, error: queryError } = await supabase
       .from("content_reports")
-      .select("id,target_type,target_post_id,target_comment_id,target_profile_id,reason,details,status,created_at,reporter:profiles!content_reports_reporter_id_fkey(id,username,display_name,avatar_url),post:posts!content_reports_target_post_id_fkey(id,body,status),comment:post_comments!content_reports_target_comment_id_fkey(id,body,status),target_profile:profiles!content_reports_target_profile_id_fkey(id,username,display_name,avatar_url)")
+      .select("id,target_type,target_post_id,target_comment_id,target_profile_id,target_review_id,target_game_comment_id,reason,details,status,created_at,reporter:profiles!content_reports_reporter_id_fkey(id,username,display_name,avatar_url),post:posts!content_reports_target_post_id_fkey(id,body,status),comment:post_comments!content_reports_target_comment_id_fkey(id,body,status),target_profile:profiles!content_reports_target_profile_id_fkey(id,username,display_name,avatar_url),review:reviews!content_reports_target_review_id_fkey(id,rating,title,body,status),game_comment:comments!content_reports_target_game_comment_id_fkey(id,body,status)")
       .eq("status", "open")
       .order("created_at", { ascending: true })
       .limit(100);
@@ -96,6 +100,12 @@ export function ModerationConsole() {
       contentError = result.error;
     } else if (action === "hide" && report.target_type === "comment" && report.target_comment_id) {
       const result = await supabase.from("post_comments").update({ status: "hidden" }).eq("id", report.target_comment_id);
+      contentError = result.error;
+    } else if (action === "hide" && report.target_type === "review" && report.target_review_id) {
+      const result = await supabase.from("reviews").update({ status: "rejected" }).eq("id", report.target_review_id);
+      contentError = result.error;
+    } else if (action === "hide" && report.target_type === "game_comment" && report.target_game_comment_id) {
+      const result = await supabase.from("comments").update({ status: "rejected" }).eq("id", report.target_game_comment_id);
       contentError = result.error;
     }
     if (contentError) {
@@ -131,7 +141,9 @@ export function ModerationConsole() {
               const post = firstRelation(report.post);
               const comment = firstRelation(report.comment);
               const targetProfile = firstRelation(report.target_profile);
-              const targetText = report.target_type === "post" ? post?.body : report.target_type === "comment" ? comment?.body : targetProfile ? "@" + targetProfile.username : "Nội dung không còn tồn tại";
+              const review = firstRelation(report.review);
+              const gameComment = firstRelation(report.game_comment);
+              const targetText = report.target_type === "post" ? post?.body : report.target_type === "comment" ? comment?.body : report.target_type === "review" ? review ? review.rating + "/10 · " + review.title + "\n" + review.body : "Đánh giá không còn tồn tại" : report.target_type === "game_comment" ? gameComment?.body : targetProfile ? "@" + targetProfile.username : "Nội dung không còn tồn tại";
               return (
                 <article className="moderation-report-card" key={report.id}>
                   <div className="moderation-report-top"><span className="moderation-reason">{report.reason}</span><time>{formatSocialDate(report.created_at)}</time></div>

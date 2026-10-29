@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { GameContentReportButton } from "@/components/game-content-report-button";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatSocialDate } from "@/lib/social-types";
@@ -345,6 +346,7 @@ export function GameCommunitySection({ gameSlug, gameTitle }: { gameSlug: string
                     <h4>{review.title}</h4>
                     <p>{review.body}</p>
                     {review.status !== "published" ? <span className={"game-community-status is-" + review.status}>{statusLabel(review.status)}</span> : null}
+                    {review.status === "published" && userId && review.user_id !== userId ? <GameContentReportButton userId={userId} targetType="review" targetId={review.id} /> : null}
                   </article>
                 );
               })}
@@ -397,6 +399,7 @@ export function GameCommunitySection({ gameSlug, gameTitle }: { gameSlug: string
                         {comment.user_id === userId ? <button type="button" className="game-community-text-button" disabled={busyAction === "comment:" + comment.id} onClick={() => void removeOwnItem("comment", comment.id)}>Xóa</button> : null}
                       </div>
                     ) : null}
+                    {comment.status === "published" && userId && comment.user_id !== userId ? <GameContentReportButton userId={userId} targetType="game_comment" targetId={comment.id} /> : null}
                   </article>
                 );
               })}
