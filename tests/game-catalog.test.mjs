@@ -21,7 +21,7 @@ const locker = readFileSync(new URL("../src/components/game-locker.tsx", import.
 const commandCenter = readFileSync(new URL("../src/components/gamer-command-center.tsx", import.meta.url), "utf8");
 
 test("game search is server-side and returns a small bounded page", () => {
-  assert.match(repository, /\.rpc\("search_games_catalog"/);
+  assert.match(repository, /\.rpc\("search_games_catalog_v2"/);
   assert.match(migration, /limit greatest\(1, least\(coalesce\(p_limit, 24\), 48\)\)/i);
   assert.match(api, /Math\.min\(Number\(search\.get\("limit"\).*48/);
 });
