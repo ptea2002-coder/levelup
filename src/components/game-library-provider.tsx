@@ -72,8 +72,14 @@ async function loadCloudLibrary(supabase: SupabaseClient, userId: string): Promi
   return result;
 }
 
-async function writeCloudLibrary(supabase: SupabaseClient, userId: string, library: GameLibrary) {
-  const entries = Object.entries(library);
+async function writeCloudLibrary(supabase: SupabaseClient, userId: string, library: GameLibrary): Promise<GameLibrary> {
+  // Re-read before each push so a stale tab cannot overwrite a newer change made on another device.
+  const cloudLibrary = await loadCloudLibrary(supabase, userId);
+  const mergedLibrary = mergeGameLibraries(library, cloudLibrary);
+  const entries = Object.entries(mergedLibrary).filter(([slug, entry]) => {
+    const cloudEntry = cloudLibrary[slug];
+    return !cloudEntry || entry.updatedAt > cloudEntry.updatedAt;
+  });
   const pageSize = 100;
 
   for (let offset = 0; offset < entries.length; offset += pageSize) {
@@ -92,6 +98,8 @@ async function writeCloudLibrary(supabase: SupabaseClient, userId: string, libra
 
     if (error) throw error;
   }
+
+  return mergedLibrary;
 }
 
 function canAccessStorage(storageKey: string): boolean {
@@ -187,15 +195,11 @@ export function GameLibraryProvider({ children }: { children: ReactNode }) {
       setSyncStatus("syncing");
 
       try {
-        const cloudLibrary = await loadCloudLibrary(supabase, userId);
+        const syncedLibrary = await writeCloudLibrary(supabase, userId, seedLibrary);
         if (cancelled) return;
 
-        const mergedLibrary = mergeGameLibraries(seedLibrary, cloudLibrary);
-        setLibrary(mergedLibrary);
-        setStorageAvailable(persistGameLibrary(mergedLibrary, storageKey));
-
-        await writeCloudLibrary(supabase, userId, mergedLibrary);
-        if (cancelled) return;
+        setLibrary(syncedLibrary);
+        setStorageAvailable(persistGameLibrary(syncedLibrary, storageKey));
 
         try {
           window.localStorage.setItem(getGameLibraryClaimedKey(userId), "1");
@@ -248,8 +252,14 @@ export function GameLibraryProvider({ children }: { children: ReactNode }) {
 
       setSyncStatus("syncing");
       try {
-        await writeCloudLibrary(supabase, userId, library);
-        if (!cancelled) setSyncStatus("synced");
+        const syncedLibrary = await writeCloudLibrary(supabase, userId, library);
+        if (!cancelled) {
+          if (JSON.stringify(syncedLibrary) !== JSON.stringify(library)) {
+            setLibrary(syncedLibrary);
+            setStorageAvailable(persistGameLibrary(syncedLibrary, storageKey));
+          }
+          setSyncStatus("synced");
+        }
       } catch {
         if (!cancelled) setSyncStatus("error");
       }
@@ -269,7 +279,7 @@ export function GameLibraryProvider({ children }: { children: ReactNode }) {
       [slug]: {
         status,
         isFavorite: previous?.isFavorite ?? false,
-        updatedAt: Date.now(),
+        updatedAt: Math.max(Date.now(), (previous?.updatedAt ?? 0) + 1),
       },
     };
     setLibrary(next);
