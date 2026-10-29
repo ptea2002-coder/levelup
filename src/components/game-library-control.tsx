@@ -27,8 +27,8 @@ export function GameLibraryControl({ gameSlug, gameTitle, variant = "compact" }:
     const persisted = setGameStatus(gameSlug, status);
     setFeedback(persisted
       ? status
-        ? \`${gameTitle}: ${statusLabels[status]}.\`
-        : \`${gameTitle} đã được bỏ khỏi Game Locker.\`
+        ? `${gameTitle}: ${statusLabels[status]}.`
+        : `${gameTitle} đã được bỏ khỏi Game Locker.`
       : "Đã cập nhật tạm thời; trình duyệt không cho phép lưu dữ liệu cục bộ.");
   };
 
@@ -37,8 +37,8 @@ export function GameLibraryControl({ gameSlug, gameTitle, variant = "compact" }:
     const persisted = setFavorite(gameSlug, nextFavorite);
     setFeedback(persisted
       ? nextFavorite
-        ? \`${gameTitle} đã được thêm vào yêu thích.\`
-        : \`${gameTitle} đã được bỏ khỏi yêu thích.\`
+        ? `${gameTitle} đã được thêm vào yêu thích.`
+        : `${gameTitle} đã được bỏ khỏi yêu thích.`
       : "Đã cập nhật tạm thời; trình duyệt không cho phép lưu dữ liệu cục bộ.");
   };
 
@@ -53,8 +53,8 @@ export function GameLibraryControl({ gameSlug, gameTitle, variant = "compact" }:
   const favoriteButton = (
     <button
       type="button"
-      className={\`library-favorite-btn${isFavorite ? " is-favorite" : ""}\`}
-      aria-label={isFavorite ? \`Bỏ ${gameTitle} khỏi yêu thích\` : \`Thêm ${gameTitle} vào yêu thích\`}
+      className={`library-favorite-btn${isFavorite ? " is-favorite" : ""}`}
+      aria-label={isFavorite ? `Bỏ ${gameTitle} khỏi yêu thích` : `Thêm ${gameTitle} vào yêu thích`}
       aria-pressed={isFavorite}
       disabled={!ready}
       onClick={updateFavorite}
@@ -67,11 +67,11 @@ export function GameLibraryControl({ gameSlug, gameTitle, variant = "compact" }:
   if (variant === "compact") {
     return (
       <div className="game-library-control game-library-control-compact">
-        {entry?.status ? <span className={\`library-status-chip status-${entry.status}\`}>{statusLabels[entry.status]}</span> : null}
+        {entry?.status ? <span className={`library-status-chip status-${entry.status}`}>{statusLabels[entry.status]}</span> : null}
         <button
           type="button"
-          className={\`library-save-btn${hasStatus ? " is-saved" : ""}\`}
-          aria-label={hasStatus ? \`Bỏ ${gameTitle} khỏi Game Locker\` : \`Lưu ${gameTitle} vào Game Locker\`}
+          className={`library-save-btn${hasStatus ? " is-saved" : ""}`}
+          aria-label={hasStatus ? `Bỏ ${gameTitle} khỏi Game Locker` : `Lưu ${gameTitle} vào Game Locker`}
           aria-pressed={hasStatus}
           disabled={!ready}
           onClick={() => updateStatus(hasStatus ? null : "wishlist")}
@@ -87,12 +87,12 @@ export function GameLibraryControl({ gameSlug, gameTitle, variant = "compact" }:
   return (
     <div className="game-library-control game-library-control-full">
       <p className="library-control-label">TRẠNG THÁI TRONG GAME LOCKER</p>
-      <div className="library-status-group" role="group" aria-label={\`Trạng thái ${gameTitle} trong Game Locker\`}>
+      <div className="library-status-group" role="group" aria-label={`Trạng thái ${gameTitle} trong Game Locker`}>
         {gameLibraryStatuses.map((status) => (
           <button
             key={status}
             type="button"
-            className={\`library-status-btn${entry?.status === status ? " active" : ""}\`}
+            className={`library-status-btn${entry?.status === status ? " active" : ""}`}
             aria-pressed={entry?.status === status}
             disabled={!ready}
             onClick={() => updateStatus(status)}
