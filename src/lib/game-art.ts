@@ -1,8 +1,9 @@
-export type GameArtworkVariant = "card" | "detail";
+export type GameArtworkVariant = "card" | "detail" | "cinematic";
 
 type ArtworkSources = {
   card: string[];
   detail: string[];
+  cinematic?: string[];
 };
 
 const steamArtwork = (appId: string): ArtworkSources => ({
@@ -11,6 +12,11 @@ const steamArtwork = (appId: string): ArtworkSources => ({
     `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_600x900.jpg`,
     `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_hero.jpg`,
     `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
+  ],
+  cinematic: [
+    `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_hero.jpg`,
+    `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
+    `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/library_600x900.jpg`,
   ],
 });
 
@@ -69,7 +75,10 @@ export function getGameArtworkSources(
   slug: string,
   variant: GameArtworkVariant = "card",
 ): string[] {
-  return artworkBySlug[slug]?.[variant] ?? [];
+  const artwork = artworkBySlug[slug];
+  if (!artwork) return [];
+  if (variant === "cinematic") return artwork.cinematic ?? artwork.detail ?? artwork.card;
+  return artwork[variant];
 }
 
 export function getGameArtworkUrl(
