@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GameCard } from "@/components/game-card";
 import { useGameLibrary } from "@/components/game-library-provider";
 import { isGameLibraryEntryActive } from "@/lib/game-library";
@@ -43,6 +43,7 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [savedProfileGames, setSavedProfileGames] = useState<Game[]>([]);
+  const requestedProfileSlugs = useRef(new Set<string>());
   const [retry, setRetry] = useState(0);
 
   const activeSavedSlugs = useMemo(
@@ -61,10 +62,11 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
     let cancelled = false;
     const loadSavedProfile = async () => {
       const knownSlugs = new Set([...games, ...savedProfileGames].map((game) => game.slug));
-      const missing = activeSavedSlugs.filter((slug) => !knownSlugs.has(slug));
+      const missing = activeSavedSlugs.filter((slug) => !knownSlugs.has(slug) && !requestedProfileSlugs.current.has(slug));
       const chunks: string[][] = [];
       for (let index = 0; index < missing.length; index += 48) chunks.push(missing.slice(index, index + 48));
       if (chunks.length === 0) return;
+      for (const slug of missing) requestedProfileSlugs.current.add(slug);
 
       try {
         const responses = await Promise.all(chunks.map(async (chunk) => {
@@ -81,6 +83,7 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
           });
         }
       } catch {
+        for (const slug of missing) requestedProfileSlugs.current.delete(slug);
         if (!cancelled) setSavedProfileGames([]);
       }
     };
