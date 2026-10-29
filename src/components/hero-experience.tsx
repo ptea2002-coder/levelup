@@ -83,6 +83,21 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
     };
   }, []);
 
+  const handleHeroPointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    if (event.pointerType !== "mouse") return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+    event.currentTarget.style.setProperty("--hero-pointer-x", `${(x * 100).toFixed(1)}%`);
+    event.currentTarget.style.setProperty("--hero-pointer-y", `${(y * 100).toFixed(1)}%`);
+    event.currentTarget.classList.add("is-pointer-active");
+  };
+
+  const resetHeroPointer = (event: ReactPointerEvent<HTMLElement>) => {
+    event.currentTarget.classList.remove("is-pointer-active");
+  };
+
   const handleStagePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.pointerType !== "mouse") return;
     const rect = event.currentTarget.getBoundingClientRect();
@@ -93,12 +108,16 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
     event.currentTarget.style.setProperty("--stage-spot-y", `${(y * 100).toFixed(1)}%`);
     event.currentTarget.style.setProperty("--stage-rotate-x", `${((0.5 - y) * 3.2).toFixed(2)}deg`);
     event.currentTarget.style.setProperty("--stage-rotate-y", `${((x - 0.5) * 4.2).toFixed(2)}deg`);
+    event.currentTarget.style.setProperty("--stage-image-x", `${((0.5 - x) * 8).toFixed(2)}px`);
+    event.currentTarget.style.setProperty("--stage-image-y", `${((0.5 - y) * 8).toFixed(2)}px`);
     event.currentTarget.classList.add("is-live");
   };
 
   const resetStagePointer = (event: ReactPointerEvent<HTMLDivElement>) => {
     event.currentTarget.style.setProperty("--stage-rotate-x", "0deg");
     event.currentTarget.style.setProperty("--stage-rotate-y", "0deg");
+    event.currentTarget.style.setProperty("--stage-image-x", "0px");
+    event.currentTarget.style.setProperty("--stage-image-y", "0px");
     event.currentTarget.classList.remove("is-live");
   };
 
@@ -107,8 +126,9 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
   return (
     <>
       <div className="levelup-scroll-progress" aria-hidden="true"><span /></div>
-      <section className="hero hero-cinematic" aria-labelledby="levelup-hero-title">
+      <section className="hero hero-cinematic" aria-labelledby="levelup-hero-title" onPointerMove={handleHeroPointerMove} onPointerLeave={resetHeroPointer}>
         <div className="hero-grid" aria-hidden="true" />
+        <div className="hero-cinematic-cursor-glow" aria-hidden="true" />
         <div className="hero-cinematic-noise" aria-hidden="true" />
         <div className="container hero-cinematic-layout">
           <div className="hero-cinematic-copy">
@@ -172,6 +192,8 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
                 "--stage-spot-y": "50%",
                 "--stage-rotate-x": "0deg",
                 "--stage-rotate-y": "0deg",
+                "--stage-image-x": "0px",
+                "--stage-image-y": "0px",
               } as CSSProperties}
             >
               <div className="hero-cinematic-art" key={activeGame.slug}>
