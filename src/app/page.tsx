@@ -19,7 +19,6 @@ export default async function HomePage() {
   const featuredGames = games
     .filter((game) => featuredSlugs.includes(game.slug))
     .sort((a, b) => featuredSlugs.indexOf(a.slug) - featuredSlugs.indexOf(b.slug));
-  const heroGame = games.find((game) => game.slug === "elden-ring") ?? featuredGames[0] ?? games[0];
 
   return (
     <main>
@@ -41,8 +40,6 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
-
-      <GamerCommandCenter games={games} />
 
       <section className="section" id="games">
         <div className="container">
@@ -75,6 +72,8 @@ export default async function HomePage() {
           <SteamLiveMetrics games={games.map((game) => ({ slug: game.slug, title: game.title, category: game.category }))} />
         </div>
       </section>
+
+      <GamerCommandCenter games={games} />
 
       <section className="section section-muted" id="guides">
         <div className="container">
