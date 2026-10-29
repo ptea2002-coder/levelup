@@ -51,6 +51,9 @@ export default async function GameDetailPage({ params }: GamePageProps) {
   if (!game) notFound();
 
   const relatedGames = await getRelatedGames(game, 3);
+  const sourceUpdatedAt = game.sourceSyncedAt
+    ? new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(game.sourceSyncedAt))
+    : null;
 
   return (
     <main className="page-main">
@@ -120,6 +123,9 @@ export default async function GameDetailPage({ params }: GamePageProps) {
                 <GameLibraryControl gameSlug={game.slug} gameTitle={game.title} variant="full" />
               </div>
               <p className="data-note">
+                {game.sourceProvider === "steamspy"
+                  ? `Nguồn dữ liệu: SteamSpy · đồng bộ ${sourceUpdatedAt ?? "chưa rõ"}. Chỉ số CCU và lượng sở hữu là tham khảo, không phải feed live. `
+                  : ""}
                 Thông tin giúp bạn khám phá nhanh. Hãy kiểm tra trang chính thức để xem yêu cầu hệ thống và cập nhật mới nhất.
               </p>
             </div>
