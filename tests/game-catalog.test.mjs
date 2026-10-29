@@ -14,6 +14,7 @@ const igdbSync = readFileSync(new URL("../supabase/functions/sync-igdb-catalog/i
 const sitemap = readFileSync(new URL("../src/app/sitemap.ts", import.meta.url), "utf8");
 const gameCard = readFileSync(new URL("../src/components/game-card.tsx", import.meta.url), "utf8");
 const gameDetail = readFileSync(new URL("../src/app/games/[slug]/page.tsx", import.meta.url), "utf8");
+const detailContent = readFileSync(new URL("../src/components/game-detail-content.tsx", import.meta.url), "utf8");
 const home = readFileSync(new URL("../src/app/page.tsx", import.meta.url), "utf8");
 const hero = readFileSync(new URL("../src/components/hero-experience.tsx", import.meta.url), "utf8");
 const locker = readFileSync(new URL("../src/components/game-locker.tsx", import.meta.url), "utf8");
@@ -114,4 +115,11 @@ test("P1 discovery ranks community sentiment and related games instead of raw re
   assert.match(repository, /scoreRelatedGame/);
   assert.match(repository, /sharedGenres \* 12/);
   assert.match(gameDetail, /detail-metrics-strip/);
+});
+
+
+test("game profiles use the catalog's real artwork before falling back to curated imagery", () => {
+  assert.match(detailContent, /game\.backgroundUrl/);
+  assert.match(detailContent, /game\.coverUrl/);
+  assert.match(igdbSync, /microsoft windows\|windows\|linux/);
 });

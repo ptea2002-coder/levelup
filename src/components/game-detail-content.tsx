@@ -12,6 +12,8 @@ export function GameDetailContent({ game }: GameDetailContentProps) {
   const video = getOfficialVideo(game.slug);
   const screenshotUrl = getSteamScreenshotUrl(game.slug);
   const gallery = Array.from(new Set([
+    ...(game.backgroundUrl ? [game.backgroundUrl] : []),
+    ...(game.coverUrl ? [game.coverUrl] : []),
     ...getGameArtworkSources(game.slug, "card"),
     ...getGameArtworkSources(game.slug, "detail"),
   ])).slice(0, 4);

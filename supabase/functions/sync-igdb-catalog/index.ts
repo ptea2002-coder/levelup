@@ -72,7 +72,7 @@ function makeMark(title: string): string {
 function normalizePlatform(name: string): string {
   const value = name.trim();
   const lower = value.toLowerCase();
-  if (/pc|windows|linux|macos|macintosh/.test(lower)) return "PC";
+  if (/^pc(?:\s*\(.*\))?$|^(microsoft windows|windows|linux|macos|mac os(?: x)?|macintosh|mac)$/.test(lower)) return "PC";
   if (/playstation 5/.test(lower)) return "PlayStation 5";
   if (/playstation 4/.test(lower)) return "PlayStation 4";
   if (/playstation 3/.test(lower)) return "PlayStation 3";
