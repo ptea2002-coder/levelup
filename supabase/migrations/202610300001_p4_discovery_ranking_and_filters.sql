@@ -10,7 +10,7 @@ create or replace function public.search_games_catalog_v2(
 returns jsonb
 language sql
 stable
-set search_path to 'public'
+set search_path = ''
 as $function$
   with prepared as materialized (
     select
