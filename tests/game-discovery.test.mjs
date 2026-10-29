@@ -29,7 +29,7 @@ test("personalization uses saved library signals and exposes recommendation reas
   assert.match(component, /useGameLibrary/);
   assert.match(component, /preferredGenres/);
   assert.match(component, /isFavorite/);
-  assert.match(component, /Khớp gu đã chọn/);
+  assert.match(component, /Khớp thể loại đã chọn/);
   assert.match(component, /Gần với game bạn lưu/);
   assert.match(component, /không phải đánh giá chất lượng tuyệt đối/);
 });
@@ -46,4 +46,29 @@ test("P4 navigation and styling support responsive and reduced-motion experience
   assert.match(styles, /@media \(max-width: 680px\)/);
   assert.match(styles, /prefers-reduced-motion: reduce/);
   assert.match(styles, /discovery-result-grid/);
+});
+
+
+test("multi-category and mood filters are sent to the server catalog query", () => {
+  assert.match(component, /params\.set\("categories", selectedGenres\.join\(","\)\)/);
+  assert.match(component, /params\.set\("mode", mode\)/);
+  assert.match(api, /categoriesParam/);
+  assert.match(api, /safeMode/);
+  assert.match(api, /categories,/);
+  assert.match(api, /mode: safeMode/);
+});
+
+test("catalog ranking uses Bayesian review smoothing and server-side mood filtering", () => {
+  const repository = readFileSync(new URL("../src/lib/game-repository.ts", import.meta.url), "utf8");
+  const migration = readFileSync(new URL("../supabase/migrations/202610300001_p4_discovery_ranking_and_filters.sql", import.meta.url), "utf8");
+  assert.match(repository, /search_games_catalog_v2/);
+  assert.match(repository, /p_categories:/);
+  assert.match(repository, /p_mode:/);
+  assert.match(repository, /Bayesian smoothing/);
+  assert.match(migration, /search_games_catalog_v2/);
+  assert.match(migration, /p_mode = 'competitive'/);
+  assert.match(migration, /p_mode = 'coop'/);
+  assert.match(migration, /p_mode = 'story'/);
+  assert.match(migration, /p_mode = 'chill'/);
+  assert.match(migration, /positive_count \+ 1500 \* 0\.75/);
 });
