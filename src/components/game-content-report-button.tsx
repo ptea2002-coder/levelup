@@ -36,26 +36,31 @@ export function GameContentReportButton({ userId, targetType, targetId }: GameCo
     }
 
     setBusy(true);
-    const payload = targetType === "review"
-      ? {
-          reporter_id: userId,
-          target_type: "review",
-          target_review_id: targetId,
-          target_game_comment_id: null,
-          reason,
-          details: details.trim(),
-          status: "open",
-        }
-      : {
-          reporter_id: userId,
-          target_type: "game_comment",
-          target_review_id: null,
-          target_game_comment_id: targetId,
-          reason,
-          details: details.trim(),
-          status: "open",
-        };
-    const { error: reportError } = await supabase.from("content_reports").insert(payload);
+    setBusy(true);
+    let reportError: { message: string } | null = null;
+    if (targetType === "review") {
+      const result = await supabase.from("content_reports").insert({
+        reporter_id: userId,
+        target_type: "review",
+        target_review_id: targetId,
+        target_game_comment_id: null,
+        reason,
+        details: details.trim(),
+        status: "open",
+      });
+      reportError = result.error;
+    } else {
+      const result = await supabase.from("content_reports").insert({
+        reporter_id: userId,
+        target_type: "game_comment",
+        target_review_id: null,
+        target_game_comment_id: targetId,
+        reason,
+        details: details.trim(),
+        status: "open",
+      });
+      reportError = result.error;
+    }
     setBusy(false);
 
     if (reportError) {
