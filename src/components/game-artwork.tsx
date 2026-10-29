@@ -31,6 +31,8 @@ export function GameArtwork({
   const [loaded, setLoaded] = useState(false);
   const src = sources[sourceIndex];
   const isDetail = variant === "detail";
+  const isCinematic = variant === "cinematic";
+  const isFeatureArtwork = isDetail || isCinematic;
   const artStyle = {
     "--art-primary": artPrimary,
     "--art-secondary": artSecondary,
@@ -38,7 +40,7 @@ export function GameArtwork({
 
   return (
     <div
-      className={isDetail ? "detail-art" : "game-art"}
+      className={isFeatureArtwork ? "detail-art" : "game-art"}
       style={artStyle}
       data-image-loaded={loaded ? "true" : "false"}
     >
@@ -50,11 +52,13 @@ export function GameArtwork({
           alt=""
           aria-hidden="true"
           fill
-          sizes={isDetail
-            ? "(max-width: 700px) calc(100vw - 32px), (max-width: 980px) 90vw, 42vw"
-            : "(max-width: 539px) calc(100vw - 32px), (max-width: 700px) 45vw, (max-width: 980px) 50vw, 33vw"}
-          preload={isDetail}
-          loading={isDetail ? undefined : "lazy"}
+          sizes={isCinematic
+            ? "(max-width: 700px) 100vw, (max-width: 1100px) 90vw, 50vw"
+            : isDetail
+              ? "(max-width: 700px) calc(100vw - 32px), (max-width: 980px) 90vw, 42vw"
+              : "(max-width: 539px) calc(100vw - 32px), (max-width: 700px) 45vw, (max-width: 980px) 50vw, 33vw"}
+          preload={isFeatureArtwork}
+          loading={isFeatureArtwork ? undefined : "lazy"}
           onLoad={() => setLoaded(true)}
           onError={() => {
             setLoaded(false);
@@ -63,12 +67,12 @@ export function GameArtwork({
         />
       ) : null}
       <span className="game-art-kicker">
-        {isDetail ? "LEVELUP / GAME PROFILE" : "LEVELUP / SELECTED"}
+        {isCinematic ? "LEVELUP / FEATURED SIGNAL" : isDetail ? "LEVELUP / GAME PROFILE" : "LEVELUP / SELECTED"}
       </span>
-      {!isDetail && index !== undefined ? (
+      {!isFeatureArtwork && index !== undefined ? (
         <span className="game-art-index">{String(index + 1).padStart(2, "0")}</span>
       ) : null}
-      <span className={(isDetail ? "detail-mark" : "game-art-mark") + (loaded ? " is-hidden" : "")} aria-hidden="true">
+      <span className={(isFeatureArtwork ? "detail-mark" : "game-art-mark") + (loaded ? " is-hidden" : "")} aria-hidden="true">
         {mark}
       </span>
       {!isDetail ? <span className="game-art-bottom">{category}</span> : null}
