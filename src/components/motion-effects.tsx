@@ -15,6 +15,12 @@ const REVEAL_SELECTORS = [
   ".steam-live-card",
   ".lfg-card",
   ".social-post-card",
+  ".gamer-stat",
+  ".gamer-mini-card",
+  ".detail-gallery-item",
+  ".detail-spec-column",
+  ".detail-guide-list li",
+  ".detail-highlight-list li",
 ];
 
 export function MotionEffects() {
@@ -91,28 +97,45 @@ export function MotionEffects() {
       });
     }
 
-    const cards = Array.from(
-      document.querySelectorAll<HTMLElement>(".game-card, .article-card, .steam-live-card, .lfg-card")
-    );
-    cards.forEach((card) => {
-      const onMove = (event: PointerEvent) => {
-        const rect = card.getBoundingClientRect();
-        if (!rect.width || !rect.height) return;
-        const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
-        const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
-        card.style.setProperty("--card-x", `${(x * 100).toFixed(1)}%`);
-        card.style.setProperty("--card-y", `${(y * 100).toFixed(1)}%`);
-        card.style.setProperty("--card-tilt-x", `${((0.5 - y) * 2.6).toFixed(2)}deg`);
-        card.style.setProperty("--card-tilt-y", `${((x - 0.5) * 3.6).toFixed(2)}deg`);
-        card.classList.add("is-tilting");
-      };
-      const onLeave = () => card.classList.remove("is-tilting");
-      card.addEventListener("pointermove", onMove);
-      card.addEventListener("pointerleave", onLeave);
-      cleanups.push(() => {
-        card.removeEventListener("pointermove", onMove);
-        card.removeEventListener("pointerleave", onLeave);
-      });
+    const cardSelector = ".game-card, .article-card, .steam-live-card, .lfg-card";
+    let activeCard: HTMLElement | null = null;
+
+    const onCardPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse") return;
+      const target = event.target;
+      const card = target instanceof Element ? target.closest<HTMLElement>(cardSelector) : null;
+
+      if (activeCard && activeCard !== card) activeCard.classList.remove("is-tilting");
+      activeCard = card;
+      if (!card) return;
+
+      const rect = card.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+      const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+      card.style.setProperty("--card-x", `${(x * 100).toFixed(1)}%`);
+      card.style.setProperty("--card-y", `${(y * 100).toFixed(1)}%`);
+      card.style.setProperty("--card-tilt-x", `${((0.5 - y) * 2.6).toFixed(2)}deg`);
+      card.style.setProperty("--card-tilt-y", `${((x - 0.5) * 3.6).toFixed(2)}deg`);
+      card.classList.add("is-tilting");
+    };
+
+    const onCardPointerOut = (event: PointerEvent) => {
+      if (!activeCard) return;
+      const nextTarget = event.relatedTarget;
+      if (nextTarget instanceof Node && activeCard.contains(nextTarget)) return;
+      if (event.target instanceof Node && activeCard.contains(event.target)) {
+        activeCard.classList.remove("is-tilting");
+        activeCard = null;
+      }
+    };
+
+    document.addEventListener("pointermove", onCardPointerMove, { passive: true });
+    document.addEventListener("pointerout", onCardPointerOut, { passive: true });
+    cleanups.push(() => {
+      document.removeEventListener("pointermove", onCardPointerMove);
+      document.removeEventListener("pointerout", onCardPointerOut);
+      activeCard?.classList.remove("is-tilting");
     });
 
     return () => cleanups.forEach((cleanup) => cleanup());
