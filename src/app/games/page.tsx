@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { GameExplorer } from "@/components/game-explorer";
-import { getGamesPage } from "@/lib/game-repository";
+import { getGameCatalogFacets, getGamesPage } from "@/lib/game-repository";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,10 @@ export const metadata: Metadata = {
 };
 
 export default async function GamesPage() {
-  const catalog = await getGamesPage({ page: 1, pageSize: 24, sort: "popular" });
+  const [catalog, facets] = await Promise.all([
+    getGamesPage({ page: 1, pageSize: 24, sort: "popular" }),
+    getGameCatalogFacets(),
+  ]);
 
   return (
     <main className="page-main">
@@ -38,7 +41,14 @@ export default async function GamesPage() {
       </section>
       <section className="section">
         <div className="container">
-          <GameExplorer games={catalog.items} remote initialTotal={catalog.total} catalogReady={catalog.available} />
+          <GameExplorer
+            games={catalog.items}
+            remote
+            initialTotal={catalog.total}
+            catalogReady={catalog.available}
+            availableCategories={facets.available ? facets.categories : undefined}
+            availablePlatforms={facets.available ? facets.platforms : undefined}
+          />
         </div>
       </section>
     </main>
