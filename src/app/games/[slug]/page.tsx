@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { GameArtwork } from "@/components/game-artwork";
 import { GameCard } from "@/components/game-card";
 import { GameDetailContent } from "@/components/game-detail-content";
+import { GameCommunitySection } from "@/components/game-community-section";
 import { GameLibraryControl } from "@/components/game-library-control";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
 import { steamTrackedGameSlugs } from "@/lib/steam-games";
@@ -188,6 +189,7 @@ export default async function GameDetailPage({ params }: GamePageProps) {
       ) : null}
 
       <GameDetailContent game={game} />
+      <GameCommunitySection gameSlug={game.slug} gameTitle={game.title} />
 
       {relatedGames.length > 0 ? (
         <section className="section related-games-section">

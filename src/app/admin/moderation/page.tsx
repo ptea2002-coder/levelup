@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ModerationConsole } from "@/components/moderation-console";
+import { GameContentModerationQueue } from "@/components/game-content-moderation-queue";
 
 export const metadata: Metadata = {
   title: "Kiểm duyệt cộng đồng",
@@ -18,6 +19,7 @@ export default function ModerationPage() {
         </div>
       </section>
       <ModerationConsole />
+      <GameContentModerationQueue />
     </main>
   );
 }
