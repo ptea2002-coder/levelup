@@ -7,6 +7,7 @@ import { CommunityNavStatus } from "@/components/community-nav-status";
 const navigation = [
   { href: "/community", label: "Bảng tin" },
   { href: "/games", label: "Khám phá game" },
+  { href: "/discover", label: "Gợi ý game" },
   { href: "/squads", label: "Tìm đồng đội" },
   { href: "/news", label: "Tin & hướng dẫn" },
   { href: "/locker", label: "Game Locker" },
