@@ -36,7 +36,6 @@ export function GameContentReportButton({ userId, targetType, targetId }: GameCo
     }
 
     setBusy(true);
-    setBusy(true);
     let reportError: { message: string } | null = null;
     if (targetType === "review") {
       const result = await supabase.from("content_reports").insert({
