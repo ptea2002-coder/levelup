@@ -204,7 +204,7 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
                   releaseYear={activeGame.releaseYear}
                   artPrimary={activeGame.artPrimary}
                   artSecondary={activeGame.artSecondary}
-                  variant="detail"
+                  variant="cinematic"
                 />
               </div>
               <div className="hero-cinematic-vignette" aria-hidden="true" />
