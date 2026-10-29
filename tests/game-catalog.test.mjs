@@ -48,7 +48,7 @@ test("real-data sync authenticates, deduplicates by provider ID and stores upstr
   assert.match(sync, /x-catalog-sync-secret/);
   assert.match(sync, /source_provider: "steamspy"/);
   assert.match(sync, /source_id: String\(appId\)/);
-  assert.match(sync, /source_metadata: app/);
+  assert.match(sync, /source_metadata: \{ \.\.\.metadata, steamspy: app \}/);
   assert.match(sync, /seenThisPage\.has\(slug\)/);
   assert.match(sync, /upsert\(rows\.slice/);
 });
