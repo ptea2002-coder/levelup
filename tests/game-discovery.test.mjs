@@ -30,6 +30,7 @@ test("personalization uses saved library signals and exposes recommendation reas
   assert.match(component, /preferredGenres/);
   assert.match(component, /isFavorite/);
   assert.match(component, /Khớp thể loại đã chọn/);
+  assert.match(component, /bayesianReview \* 100/);
   assert.match(component, /Gần với game bạn lưu/);
   assert.match(component, /không phải đánh giá chất lượng tuyệt đối/);
 });
