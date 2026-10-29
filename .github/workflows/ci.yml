@@ -2,9 +2,9 @@ name: LevelUP CI
 
 on:
   push:
-    branches: [main, v2-foundation]
+    branches: [main, v2-foundation, p3-1-editorial-hardening]
   pull_request:
-    branches: [main]
+    branches: [main, v2-foundation]
 
 jobs:
   validate:
