@@ -44,7 +44,16 @@ create table if not exists public.favorites (
 
 create table if not exists public.user_game_library (
   user_id uuid not null references public.profiles(id) on delete cascade,
-  game_slug text not null check (game_slug ~ '^[a-z0-9-]{1,100}
+  game_slug text not null check (game_slug ~ '^[a-z0-9-]{1,100}$'),
+  status text check (status is null or status in ('wishlist', 'playing', 'completed')),
+  is_favorite boolean not null default false,
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  primary key (user_id, game_slug)
+);
+
+create index if not exists user_game_library_user_updated_idx
+  on public.user_game_library (user_id, updated_at desc);
 
 create table if not exists public.reviews (
   id uuid primary key default gen_random_uuid(),
