@@ -130,6 +130,13 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
 
   if (!activeGame) return null;
 
+  const terminalLines = [
+    { text: "$ levelup --boot --mode=discovery", tone: "command" },
+    { text: "[OK] discovery.core loaded", tone: "result" },
+    { text: `[OK] game-index: ${String(curatedGames.length).padStart(2, "0")}`, tone: "result" },
+    { text: `[LIVE] target: ${activeGame.slug}`, tone: "live" },
+  ];
+
   return (
     <>
       <div className="levelup-scroll-progress" aria-hidden="true"><span /></div>
@@ -221,6 +228,35 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
               <div className="hero-stage-topbar">
                 <span><i /> FEATURED SIGNAL / 00{Math.max(1, curatedGames.findIndex((game) => game.slug === activeGame.slug) + 1)}</span>
                 <span className="hero-stage-live">LIVE SELECT</span>
+              </div>
+              <div className="hero-code-terminal" key={`terminal-${activeGame.slug}`} aria-hidden="true">
+                <div className="hero-code-terminal-head">
+                  <span className="hero-code-terminal-lights"><i /><i /><i /></span>
+                  <span className="hero-code-terminal-title">LVLUP:// TERMINAL</span>
+                  <span className="hero-code-terminal-mode">TRACE_02</span>
+                </div>
+                <div className="hero-code-terminal-lines">
+                  {terminalLines.map((line, index) => {
+                    const terminalLength = line.text.length + (line.tone === "live" ? 1 : 0);
+                    return (
+                      <span
+                        className={`hero-code-line hero-code-line-${line.tone}`}
+                        key={line.text}
+                        style={{
+                          "--terminal-delay": `${260 + index * 205}ms`,
+                          "--terminal-width": `${terminalLength}ch`,
+                          "--terminal-steps": terminalLength,
+                        } as CSSProperties}
+                      >
+                        {line.text}
+                      </span>
+                    );
+                  })}
+                </div>
+                <div className="hero-code-terminal-footer">
+                  <span>SELECTION / SYNCED</span>
+                  <span>REGION <b>VN · UTC+7</b></span>
+                </div>
               </div>
               <div className="hero-stage-crosshair" aria-hidden="true"><i /><i /><i /><i /></div>
               <div className="hero-stage-copy" key={`${activeGame.slug}-copy`}>

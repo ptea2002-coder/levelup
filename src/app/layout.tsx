@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { GameLibraryProvider } from "@/components/game-library-provider";
 import "./globals.css";
+import "./aaa-motion.css";
 
 const vietnameseFont = Be_Vietnam_Pro({
   variable: "--font-vietnam",
