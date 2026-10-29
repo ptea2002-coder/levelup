@@ -169,6 +169,10 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
                 <span className="hero-index-link-icon" aria-hidden="true">⌘</span>
                 Mở toàn bộ thư viện
               </Link>
+              <Link className="hero-index-link hero-community-link" href="/community">
+                <span className="hero-index-link-icon" aria-hidden="true">⌁</span>
+                Vào cộng đồng
+              </Link>
             </div>
             <div className="hero-cinematic-stats" aria-label="Tổng quan LevelUP">
               <div className="hero-cinematic-stat">
@@ -184,7 +188,7 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
               <div className="hero-cinematic-stat">
                 <span className="hero-stat-label">SYSTEM</span>
                 <strong className="hero-stat-ready">ONLINE<span>_</span></strong>
-                <span className="hero-stat-foot">Discovery / Community</span>
+                <span className="hero-stat-foot">Feed / Squad / Player ID</span>
               </div>
             </div>
             <div className="hero-cinematic-scroll-hint">

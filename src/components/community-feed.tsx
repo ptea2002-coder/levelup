@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { User } from "@supabase/supabase-js";
 import type { Game } from "@/lib/games";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -10,7 +10,7 @@ import { PlayerAvatar } from "@/components/player-avatar";
 import { firstRelation, formatSocialDate, type SocialComment, type SocialLike, type SocialPost, type SocialProfile } from "@/lib/social-types";
 
 type CommunityFeedProps = { games: Game[] };
-type FeedMode = "latest" | "following";
+type FeedMode = "latest" | "following" | "trending";
 
 export function CommunityFeed({ games }: CommunityFeedProps) {
   const [user, setUser] = useState<User | null>(null);
@@ -21,6 +21,7 @@ export function CommunityFeed({ games }: CommunityFeedProps) {
   const [comments, setComments] = useState<SocialComment[]>([]);
   const [followingIds, setFollowingIds] = useState<string[]>([]);
   const [feedMode, setFeedMode] = useState<FeedMode>("latest");
+  const [gameFilter, setGameFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
@@ -142,6 +143,21 @@ export function CommunityFeed({ games }: CommunityFeedProps) {
   }, [authReady, feedMode, user]);
 
   useEffect(() => { void loadFeed(); }, [loadFeed]);
+
+  const visiblePosts = useMemo(() => {
+    const filtered = posts.filter((post) => (
+      gameFilter === "all" || firstRelation(post.games)?.slug === gameFilter
+    ));
+    if (feedMode !== "trending") return filtered;
+    const engagementScore = (postId: string) => (
+      likes.reduce((total, like) => total + (like.post_id === postId ? 2 : 0), 0) +
+      comments.reduce((total, comment) => total + (comment.post_id === postId ? 3 : 0), 0)
+    );
+    return [...filtered].sort((a, b) => (
+      engagementScore(b.id) - engagementScore(a.id) ||
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    ));
+  }, [posts, gameFilter, feedMode, likes, comments]);
 
   async function handlePostSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -286,9 +302,22 @@ export function CommunityFeed({ games }: CommunityFeedProps) {
             <button className="social-refresh-button" type="button" onClick={() => void loadFeed()} disabled={loading}>↻ Làm mới</button>
           </div>
 
+          <div className="social-pulse-grid" aria-label="Tổng quan bảng tin hiện tại">
+            <div className="social-pulse-card"><span>POSTS IN FEED</span><strong>{posts.length.toString().padStart(2, "0")}</strong><small>Bài gần đây đã tải</small></div>
+            <div className="social-pulse-card"><span>REACTIONS</span><strong>{likes.length.toString().padStart(2, "0")}</strong><small>Lượt thích trong feed</small></div>
+            <div className="social-pulse-card"><span>DISCUSSIONS</span><strong>{comments.length.toString().padStart(2, "0")}</strong><small>Bình luận đã tải</small></div>
+            <div className="social-pulse-card"><span>FOLLOWING</span><strong>{followingIds.length.toString().padStart(2, "0")}</strong><small>Game thủ bạn theo dõi</small></div>
+          </div>
           <div className="social-feed-tabs" role="group" aria-label="Chọn bảng tin">
             <button type="button" className={feedMode === "latest" ? "is-active" : ""} aria-pressed={feedMode === "latest"} onClick={() => setFeedMode("latest")}>Mới nhất</button>
+            <button type="button" className={feedMode === "trending" ? "is-active" : ""} aria-pressed={feedMode === "trending"} onClick={() => setFeedMode("trending")}>Đang nổi</button>
             <button type="button" className={feedMode === "following" ? "is-active" : ""} aria-pressed={feedMode === "following"} onClick={() => setFeedMode("following")}>Đang theo dõi</button>
+          </div>
+          <div className="social-game-channels" role="group" aria-label="Lọc bài viết theo game">
+            <button type="button" className={gameFilter === "all" ? "is-active" : ""} aria-pressed={gameFilter === "all"} onClick={() => setGameFilter("all")}>Tất cả game</button>
+            {games.slice(0, 10).map((game) => (
+              <button type="button" key={game.slug} className={gameFilter === game.slug ? "is-active" : ""} aria-pressed={gameFilter === game.slug} onClick={() => setGameFilter(game.slug)}>{game.title}</button>
+            ))}
           </div>
 
           {user ? (
@@ -351,15 +380,16 @@ export function CommunityFeed({ games }: CommunityFeedProps) {
             </div>
           ) : loading ? (
             <div className="social-loading-state" role="status"><span className="social-loader" /> Đang tải bài đăng cộng đồng…</div>
-          ) : !loadError && posts.length === 0 ? (
+          ) : !loadError && visiblePosts.length === 0 ? (
             <div className="social-empty-state">
-              <p className="eyebrow">{feedMode === "following" ? "YOUR SQUAD / NO POSTS" : "COMMUNITY / FIRST DROP"}</p>
-              <h3>{feedMode === "following" ? "Bảng tin của bạn đang yên ắng." : "Hãy là người mở màn."}</h3>
-              <p>{feedMode === "following" ? "Theo dõi game thủ hoặc tự đăng bài để tạo cuộc trò chuyện đầu tiên." : "Chưa có bài đăng công khai. Khi game thủ chia sẻ, bài viết sẽ xuất hiện tại đây."}</p>
+              <p className="eyebrow">{posts.length > 0 ? "GAME CHANNEL / NO MATCHES" : feedMode === "following" ? "YOUR SQUAD / NO POSTS" : "COMMUNITY / FIRST DROP"}</p>
+              <h3>{posts.length > 0 ? "Kênh game này chưa có bài viết." : feedMode === "following" ? "Bảng tin của bạn đang yên ắng." : "Hãy là người mở màn."}</h3>
+              <p>{posts.length > 0 ? "Thử chọn game khác hoặc xem tất cả bài đăng trong cộng đồng." : feedMode === "following" ? "Theo dõi game thủ hoặc tự đăng bài để tạo cuộc trò chuyện đầu tiên." : "Chưa có bài đăng công khai. Khi game thủ chia sẻ, bài viết sẽ xuất hiện tại đây."}</p>
+              {posts.length > 0 ? <button className="social-text-action" type="button" onClick={() => setGameFilter("all")}>Xem tất cả game ↗</button> : null}
             </div>
           ) : !loadError ? (
             <div className="social-post-list">
-              {posts.map((post) => {
+              {visiblePosts.map((post) => {
                 const author = firstRelation(post.profiles);
                 const game = firstRelation(post.games);
                 const postComments = comments.filter((comment) => comment.post_id === post.id).slice(0, 3).reverse();

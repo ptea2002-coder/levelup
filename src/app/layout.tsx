@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { GameLibraryProvider } from "@/components/game-library-provider";
 import "./globals.css";
 import "./aaa-motion.css";
+import "./social-network.css";
 
 const vietnameseFont = Be_Vietnam_Pro({
   variable: "--font-vietnam",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     default: "LevelUP — Play hard. Level up.",
     template: "%s | LevelUP",
   },
-  description: "Khám phá game, đọc hướng dẫn và tìm cộng đồng chơi game theo cách của bạn.",
+  description: "Khám phá game, kết nối game thủ, chia sẻ chiến thuật và tìm đồng đội trên mạng xã hội gaming LevelUP.",
   applicationName: "LevelUP",
   keywords: ["game", "game PC", "hướng dẫn game", "cộng đồng game thủ", "LevelUP Việt Nam"],
   authors: [{ name: "LevelUP" }],

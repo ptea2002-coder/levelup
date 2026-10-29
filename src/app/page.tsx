@@ -111,16 +111,19 @@ export default async function HomePage() {
         <div className="container community-panel">
           <div className="community-decoration" aria-hidden="true">LVL<br />UP_</div>
           <div className="community-copy">
-            <p className="eyebrow">04 / PLAYER COMMUNITY</p>
+            <p className="eyebrow">04 / PLAYER SOCIAL HUB</p>
             <h2>GAME TỐT HƠN<br />KHI CHƠI <span>CÙNG NHAU.</span></h2>
-            <p>Hồ sơ game thủ, bảng tin cộng đồng và tìm đồng đội đã có mặt trên LevelUP. Kết nối với người chơi cùng gu, chia sẻ góc nhìn và lập squad phù hợp để vào game nhanh hơn.</p>
-            <Link className="btn btn-primary" href="/squads">Tìm đồng đội <span aria-hidden="true">↗</span></Link>
+            <p>LevelUP là điểm hẹn của game thủ: theo dõi người cùng gu, chia sẻ khoảnh khắc, thảo luận chiến thuật và lập squad phù hợp để vào trận nhanh hơn.</p>
+            <div className="community-actions">
+              <Link className="btn btn-primary" href="/community">Mở bảng tin <span aria-hidden="true">↗</span></Link>
+              <Link className="btn btn-secondary" href="/squads">Tìm đồng đội <span aria-hidden="true">⌁</span></Link>
+            </div>
           </div>
           <div className="community-status">
-            <span className="status-line"><i /> PHASE 01 / DISCOVERY</span>
-            <span className="status-line"><i /> PHASE 02 / PLAYER PROFILES</span>
-            <span className="status-line"><i /> PHASE 03 / SOCIAL FEED + LFG</span>
-            <span className="status-line pending"><i /> PHASE 04 / PERSONALIZATION</span>
+            <Link href="/community" className="status-line"><i /> PLAYER FEED / BẢNG TIN</Link>
+            <Link href="/login" className="status-line"><i /> PLAYER ID / HỒ SƠ</Link>
+            <Link href="/squads" className="status-line"><i /> SQUAD SYSTEM / TÌM ĐỘI</Link>
+            <Link href="/notifications" className="status-line"><i /> NOTIFICATIONS / THÔNG BÁO</Link>
           </div>
         </div>
       </section>
