@@ -1,31 +1,31 @@
 # LevelUP 2.0 — Roadmap
 
-## Phase 0 — Foundation (current branch)
+## Phase 0 — Foundation
 
 - [x] Create a separate `v2-foundation` branch so the existing GitHub Pages site is not overwritten.
 - [x] Add Next.js App Router, React, TypeScript, Tailwind CSS v4, and responsive brand styles.
-- [x] Create typed starter catalog, search/filter UI, game detail routes, and authored evergreen guides.
-- [x] Add an initial Supabase schema with row-level security policies and seed game data.
-- [x] Add a GitHub Actions type-check/build workflow.
-- [ ] Confirm the CI workflow passes and fix any build issues.
-- [ ] Generate and commit `package-lock.json` after the first dependency install.
+- [x] Create typed catalog, search/filter UI, game detail routes, and authored evergreen guides.
+- [x] Add the initial Supabase schema and seed data.
+- [x] Add a GitHub Actions type-check/build workflow; CI passes on the current P2 implementation.
+- [x] Commit `package-lock.json` and use locked dependency installation in CI.
 
 ## Phase 1 — Connect the backend
 
-1. Create a Supabase project on the appropriate free tier.
-2. Review and apply `supabase/schema.sql` in a non-production project first.
-3. Configure `.env.local` from `.env.example`; only public URL and anon key belong in browser-visible variables.
-4. Add the Supabase client/server utilities and migrate catalog reads from static data to PostgreSQL.
-5. Add signup, login, logout, session handling, and profile creation.
-6. Add tests for RLS and unauthorized access before shipping user data.
+- [x] Create and connect the Supabase project.
+- [x] Apply versioned schema migrations for the catalog, social features, and personal game library.
+- [x] Configure the deployed app with browser-safe Supabase URL/anon-key settings; secrets stay server-side.
+- [x] Add Supabase client/server utilities and migrate catalog reads to PostgreSQL.
+- [x] Add signup, login, logout, session handling, and profile creation.
+- [ ] Add automated integration tests proving anonymous access is denied and one user cannot read or write another user's private rows.
 
 ## Phase 2 — User features
 
 - [x] Cloud-synced favorites and personal game lists (local-first Game Locker, per-account sync, removal tombstones, and owner-only RLS).
-- Reviews with ratings, pending moderation, and abuse reporting.
-- Comments with rate limits and moderation tools.
-- Profile editing and basic account controls.
-- Accessibility and mobile regression checks.
+- [x] Reviews with ratings, pending moderation, and abuse reporting for published game reviews.
+- [x] Game comments with server-side rate limits, pending moderation, and owner-only withdrawal of pending/rejected content.
+- [x] Profile editing and basic account controls (display name, bio, follow/unfollow, authentication/session state).
+- [x] P2 accessibility/responsive regression guards for ARIA states, live feedback, reduced motion, and mobile layouts.
+
 
 ## Phase 3 — Editorial CMS
 
@@ -45,13 +45,13 @@
 ## Release gates
 
 Before production cutover:
-- CI passes on the exact commit to deploy.
-- Environment variables are configured in the hosting provider.
-- RLS policies are reviewed with both anonymous and authenticated test users.
-- All navigation routes and mobile breakpoints are checked.
-- No secrets, service-role keys, or private credentials exist in Git history.
-- Domain, redirects, privacy policy, community rules, and contact path are ready.
+- [x] CI passes on the exact P2 preview commit.
+- [x] Supabase environment configuration is present for the preview app.
+- [ ] RLS policies are verified with automated anonymous, owner, and cross-user integration tests.
+- [ ] All navigation routes and mobile breakpoints receive a full browser regression pass.
+- [ ] Secrets, service-role keys, and private credentials are audited across Git history.
+- [ ] Domain, redirects, privacy policy, community rules, and contact path are ready.
 
 ## Current limitations
 
-The branch is a working foundation, not a launched full-stack service. Supabase is not connected, login is not active, favorites are not cloud-synced, and no live news feed or admin CMS exists yet.
+The branch is a feature-complete preview foundation, not a production launch. Supabase auth and catalog reads are connected; the Game Locker syncs per-account statuses/favorites, and reviews/comments have rate limits, moderation, and abuse reporting. IGDB catalog sync remains intentionally disabled until credentials are configured. An editorial CMS and live news feed are not implemented, and the RLS integration suite plus full browser/mobile release audit remain open gates.
