@@ -173,9 +173,11 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
           + explicitMatches.length * 12
           + (platformMatch ? 3 : 0)
           + (mode !== "all" ? 8 : 0)
-          + bayesianReview * 10
-          + Math.log10(reviewTotal + 1) * 0.25
-          + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.15;
+          // Keep the smoothed review signal dominant so client-side personalization
+          // cannot undo the database's safer ranking for low-volume games.
+          + bayesianReview * 100
+          + Math.log10(reviewTotal + 1) * 0.01
+          + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.005;
         const reasons: string[] = [];
         if (explicitMatches.length) reasons.push("Khớp thể loại đã chọn");
         if (shared.length) reasons.push("Gần với game bạn lưu");
