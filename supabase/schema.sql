@@ -795,7 +795,7 @@ create policy "Editors delete editorial media" on storage.objects for delete to 
 notify pgrst, 'reload schema';
 
 
--- P3.1 editorial hardening (mirrors migration 20261029180000_editorial_hardening.sql).
+-- P3.1 editorial hardening (mirrors migration 20261029164550_editorial_hardening.sql).
 -- P3.1: harden editorial collaboration and archive feedback.
 -- Editors may collaborate on any article, while only admins may reassign authors.
 create index if not exists articles_published_by_idx
