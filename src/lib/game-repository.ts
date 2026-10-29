@@ -78,6 +78,7 @@ function fromRow(row: GameRow): Game {
     negativeReviews: Number(row.negative_reviews ?? 0),
     concurrentPlayers: Number(row.concurrent_players ?? 0),
     ownersEstimate: row.owners_estimate ?? null,
+    sourceSyncedAt: row.source_synced_at ?? null,
   };
 }
 
