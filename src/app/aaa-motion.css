@@ -218,3 +218,54 @@
     overflow: visible;
   }
 }
+
+
+/* Decode major section titles like a command stream as they enter the viewport. */
+.section-head.motion-reveal.is-visible h2,
+.page-hero.motion-reveal.is-visible h1,
+.community-panel.motion-reveal.is-visible .community-copy h2,
+.gamer-command-shell.motion-reveal.is-visible .gamer-command-top h2 {
+  animation: levelup-heading-decode .92s steps(24, end) 70ms both;
+  will-change: clip-path, filter;
+}
+
+@keyframes levelup-heading-decode {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: .62;
+    filter: blur(4px);
+    transform: translateY(5px);
+  }
+  13% {
+    opacity: 1;
+  }
+  70% {
+    clip-path: inset(0 0 0 0);
+    filter: blur(0);
+    transform: translateY(0);
+    text-shadow: -2px 0 rgba(99,230,223,.58), 2px 0 rgba(199,255,70,.34);
+  }
+  76% {
+    text-shadow: 2px 0 rgba(99,230,223,.4), -2px 0 rgba(167,139,250,.42);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+    text-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-head.motion-reveal.is-visible h2,
+  .page-hero.motion-reveal.is-visible h1,
+  .community-panel.motion-reveal.is-visible .community-copy h2,
+  .gamer-command-shell.motion-reveal.is-visible .gamer-command-top h2 {
+    animation: none !important;
+    clip-path: none !important;
+    filter: none !important;
+    transform: none !important;
+    will-change: auto;
+  }
+}
