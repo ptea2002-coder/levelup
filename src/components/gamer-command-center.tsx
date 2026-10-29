@@ -92,7 +92,7 @@ export function GamerCommandCenter({ games }: GamerCommandCenterProps) {
                       <small>{String(game.releaseYear)}</small>
                     </div>
                     <div className="gamer-mini-copy">
-                      <p className="gamer-mini-meta">{game.category} / {statusLabels[entry.status]}</p>
+                      <p className="gamer-mini-meta">{game.category} / {entry.status ? statusLabels[entry.status] : "Yêu thích"}</p>
                       <Link href={`/games/${game.slug}`}><h3>{game.title}</h3></Link>
                       <span className="gamer-mini-updated">
                         Đã thêm {entry.updatedAt ? new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "short" }).format(new Date(entry.updatedAt)) : "trước đó"}
