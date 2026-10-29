@@ -27,8 +27,9 @@ export function GamerCommandCenter({ games }: GamerCommandCenterProps) {
     [games, library],
   );
 
+  const savedCount = Object.keys(library).length;
   const countByStatus = (status: GameLibraryStatus) =>
-    savedGames.filter((game) => library[game.slug]?.status === status).length;
+    Object.values(library).filter((entry) => entry.status === status).length;
 
   return (
     <section className="section gamer-command-section" aria-labelledby="gamer-command-title">
@@ -62,12 +63,19 @@ export function GamerCommandCenter({ games }: GamerCommandCenterProps) {
 
           {!ready ? (
             <div className="gamer-command-empty" role="status">Đang đồng bộ Game Locker trên thiết bị này…</div>
-          ) : savedGames.length === 0 ? (
+          ) : savedCount === 0 ? (
             <div className="gamer-command-empty">
               <span className="eyebrow">LOADOUT EMPTY / READY FOR YOUR NEXT MAIN</span>
               <h3>Mọi bộ sưu tập đều bắt đầu từ một game.</h3>
               <p>Lưu game từ bất kỳ thẻ nào. Trạng thái được lưu trong trình duyệt này, không cần đăng nhập.</p>
               <Link className="btn btn-primary" href="/games">Chọn game đầu tiên <span aria-hidden="true">↗</span></Link>
+            </div>
+          ) : savedGames.length === 0 ? (
+            <div className="gamer-command-empty">
+              <span className="eyebrow">SAVED GAMES / OPEN LOCKER</span>
+              <h3>Bạn đã lưu {savedCount} game.</h3>
+              <p>Trang chủ chỉ hiển thị nhóm game nổi bật. Mở Game Locker để xem toàn bộ bộ sưu tập đã lưu.</p>
+              <Link className="btn btn-primary" href="/locker">Mở Game Locker <span aria-hidden="true">↗</span></Link>
             </div>
           ) : (
             <div className="gamer-mini-grid">
@@ -99,7 +107,7 @@ export function GamerCommandCenter({ games }: GamerCommandCenterProps) {
 
           <div className="gamer-command-foot">
             <span><i aria-hidden="true" /> {storageAvailable ? "LOCAL SAVE / ĐỒNG BỘ TRÊN TRÌNH DUYỆT" : "SESSION SAVE / BỘ NHỚ TRÌNH DUYỆT BỊ HẠN CHẾ"}</span>
-            <span>{savedGames.length} / {games.length} game trong Locker</span>
+            <span>{savedCount} game đã lưu · hiển thị tối đa 3 game nổi bật</span>
           </div>
         </div>
       </div>
