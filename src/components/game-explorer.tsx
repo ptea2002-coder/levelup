@@ -9,16 +9,13 @@ const categoryOrder = [
   "Turn-based RPG", "Simulation", "Sports", "MMORPG", "Co-op Shooter", "PC Game",
 ];
 
-const commonPlatforms = [
-  "PC", "Steam", "PlayStation", "PlayStation 5", "Xbox", "Xbox Series X|S",
-  "Nintendo Switch", "Mobile",
-];
-
 type GameExplorerProps = {
   games: Game[];
   remote?: boolean;
   initialTotal?: number;
   catalogReady?: boolean;
+  availableCategories?: string[];
+  availablePlatforms?: string[];
 };
 
 type CatalogResponse = {
@@ -32,6 +29,8 @@ export function GameExplorer({
   remote = false,
   initialTotal,
   catalogReady = true,
+  availableCategories,
+  availablePlatforms,
 }: GameExplorerProps) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tất cả");
@@ -102,20 +101,23 @@ export function GameExplorer({
   }, [remote, catalogReady, query, activeCategory, activePlatform, sortBy, retryKey]);
 
   const categories = useMemo(() => {
-    const available = new Set(games.map((game) => game.category));
-    if (remote) for (const category of categoryOrder) available.add(category);
+    const sourceCategories = remote && availableCategories?.length
+      ? availableCategories
+      : games.map((game) => game.category);
+    const available = new Set(sourceCategories.filter(Boolean));
     const ordered = categoryOrder.filter((category) => available.has(category));
     const remaining = Array.from(available)
       .filter((category) => !categoryOrder.includes(category))
       .sort((a, b) => a.localeCompare(b, "vi"));
     return ["Tất cả", ...ordered, ...remaining];
-  }, [games, remote]);
+  }, [availableCategories, games, remote]);
 
   const platforms = useMemo(() => {
-    const available = new Set(games.flatMap((game) => game.platforms));
-    if (remote) for (const platform of commonPlatforms) available.add(platform);
-    return Array.from(available).sort((a, b) => a.localeCompare(b, "vi"));
-  }, [games, remote]);
+    const sourcePlatforms = remote && availablePlatforms?.length
+      ? availablePlatforms
+      : games.flatMap((game) => game.platforms);
+    return [...new Set(sourcePlatforms.filter(Boolean))].sort((a, b) => a.localeCompare(b, "vi"));
+  }, [availablePlatforms, games, remote]);
 
   const filteredGames = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("vi");
@@ -214,7 +216,7 @@ export function GameExplorer({
         <label className="discovery-select">
           <span>Sắp xếp</span>
           <select value={sortBy} onChange={(event) => setSortBy(event.target.value as "popular" | "name" | "newest" | "positive")} aria-label="Sắp xếp game">
-            <option value="popular">Đang được chơi</option>
+            <option value="popular">{remote ? "Phổ biến (SteamSpy)" : "Nổi bật"}</option>
             <option value="positive">Đánh giá tích cực</option>
             <option value="newest">Mới phát hành</option>
             <option value="name">Tên A–Z</option>
