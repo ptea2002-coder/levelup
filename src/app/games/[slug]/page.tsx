@@ -8,7 +8,7 @@ import { GameLibraryControl } from "@/components/game-library-control";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
 import { steamTrackedGameSlugs } from "@/lib/steam-games";
 import { getGameArtworkUrl } from "@/lib/game-art";
-import { getGames } from "@/lib/game-repository";
+import { getGameBySlug, getRelatedGames } from "@/lib/game-repository";
 
 type GamePageProps = {
   params: Promise<{ slug: string }>;
@@ -18,11 +18,10 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: GamePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const games = await getGames();
-  const game = games.find((item) => item.slug === slug);
+  const game = await getGameBySlug(slug);
   if (!game) return { title: "Không tìm thấy game" };
 
-  const image = getGameArtworkUrl(game.slug, "detail");
+  const image = game.backgroundUrl || game.coverUrl || getGameArtworkUrl(game.slug, "detail");
 
   return {
     title: game.title,
@@ -48,22 +47,10 @@ export async function generateMetadata({ params }: GamePageProps): Promise<Metad
 
 export default async function GameDetailPage({ params }: GamePageProps) {
   const { slug } = await params;
-  const games = await getGames();
-  const game = games.find((item) => item.slug === slug);
+  const game = await getGameBySlug(slug);
   if (!game) notFound();
 
-  const relatedGames = games
-    .filter((candidate) => candidate.slug !== game.slug)
-    .map((candidate) => ({
-      candidate,
-      score:
-        (candidate.category === game.category ? 3 : 0) +
-        candidate.genres.filter((genre) => game.genres.includes(genre)).length,
-    }))
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score || a.candidate.title.localeCompare(b.candidate.title))
-    .slice(0, 3)
-    .map((item) => item.candidate);
+  const relatedGames = await getRelatedGames(game, 3);
 
   return (
     <main className="page-main">
@@ -85,13 +72,15 @@ export default async function GameDetailPage({ params }: GamePageProps) {
               releaseYear={game.releaseYear}
               artPrimary={game.artPrimary}
               artSecondary={game.artSecondary}
+              coverUrl={game.coverUrl}
+              backgroundUrl={game.backgroundUrl}
               variant="detail"
             />
 
             <div className="detail-copy">
               <p className="eyebrow">GAME PROFILE / {game.category.toUpperCase()}</p>
               <h1>{game.title}<span>.</span></h1>
-              <p className="detail-description">{game.description}</p>
+              <p className="detail-description">{game.shortDescription || game.description || "Mô tả chi tiết chưa có trong nguồn dữ liệu. Hãy mở trang Steam để xem thông tin do nhà phát hành cung cấp."}</p>
 
               <div className="detail-tags" aria-label="Thể loại game">
                 {game.genres.map((genre) => <span key={genre}>{genre}</span>)}
@@ -104,7 +93,7 @@ export default async function GameDetailPage({ params }: GamePageProps) {
                 </div>
                 <div>
                   <dt>Năm phát hành</dt>
-                  <dd>{game.releaseYear}</dd>
+                  <dd>{game.releaseYear > 0 ? game.releaseYear : "Chưa cập nhật"}</dd>
                 </div>
                 <div>
                   <dt>Thể loại chính</dt>
@@ -120,7 +109,7 @@ export default async function GameDetailPage({ params }: GamePageProps) {
 
               <div className="detail-actions">
                 <a className="btn btn-primary" href={game.officialUrl} target="_blank" rel="noopener noreferrer">
-                  Trang chính thức <span aria-hidden="true">↗</span>
+                  {game.sourceProvider === "steamspy" ? "Xem trên Steam" : "Trang chính thức"} <span aria-hidden="true">↗</span>
                 </a>
                 <Link className="btn btn-secondary" href="/games">
                   Khám phá game khác <span aria-hidden="true">→</span>

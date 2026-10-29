@@ -4,18 +4,47 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { GameCard } from "@/components/game-card";
 import type { Game } from "@/lib/games";
 
-const categoryOrder = ["FPS", "MOBA", "Battle Royale", "Action RPG", "Hero Shooter", "Sandbox", "Turn-based RPG", "Simulation", "Sports", "MMORPG", "Co-op Shooter"];
+const categoryOrder = [
+  "FPS", "MOBA", "Battle Royale", "Action RPG", "Hero Shooter", "Sandbox",
+  "Turn-based RPG", "Simulation", "Sports", "MMORPG", "Co-op Shooter", "PC Game",
+];
+
+const commonPlatforms = [
+  "PC", "Steam", "PlayStation", "PlayStation 5", "Xbox", "Xbox Series X|S",
+  "Nintendo Switch", "Mobile",
+];
 
 type GameExplorerProps = {
   games: Game[];
+  remote?: boolean;
+  initialTotal?: number;
+  catalogReady?: boolean;
 };
 
-export function GameExplorer({ games }: GameExplorerProps) {
+type CatalogResponse = {
+  items: Game[];
+  total: number;
+  error?: string;
+};
+
+export function GameExplorer({
+  games,
+  remote = false,
+  initialTotal,
+  catalogReady = true,
+}: GameExplorerProps) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tất cả");
   const [activePlatform, setActivePlatform] = useState("Tất cả nền tảng");
-  const [sortBy, setSortBy] = useState<"recommended" | "name" | "newest">("recommended");
+  const [sortBy, setSortBy] = useState<"popular" | "name" | "newest" | "positive">("popular");
+  const [remoteItems, setRemoteItems] = useState(games);
+  const [total, setTotal] = useState(initialTotal ?? games.length);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState(remote && !catalogReady);
+  const [retryKey, setRetryKey] = useState(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const firstRequest = useRef(true);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -23,62 +52,124 @@ export function GameExplorer({ games }: GameExplorerProps) {
       const isTyping = target instanceof HTMLElement && (
         target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
       );
-
       if (event.key === "/" && !event.altKey && !event.ctrlKey && !event.metaKey && !isTyping) {
         event.preventDefault();
         searchInputRef.current?.focus();
       }
-
       if (event.key === "Escape" && document.activeElement === searchInputRef.current) {
         setQuery("");
         searchInputRef.current?.blur();
       }
     };
-
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
   }, []);
 
+  useEffect(() => {
+    if (!remote) return;
+    if (firstRequest.current) {
+      firstRequest.current = false;
+      if (catalogReady) return;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setLoading(true);
+      setLoadError(false);
+      const params = new URLSearchParams({ page: "1", limit: "24", sort: sortBy });
+      if (query.trim()) params.set("query", query.trim());
+      if (activeCategory !== "Tất cả") params.set("category", activeCategory);
+      if (activePlatform !== "Tất cả nền tảng") params.set("platform", activePlatform);
+
+      try {
+        const response = await fetch("/api/games?" + params.toString(), { signal: controller.signal });
+        const payload = await response.json() as CatalogResponse;
+        if (!response.ok) throw new Error(payload.error || "Không thể tải kho game.");
+        setRemoteItems(payload.items ?? []);
+        setTotal(Number(payload.total ?? 0));
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") return;
+        setLoadError(true);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }, query.trim() ? 250 : 0);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [remote, catalogReady, query, activeCategory, activePlatform, sortBy, retryKey]);
+
   const categories = useMemo(() => {
     const available = new Set(games.map((game) => game.category));
+    if (remote) for (const category of categoryOrder) available.add(category);
     const ordered = categoryOrder.filter((category) => available.has(category));
     const remaining = Array.from(available)
       .filter((category) => !categoryOrder.includes(category))
       .sort((a, b) => a.localeCompare(b, "vi"));
     return ["Tất cả", ...ordered, ...remaining];
-  }, [games]);
+  }, [games, remote]);
 
-  const platforms = useMemo(
-    () => Array.from(new Set(games.flatMap((game) => game.platforms))).sort((a, b) => a.localeCompare(b, "vi")),
-    [games],
-  );
+  const platforms = useMemo(() => {
+    const available = new Set(games.flatMap((game) => game.platforms));
+    if (remote) for (const platform of commonPlatforms) available.add(platform);
+    return Array.from(available).sort((a, b) => a.localeCompare(b, "vi"));
+  }, [games, remote]);
 
   const filteredGames = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("vi");
     return games.filter((game) => {
-      const matchesCategory =
-        activeCategory === "Tất cả" ||
-        game.category === activeCategory ||
-        game.genres.includes(activeCategory);
+      const matchesCategory = activeCategory === "Tất cả"
+        || game.category === activeCategory
+        || game.genres.includes(activeCategory);
       const matchesPlatform = activePlatform === "Tất cả nền tảng" || game.platforms.includes(activePlatform);
-      const searchable = [
-        game.title,
-        game.category,
-        game.developer,
-        ...game.genres,
-        ...game.platforms,
-      ].join(" ").toLocaleLowerCase("vi");
+      const searchable = [game.title, game.category, game.developer, ...game.genres, ...game.platforms]
+        .join(" ").toLocaleLowerCase("vi");
       return matchesCategory && matchesPlatform && (!normalizedQuery || searchable.includes(normalizedQuery));
     });
   }, [activeCategory, activePlatform, games, query]);
 
-  const sortedGames = useMemo(() => {
+  const sortedLocalGames = useMemo(() => {
     if (sortBy === "name") return [...filteredGames].sort((a, b) => a.title.localeCompare(b.title, "vi"));
-    if (sortBy === "newest") {
-      return [...filteredGames].sort((a, b) => b.releaseYear - a.releaseYear || a.title.localeCompare(b.title, "vi"));
-    }
+    if (sortBy === "newest") return [...filteredGames].sort((a, b) => b.releaseYear - a.releaseYear);
+    if (sortBy === "positive") return [...filteredGames].sort((a, b) => (b.positiveReviews ?? 0) - (a.positiveReviews ?? 0));
     return filteredGames;
   }, [filteredGames, sortBy]);
+
+  const displayedGames = remote ? remoteItems : sortedLocalGames;
+  const resultTotal = remote ? total : sortedLocalGames.length;
+  const hasMore = remote && remoteItems.length < total;
+
+  const loadMore = async () => {
+    if (!remote || loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    setLoadError(false);
+    const nextPage = Math.floor(remoteItems.length / 24) + 1;
+    const params = new URLSearchParams({ page: String(nextPage), limit: "24", sort: sortBy });
+    if (query.trim()) params.set("query", query.trim());
+    if (activeCategory !== "Tất cả") params.set("category", activeCategory);
+    if (activePlatform !== "Tất cả nền tảng") params.set("platform", activePlatform);
+
+    try {
+      const response = await fetch("/api/games?" + params.toString());
+      const payload = await response.json() as CatalogResponse;
+      if (!response.ok) throw new Error(payload.error || "Không thể tải thêm game.");
+      setRemoteItems((current) => [...current, ...(payload.items ?? [])]);
+      setTotal(Number(payload.total ?? 0));
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const resetFilters = () => {
+    setQuery("");
+    setActiveCategory("Tất cả");
+    setActivePlatform("Tất cả nền tảng");
+    setSortBy("popular");
+  };
 
   return (
     <div className="game-explorer">
@@ -88,7 +179,7 @@ export function GameExplorer({ games }: GameExplorerProps) {
             <button
               key={category}
               type="button"
-              className={`filter-btn${activeCategory === category ? " active" : ""}`}
+              className={"filter-btn" + (activeCategory === category ? " active" : "")}
               aria-pressed={activeCategory === category}
               onClick={() => setActiveCategory(category)}
             >
@@ -122,45 +213,51 @@ export function GameExplorer({ games }: GameExplorerProps) {
         </label>
         <label className="discovery-select">
           <span>Sắp xếp</span>
-          <select value={sortBy} onChange={(event) => setSortBy(event.target.value as "recommended" | "name" | "newest")} aria-label="Sắp xếp game">
-            <option value="recommended">Thứ tự gợi ý</option>
+          <select value={sortBy} onChange={(event) => setSortBy(event.target.value as "popular" | "name" | "newest" | "positive")} aria-label="Sắp xếp game">
+            <option value="popular">Đang được chơi</option>
+            <option value="positive">Đánh giá tích cực</option>
             <option value="newest">Mới phát hành</option>
             <option value="name">Tên A–Z</option>
           </select>
         </label>
-        <button
-          className="discovery-reset"
-          type="button"
-          disabled={!query && activeCategory === "Tất cả" && activePlatform === "Tất cả nền tảng" && sortBy === "recommended"}
-          onClick={() => { setQuery(""); setActiveCategory("Tất cả"); setActivePlatform("Tất cả nền tảng"); setSortBy("recommended"); }}
-        >
+        <button className="discovery-reset" type="button" disabled={!query && activeCategory === "Tất cả" && activePlatform === "Tất cả nền tảng" && sortBy === "popular"} onClick={resetFilters}>
           Đặt lại bộ lọc
         </button>
       </div>
 
       <p className="results-count" role="status">
-        {sortedGames.length} tựa game phù hợp
+        {loading ? "Đang tìm trong kho game..." : "Hiển thị " + displayedGames.length.toLocaleString("vi-VN") + " / " + resultTotal.toLocaleString("vi-VN") + " tựa game"}
       </p>
 
-      <div className="game-grid">
-        {sortedGames.map((game) => (
-          <GameCard key={game.slug} game={game} index={games.findIndex((item) => item.slug === game.slug)} />
-        ))}
-        {filteredGames.length === 0 && (
-          <div className="empty-state">
-            <span className="eyebrow">KHÔNG CÓ KẾT QUẢ</span>
-            <h3>Thử một từ khóa khác</h3>
-            <p>Thư viện hiện tại là bộ sưu tập khởi đầu; dữ liệu sẽ được mở rộng trong các giai đoạn tiếp theo.</p>
-            <button
-              className="btn btn-secondary"
-              type="button"
-              onClick={() => { setQuery(""); setActiveCategory("Tất cả"); setActivePlatform("Tất cả nền tảng"); setSortBy("recommended"); }}
-            >
-              Xóa bộ lọc
-            </button>
+      {loadError ? (
+        <div className="empty-state" role="status">
+          <span className="eyebrow">CATALOG / CONNECTION</span>
+          <h3>Chưa kết nối được kho game</h3>
+          <p>LevelUP không thay dữ liệu thật bằng danh sách mẫu. Hãy thử tải lại sau khi kết nối dữ liệu được khôi phục.</p>
+          {remote ? <button className="btn btn-secondary" type="button" onClick={() => { resetFilters(); setRetryKey((value) => value + 1); }}>Thử lại</button> : null}
+        </div>
+      ) : (
+        <>
+          <div className="game-grid">
+            {displayedGames.map((game, index) => <GameCard key={game.slug} game={game} index={index} />)}
+            {!loading && displayedGames.length === 0 ? (
+              <div className="empty-state">
+                <span className="eyebrow">KHÔNG CÓ KẾT QUẢ</span>
+                <h3>Thử một từ khóa khác</h3>
+                <p>Không có game phù hợp với điều kiện tìm kiếm hiện tại.</p>
+                <button className="btn btn-secondary" type="button" onClick={resetFilters}>Xóa bộ lọc</button>
+              </div>
+            ) : null}
           </div>
-        )}
-      </div>
+          {hasMore ? (
+            <div className="catalog-load-more">
+              <button className="btn btn-secondary" type="button" onClick={loadMore} disabled={loadingMore || loading}>
+                {loadingMore ? "Đang tải..." : "Tải thêm 24 game"}
+              </button>
+            </div>
+          ) : null}
+        </>
+      )}
     </div>
   );
 }

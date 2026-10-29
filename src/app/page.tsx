@@ -5,7 +5,7 @@ import { GameExplorer } from "@/components/game-explorer";
 import { GamerCommandCenter } from "@/components/gamer-command-center";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
 import { articles } from "@/lib/articles";
-import { getGames } from "@/lib/game-repository";
+import { getGames, getGamesBySlugs } from "@/lib/game-repository";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -14,11 +14,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const games = await getGames();
   const featuredSlugs = ["valorant", "league-of-legends", "counter-strike-2", "apex-legends", "genshin-impact", "elden-ring"];
-  const featuredGames = games
-    .filter((game) => featuredSlugs.includes(game.slug))
-    .sort((a, b) => featuredSlugs.indexOf(a.slug) - featuredSlugs.indexOf(b.slug));
+  const [games, featuredGames] = await Promise.all([getGames(48), getGamesBySlugs(featuredSlugs)]);
 
   return (
     <main>
@@ -53,7 +50,7 @@ export default async function HomePage() {
               <Link className="text-link" href="/games">Toàn bộ thư viện <span aria-hidden="true">↗</span></Link>
             </div>
           </div>
-          <GameExplorer games={featuredGames} />
+          <GameExplorer games={featuredGames} remote={false} />
         </div>
       </section>
 

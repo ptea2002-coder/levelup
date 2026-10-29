@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { GameExplorer } from "@/components/game-explorer";
-import { getGames } from "@/lib/game-repository";
+import { getGamesPage } from "@/lib/game-repository";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default async function GamesPage() {
-  const games = await getGames();
+  const catalog = await getGamesPage({ page: 1, pageSize: 24, sort: "popular" });
 
   return (
     <main className="page-main">
@@ -31,12 +31,13 @@ export default async function GamesPage() {
         <div className="container">
           <p className="eyebrow">DATABASE / 001</p>
           <h1>GAME<br /><span>LIBRARY.</span></h1>
-          <p>Khám phá game theo thể loại, studio và nền tảng. Dữ liệu được tải từ Supabase khi backend sẵn sàng, kèm bộ dữ liệu dự phòng để trang luôn hoạt động.</p>
+          <p>Tra cứu kho game được đồng bộ từ nguồn dữ liệu thực. Tìm kiếm và lọc trực tiếp trên máy chủ; trình duyệt chỉ tải từng trang nhỏ để luôn nhanh kể cả khi kho có hàng trăm nghìn tựa game.</p>
+          <p className="catalog-meta">{catalog.available ? catalog.total.toLocaleString("vi-VN") + " tựa game trong kho dữ liệu" : "Kho dữ liệu đang kết nối"}</p>
         </div>
       </section>
       <section className="section">
         <div className="container">
-          <GameExplorer games={games} />
+          <GameExplorer games={catalog.items} remote initialTotal={catalog.total} catalogReady={catalog.available} />
         </div>
       </section>
     </main>

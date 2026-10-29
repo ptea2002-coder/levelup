@@ -12,6 +12,8 @@ type GameArtworkProps = {
   releaseYear: number;
   artPrimary: string;
   artSecondary: string;
+  coverUrl?: string | null;
+  backgroundUrl?: string | null;
   variant?: GameArtworkVariant;
   index?: number;
 };
@@ -23,10 +25,14 @@ export function GameArtwork({
   releaseYear,
   artPrimary,
   artSecondary,
+  coverUrl,
+  backgroundUrl,
   variant = "card",
   index,
 }: GameArtworkProps) {
-  const sources = getGameArtworkSources(slug, variant);
+  const curatedSources = getGameArtworkSources(slug, variant);
+  const remoteSources = variant === "card" ? [coverUrl] : [backgroundUrl, coverUrl];
+  const sources = [...new Set([...remoteSources, ...curatedSources].filter((source): source is string => Boolean(source)))];
   const [sourceIndex, setSourceIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const src = sources[sourceIndex];

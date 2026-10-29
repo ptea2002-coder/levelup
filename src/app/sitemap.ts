@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
 import { articles } from "@/lib/articles";
-import { getGames } from "@/lib/game-repository";
+import { getSitemapGames } from "@/lib/game-repository";
 import { siteUrl } from "@/lib/site";
 
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const absoluteUrl = (path: string) => new URL(path, siteUrl).toString();
-  const games = await getGames();
+  const games = await getSitemapGames(5000);
 
   return [
     { url: absoluteUrl("/"), changeFrequency: "weekly", priority: 1 },

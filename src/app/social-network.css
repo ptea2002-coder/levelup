@@ -232,3 +232,18 @@ button:not(:disabled) { touch-action: manipulation; }
   #main-content main { animation: none !important; }
   .social-pulse-card,.social-post-card,.social-aside-card,.social-game-channels button,.nav-links a::after,.brand-mark { transition: none !important; }
 }
+
+.catalog-meta {
+  margin-top: 1rem;
+  color: var(--accent, #8b7bff);
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}
+.catalog-load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+.catalog-load-more .btn {
+  min-width: min(100%, 260px);
+}

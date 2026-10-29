@@ -11,6 +11,15 @@ export type Game = {
   mark: string;
   artPrimary: string;
   artSecondary: string;
+  sourceProvider?: string | null;
+  sourceId?: string | null;
+  coverUrl?: string | null;
+  backgroundUrl?: string | null;
+  shortDescription?: string | null;
+  positiveReviews?: number | null;
+  negativeReviews?: number | null;
+  concurrentPlayers?: number | null;
+  ownersEstimate?: string | null;
 };
 
 export const games: Game[] = [
