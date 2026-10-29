@@ -51,9 +51,10 @@ function KineticLine({
 type HeroExperienceProps = {
   games: Game[];
   articleCount: number;
+  gameCount?: number;
 };
 
-export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
+export function HeroExperience({ games, articleCount, gameCount = games.length }: HeroExperienceProps) {
   const curatedGames = useMemo(() => {
     const curated = games
       .filter((game) => FEATURED_ORDER.includes(game.slug))
@@ -133,7 +134,7 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
   const terminalLines = [
     { text: "$ levelup --boot --mode=discovery", tone: "command" },
     { text: "[OK] discovery.core loaded", tone: "result" },
-    { text: `[OK] game-index: ${String(curatedGames.length).padStart(2, "0")}`, tone: "result" },
+    { text: `[OK] featured-set: ${String(curatedGames.length).padStart(2, "0")}`, tone: "result" },
     { text: `[LIVE] target: ${activeGame.slug}`, tone: "live" },
   ];
 
@@ -177,8 +178,8 @@ export function HeroExperience({ games, articleCount }: HeroExperienceProps) {
             <div className="hero-cinematic-stats" aria-label="Tổng quan LevelUP">
               <div className="hero-cinematic-stat">
                 <span className="hero-stat-label">GAME DATABASE</span>
-                <strong>{String(games.length).padStart(2, "0")}</strong>
-                <span className="hero-stat-foot">Tựa game được tuyển chọn</span>
+                <strong>{gameCount > 0 ? gameCount.toLocaleString("vi-VN") : "—"}</strong>
+                <span className="hero-stat-foot">Tựa game trong kho dữ liệu</span>
               </div>
               <div className="hero-cinematic-stat">
                 <span className="hero-stat-label">FIELD NOTES</span>
