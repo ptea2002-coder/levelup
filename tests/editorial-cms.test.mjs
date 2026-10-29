@@ -30,7 +30,7 @@ test("public editorial pages can combine database articles with evergreen guides
 });
 
 test("P3.1 lets editors collaborate without allowing author reassignment", () => {
-  const hardening = readFileSync(new URL("../supabase/migrations/20261029180000_editorial_hardening.sql", import.meta.url), "utf8");
+  const hardening = readFileSync(new URL("../supabase/migrations/20261029164550_editorial_hardening.sql", import.meta.url), "utf8");
   assert.ok(hardening.includes("create trigger articles_guard_author_id"));
   assert.ok(hardening.includes("new.author_id := old.author_id"));
   assert.ok(hardening.includes("drop policy if exists \"Editors update articles\""));
