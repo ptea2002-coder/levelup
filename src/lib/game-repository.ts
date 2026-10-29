@@ -53,11 +53,29 @@ export type GameCatalogFacets = {
 export type GameCatalogQuery = {
   query?: string;
   category?: string;
+  categories?: string[];
   platform?: string;
+  mode?: "all" | "competitive" | "coop" | "story" | "chill";
   sort?: "popular" | "recommended" | "name" | "newest" | "positive";
   page?: number;
   pageSize?: number;
 };
+
+const catalogModeTerms: Record<Exclude<NonNullable<GameCatalogQuery["mode"]>, "all">, string[]> = {
+  competitive: ["fps", "moba", "battle royale", "tactical", "competitive", "hero shooter", "fighting", "sports", "pvp", "shooter", "counter-strike", "valorant", "dota", "league of legends", "apex legends", "overwatch", "warzone", "rainbow six", "team fortress", "rocket league"],
+  coop: ["co-op", "coop", "multiplayer", "survival", "party", "team-based", "pve", "squad", "raid", "left 4 dead", "helldivers", "deep rock", "it takes two", "monster hunter", "valheim", "terraria", "minecraft", "rust"],
+  story: ["rpg", "role-playing", "story", "adventure", "narrative", "open world", "soulslike", "single-player", "fantasy", "campaign", "quest", "baldur", "witcher", "elden ring", "final fantasy", "cyberpunk", "mass effect", "red dead", "assassin", "persona", "horizon", "god of war", "black myth"],
+  chill: ["simulation", "casual", "farming", "sandbox", "puzzle", "creative", "cozy", "relaxing", "building", "city builder", "life sim", "management", "crafting", "stardew", "animal crossing", "powerwash", "unpacking", "house flipper", "the sims", "planet zoo", "cities: skylines", "palia", "dorfromantik", "balatro"],
+};
+
+function matchesCatalogMode(game: Game, mode: GameCatalogQuery["mode"] = "all"): boolean {
+  if (!mode || mode === "all") return true;
+  const searchable = [
+    game.title, game.category, game.developer, game.description, game.shortDescription ?? "",
+    ...game.genres, ...game.platforms,
+  ].join(" ").toLocaleLowerCase("vi");
+  return catalogModeTerms[mode].some((term) => searchable.includes(term));
+}
 
 function fromRow(row: GameRow): Game {
   return {
@@ -90,29 +108,39 @@ function fromRow(row: GameRow): Game {
 
 function localSearch(params: GameCatalogQuery): GameCatalogPage {
   const query = (params.query ?? "").trim().toLocaleLowerCase("vi");
-  const category = params.category?.trim();
+  const categories = (params.categories?.length ? params.categories : params.category ? [params.category] : [])
+    .map((category) => category.trim()).filter(Boolean);
   const platform = params.platform?.trim();
   let results = starterGames.filter((game) => {
-    const searchable = [game.title, game.category, game.developer, ...game.genres, ...game.platforms]
-      .join(" ").toLocaleLowerCase("vi");
+    const searchable = [
+      game.title, game.category, game.developer, game.description, game.shortDescription ?? "",
+      ...game.genres, ...game.platforms,
+    ].join(" ").toLocaleLowerCase("vi");
     return (!query || searchable.includes(query))
-      && (!category || game.category === category || game.genres.includes(category))
-      && (!platform || game.platforms.includes(platform));
+      && (categories.length === 0 || categories.some((category) => game.category === category || game.genres.includes(category)))
+      && (!platform || game.platforms.includes(platform))
+      && matchesCatalogMode(game, params.mode);
   });
   if (params.sort === "name") results = [...results].sort((a, b) => a.title.localeCompare(b.title, "vi"));
   if (params.sort === "newest") results = [...results].sort((a, b) => b.releaseYear - a.releaseYear);
   if (params.sort === "positive") results = [...results].sort((a, b) => {
+    const score = (game: Game) => {
+      const positive = game.positiveReviews ?? 0;
+      const total = positive + (game.negativeReviews ?? 0);
+      return (positive + 1500 * 0.75) / (total + 1500);
+    };
     const totalA = (a.positiveReviews ?? 0) + (a.negativeReviews ?? 0);
     const totalB = (b.positiveReviews ?? 0) + (b.negativeReviews ?? 0);
-    const rateA = totalA > 0 ? (a.positiveReviews ?? 0) / totalA : -1;
-    const rateB = totalB > 0 ? (b.positiveReviews ?? 0) / totalB : -1;
-    return rateB - rateA || totalB - totalA || (b.positiveReviews ?? 0) - (a.positiveReviews ?? 0);
+    return score(b) - score(a) || totalB - totalA || (b.positiveReviews ?? 0) - (a.positiveReviews ?? 0);
   });
   if (params.sort === "recommended") results = [...results].sort((a, b) => {
     const score = (game: Game) => {
-      const total = (game.positiveReviews ?? 0) + (game.negativeReviews ?? 0);
-      const ratio = total > 0 ? (game.positiveReviews ?? 0) / total : 0;
-      return ratio * 100 + Math.log10(total + 1) * 5 + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.5;
+      const positive = game.positiveReviews ?? 0;
+      const total = positive + (game.negativeReviews ?? 0);
+      // Bayesian smoothing stops tiny samples with 100% positive reviews from dominating.
+      return (positive + 1500 * 0.75) / (total + 1500)
+        + Math.log10(total + 1) * 0.002
+        + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.001;
     };
     return score(b) - score(a) || a.title.localeCompare(b.title, "vi");
   });
@@ -179,10 +207,13 @@ export async function getGamesPage(params: GameCatalogQuery = {}): Promise<GameC
 
   const pageSize = Math.max(1, Math.min(params.pageSize ?? 24, 48));
   const page = Math.max(1, params.page ?? 1);
-  const { data, error } = await supabase.rpc("search_games_catalog", {
+  const { data, error } = await supabase.rpc("search_games_catalog_v2", {
     p_query: params.query?.trim() || null,
-    p_category: params.category?.trim() || null,
+    p_categories: params.categories?.length
+      ? params.categories
+      : params.category?.trim() ? [params.category.trim()] : null,
     p_platform: params.platform?.trim() || null,
+    p_mode: params.mode ?? "all",
     p_sort: params.sort ?? "popular",
     p_limit: pageSize,
     p_offset: (page - 1) * pageSize,

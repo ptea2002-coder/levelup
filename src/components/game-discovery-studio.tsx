@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GameCard } from "@/components/game-card";
 import { useGameLibrary } from "@/components/game-library-provider";
 import { isGameLibraryEntryActive } from "@/lib/game-library";
@@ -22,19 +22,13 @@ type CatalogResponse = {
   error?: string;
 };
 
-const modes: { id: DiscoveryMode; label: string; description: string; terms: string[] }[] = [
-  { id: "all", label: "Mở mọi cánh cửa", description: "Cân bằng theo gu và thư viện của bạn", terms: [] },
-  { id: "competitive", label: "Competitive", description: "Đấu hạng, kỹ năng và chiến thuật", terms: ["fps", "moba", "battle royale", "tactical", "competitive", "hero shooter", "fighting", "sports"] },
-  { id: "coop", label: "Co-op cùng hội", description: "Chơi cùng bạn bè, phối hợp và sinh tồn", terms: ["co-op", "coop", "multiplayer", "survival", "party", "team-based"] },
-  { id: "story", label: "Cốt truyện & khám phá", description: "Thế giới mở, nhập vai và phiêu lưu", terms: ["rpg", "story", "adventure", "narrative", "open world", "soulslike", "single-player"] },
-  { id: "chill", label: "Chill mode", description: "Nhịp chậm, sáng tạo và thư giãn", terms: ["simulation", "casual", "farming", "sandbox", "puzzle", "creative", "cozy"] },
+const modes: { id: DiscoveryMode; label: string; description: string }[] = [
+  { id: "all", label: "Mở mọi cánh cửa", description: "Cân bằng theo gu và thư viện của bạn" },
+  { id: "competitive", label: "Competitive", description: "Đấu hạng, kỹ năng và chiến thuật" },
+  { id: "coop", label: "Co-op cùng hội", description: "Chơi cùng bạn bè, phối hợp và sinh tồn" },
+  { id: "story", label: "Cốt truyện & khám phá", description: "Thế giới mở, nhập vai và phiêu lưu" },
+  { id: "chill", label: "Chill mode", description: "Nhịp chậm, sáng tạo và thư giãn" },
 ];
-
-const normalize = (value: string) => value.toLocaleLowerCase("vi").trim();
-
-function gameText(game: Game) {
-  return normalize([game.category, ...game.genres, ...game.platforms].join(" "));
-}
 
 export function GameDiscoveryStudio({ initialGames, initialTotal, categories, platforms, catalogReady }: Props) {
   const { library, ready } = useGameLibrary();
@@ -49,6 +43,7 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [savedProfileGames, setSavedProfileGames] = useState<Game[]>([]);
+  const requestedProfileSlugs = useRef(new Set<string>());
   const [retry, setRetry] = useState(0);
 
   const activeSavedSlugs = useMemo(
@@ -63,11 +58,16 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
       setSavedProfileGames([]);
       return;
     }
+
     let cancelled = false;
     const loadSavedProfile = async () => {
-      const missing = activeSavedSlugs.filter((slug) => !games.some((game) => game.slug === slug));
+      const knownSlugs = new Set([...games, ...savedProfileGames].map((game) => game.slug));
+      const missing = activeSavedSlugs.filter((slug) => !knownSlugs.has(slug) && !requestedProfileSlugs.current.has(slug));
       const chunks: string[][] = [];
       for (let index = 0; index < missing.length; index += 48) chunks.push(missing.slice(index, index + 48));
+      if (chunks.length === 0) return;
+      for (const slug of missing) requestedProfileSlugs.current.add(slug);
+
       try {
         const responses = await Promise.all(chunks.map(async (chunk) => {
           const response = await fetch("/api/games?slugs=" + encodeURIComponent(chunk.join(",")), { cache: "no-store" });
@@ -75,14 +75,22 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
           const payload = await response.json() as CatalogResponse;
           return payload.items ?? [];
         }));
-        if (!cancelled) setSavedProfileGames(responses.flat());
+        if (!cancelled) {
+          setSavedProfileGames((current) => {
+            const bySlug = new Map(current.map((game) => [game.slug, game] as const));
+            for (const game of responses.flat()) bySlug.set(game.slug, game);
+            return [...bySlug.values()];
+          });
+        }
       } catch {
+        for (const slug of missing) requestedProfileSlugs.current.delete(slug);
         if (!cancelled) setSavedProfileGames([]);
       }
     };
+
     void loadSavedProfile();
     return () => { cancelled = true; };
-  }, [activeSavedSlugs, games, ready]);
+  }, [activeSavedSlugs, games, ready, savedProfileGames]);
 
   const buildParams = useCallback((nextPage: number) => {
     const params = new URLSearchParams({
@@ -92,10 +100,11 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
     });
     const normalizedQuery = query.trim().slice(0, 100);
     if (normalizedQuery) params.set("query", normalizedQuery);
-    if (selectedGenres.length === 1) params.set("category", selectedGenres[0]);
+    if (selectedGenres.length > 0) params.set("categories", selectedGenres.join(","));
     if (platform) params.set("platform", platform);
+    if (mode !== "all") params.set("mode", mode);
     return params;
-  }, [platform, query, selectedGenres]);
+  }, [mode, platform, query, selectedGenres]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -103,7 +112,10 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
       setLoading(true);
       setError("");
       try {
-        const response = await fetch("/api/games?" + buildParams(1).toString(), { signal: controller.signal });
+        const response = await fetch("/api/games?" + buildParams(1).toString(), {
+          signal: controller.signal,
+          cache: "no-store",
+        });
         const payload = await response.json() as CatalogResponse;
         if (!response.ok) throw new Error(payload.error || "Không thể tải kho game.");
         setGames(payload.items ?? []);
@@ -116,6 +128,7 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
         if (!controller.signal.aborted) setLoading(false);
       }
     }, query.trim() ? 250 : 0);
+
     return () => { window.clearTimeout(timer); controller.abort(); };
   }, [buildParams, retry]);
 
@@ -127,36 +140,44 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
     return [...bySlug.values()];
   }, [activeSavedSlugs, games, savedProfileGames]);
 
-  const preferredGenres = useMemo(() => {
+  const preferredGenreWeights = useMemo(() => {
     const weights = new Map<string, number>();
     for (const game of savedProfile) {
-      const weight = library[game.slug]?.isFavorite ? 3 : library[game.slug]?.status === "playing" ? 2 : 1;
+      const entry = library[game.slug];
+      const weight = entry?.isFavorite ? 3 : entry?.status === "playing" ? 2 : 1;
       for (const genre of new Set([game.category, ...game.genres].filter(Boolean))) {
         weights.set(genre, (weights.get(genre) ?? 0) + weight);
       }
     }
-    return [...weights.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([genre]) => genre);
+    return weights;
   }, [library, savedProfile]);
+
+  const preferredGenres = useMemo(
+    () => [...preferredGenreWeights.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([genre]) => genre),
+    [preferredGenreWeights],
+  );
 
   const recommendations = useMemo(() => {
     const activeMode = modes.find((item) => item.id === mode) ?? modes[0];
     return games
       .filter((game) => !activeSavedSlugs.includes(game.slug))
-      .filter((game) => selectedGenres.length === 0 || selectedGenres.some((genre) => game.category === genre || game.genres.includes(genre)))
-      .filter((game) => mode === "all" || activeMode.terms.some((term) => gameText(game).includes(term)))
       .map((game) => {
         const gameGenres = new Set([game.category, ...game.genres]);
         const shared = preferredGenres.filter((genre) => gameGenres.has(genre));
         const explicitMatches = selectedGenres.filter((genre) => gameGenres.has(genre));
         const platformMatch = Boolean(platform && game.platforms.includes(platform));
-        const score = shared.reduce((sum, genre) => sum + (library[savedProfile.find((saved) => saved.category === genre || saved.genres.includes(genre))?.slug ?? ""]?.isFavorite ? 3 : 2), 0)
+        const positive = game.positiveReviews ?? 0;
+        const reviewTotal = positive + (game.negativeReviews ?? 0);
+        const bayesianReview = (positive + 1500 * 0.75) / (reviewTotal + 1500);
+        const score = shared.reduce((sum, genre) => sum + (preferredGenreWeights.get(genre) ?? 1), 0)
           + explicitMatches.length * 12
           + (platformMatch ? 3 : 0)
           + (mode !== "all" ? 8 : 0)
-          + Math.log10((game.positiveReviews ?? 0) + (game.negativeReviews ?? 0) + 1)
-          + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.2;
+          + bayesianReview * 10
+          + Math.log10(reviewTotal + 1) * 0.25
+          + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.15;
         const reasons: string[] = [];
-        if (explicitMatches.length) reasons.push("Khớp gu đã chọn");
+        if (explicitMatches.length) reasons.push("Khớp thể loại đã chọn");
         if (shared.length) reasons.push("Gần với game bạn lưu");
         if (platformMatch) reasons.push("Đúng nền tảng");
         if (mode !== "all") reasons.push(activeMode.label);
@@ -164,7 +185,7 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
         return { game, score, reasons: reasons.slice(0, 3) };
       })
       .sort((a, b) => b.score - a.score || a.game.title.localeCompare(b.game.title, "vi"));
-  }, [activeSavedSlugs, games, library, mode, platform, preferredGenres, savedProfile, selectedGenres]);
+  }, [activeSavedSlugs, games, library, mode, platform, preferredGenreWeights, preferredGenres, selectedGenres]);
 
   const loadMore = async () => {
     if (loadingMore || loading || games.length >= total) return;
@@ -256,20 +277,22 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
             <h2 id="discovery-results-title">CÁC TÍN HIỆU<br /><span>ĐÁNG THEO ĐUỔI.</span></h2>
             <p>{activeMode.description}{preferredGenres.length ? " · Hồ sơ gu đã nhận diện: " + preferredGenres.slice(0, 3).join(", ") + "." : " · Lưu vài game để gợi ý cá nhân hóa hơn."}</p>
           </div>
-          <div className="discovery-result-counter"><strong>{recommendations.length}</strong><span>GỢI Ý ĐANG KHỚP</span></div>
+          <div className="discovery-result-counter"><strong>{loading ? "…" : recommendations.length}</strong><span>GỢI Ý ĐANG KHỚP</span></div>
         </div>
         {loading ? <p className="discovery-status" role="status">Đang quét kho game và tính điểm phù hợp…</p> : null}
         {error ? <div className="empty-state" role="status"><h3>Radar bị gián đoạn.</h3><p>{error}</p><button className="btn btn-secondary" type="button" onClick={() => setRetry((value) => value + 1)}>Thử lại</button></div> : null}
         {!catalogReady && !loading && !error ? <div className="empty-state" role="status"><h3>Kho game chưa sẵn sàng.</h3><p>LevelUP không thay dữ liệu catalog thực bằng danh sách mẫu.</p></div> : null}
         {!loading && !error && recommendations.length === 0 ? <div className="empty-state"><h3>Chưa bắt được tín hiệu phù hợp.</h3><p>Thử bỏ bớt thể loại hoặc chọn tâm trạng khác để mở rộng kết quả.</p><button className="btn btn-secondary" type="button" onClick={reset}>Mở rộng tìm kiếm</button></div> : null}
-        <div className="discovery-result-grid">
-          {recommendations.slice(0, 12).map(({ game, reasons }, index) => (
-            <div className="discovery-recommendation" key={game.slug}>
-              <div className="discovery-reason-row"><span>FIT / {String(index + 1).padStart(2, "0")}</span><div>{reasons.map((reason) => <span key={reason}>{reason}</span>)}</div></div>
-              <GameCard game={game} index={index} />
-            </div>
-          ))}
-        </div>
+        {!loading && !error ? (
+          <div className="discovery-result-grid">
+            {recommendations.slice(0, 12).map(({ game, reasons }, index) => (
+              <div className="discovery-recommendation" key={game.slug}>
+                <div className="discovery-reason-row"><span>FIT / {String(index + 1).padStart(2, "0")}</span><div>{reasons.map((reason) => <span key={reason}>{reason}</span>)}</div></div>
+                <GameCard game={game} index={index} />
+              </div>
+            ))}
+          </div>
+        ) : null}
         {!loading && !error && games.length < total ? (
           <div className="catalog-load-more"><button className="btn btn-secondary" type="button" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Đang quét thêm..." : "Quét thêm 48 game · " + Math.min(total - games.length, 48).toLocaleString("vi-VN")}</button></div>
         ) : null}
