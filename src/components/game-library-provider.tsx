@@ -297,7 +297,7 @@ export function GameLibraryProvider({ children }: { children: ReactNode }) {
       [slug]: {
         status: previous?.status ?? null,
         isFavorite: favorite,
-        updatedAt: Date.now(),
+        updatedAt: Math.max(Date.now(), (previous?.updatedAt ?? 0) + 1),
       },
     };
     setLibrary(next);
