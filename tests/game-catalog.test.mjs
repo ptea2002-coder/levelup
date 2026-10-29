@@ -8,6 +8,14 @@ const api = readFileSync(new URL("../src/app/api/games/route.ts", import.meta.ur
 const migration = readFileSync(new URL("../supabase/migrations/20261029150000_expand_game_catalog.sql", import.meta.url), "utf8");
 const sync = readFileSync(new URL("../supabase/functions/sync-game-catalog/index.ts", import.meta.url), "utf8");
 const cron = readFileSync(new URL("../supabase/migrations/20261029151000_schedule_game_catalog_sync.sql", import.meta.url), "utf8");
+const facetsMigration = readFileSync(new URL("../supabase/migrations/20261029154000_catalog_facets.sql", import.meta.url), "utf8");
+const sitemap = readFileSync(new URL("../src/app/sitemap.ts", import.meta.url), "utf8");
+const gameCard = readFileSync(new URL("../src/components/game-card.tsx", import.meta.url), "utf8");
+const gameDetail = readFileSync(new URL("../src/app/games/[slug]/page.tsx", import.meta.url), "utf8");
+const home = readFileSync(new URL("../src/app/page.tsx", import.meta.url), "utf8");
+const hero = readFileSync(new URL("../src/components/hero-experience.tsx", import.meta.url), "utf8");
+const locker = readFileSync(new URL("../src/components/game-locker.tsx", import.meta.url), "utf8");
+const commandCenter = readFileSync(new URL("../src/components/gamer-command-center.tsx", import.meta.url), "utf8");
 
 test("game search is server-side and returns a small bounded page", () => {
   assert.match(repository, /\.rpc\("search_games_catalog"/);
@@ -47,4 +55,38 @@ test("catalog import continues in the background with the upstream request rate 
   assert.match(sync, /< 55_000/);
   assert.match(cron, /'\* \* \* \* \*'/);
   assert.match(cron, /status <> 'complete'/);
+});
+
+test("discovery facets are sourced from visible catalog records instead of hard-coded options", () => {
+  assert.match(facetsMigration, /get_game_catalog_facets/);
+  assert.match(facetsMigration, /is_catalog_visible = true/);
+  assert.match(repository, /rpc\("get_game_catalog_facets"\)/);
+  assert.match(explorer, /availablePlatforms/);
+  assert.doesNotMatch(explorer, /commonPlatforms/);
+});
+
+test("SteamSpy player counts are clearly labeled as reference metrics rather than live players", () => {
+  assert.match(gameCard, /CCU tham khảo/);
+  assert.doesNotMatch(gameCard, / đang chơi/);
+  assert.match(gameDetail, /không phải feed live/);
+});
+
+test("sitemap reads every visible game slug in bounded pages instead of stopping at 5,000", () => {
+  assert.match(sitemap, /getSitemapGameSlugs/);
+  assert.match(repository, /getSitemapGameSlugs/);
+  assert.match(repository, /\.range\(offset, offset \+ pageSize - 1\)/);
+  assert.doesNotMatch(sitemap, /getSitemapGames\(5000\)/);
+});
+
+test("homepage database count uses the catalog total and locker counts all local saves", () => {
+  assert.match(home, /getGamesPage\(\{ page: 1, pageSize: 1/);
+  assert.match(hero, /gameCount/);
+  assert.match(commandCenter, /Object\.keys\(library\)\.length/);
+  assert.match(commandCenter, /hiển thị tối đa 3 game nổi bật/);
+});
+
+test("Game Locker resolves saved slugs outside its initial catalog page", () => {
+  assert.match(api, /search\.get\("slugs"\)/);
+  assert.match(locker, /api\/games\?slugs=/);
+  assert.match(locker, /allGames/);
 });
