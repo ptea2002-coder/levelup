@@ -11,8 +11,9 @@ type GameCardProps = {
 };
 
 export function GameCard({ game, index }: GameCardProps) {
-  const activityLabel = game.concurrentPlayers && game.concurrentPlayers > 0
-    ? game.concurrentPlayers.toLocaleString("vi-VN") + " đang chơi"
+  const isSteamSpyMetric = game.sourceProvider === "steamspy" && Boolean(game.concurrentPlayers && game.concurrentPlayers > 0);
+  const activityLabel = isSteamSpyMetric
+    ? "CCU tham khảo · " + game.concurrentPlayers!.toLocaleString("vi-VN")
     : (game.platforms[0] ?? "Game");
 
   return (
@@ -41,7 +42,7 @@ export function GameCard({ game, index }: GameCardProps) {
         <div className="game-body">
           <p>{game.shortDescription || game.description || "Thông tin chi tiết đang được đồng bộ từ nguồn dữ liệu game."}</p>
           <div className="card-foot">
-            <span>{activityLabel}</span>
+            <span title={isSteamSpyMetric ? "Chỉ số CCU do SteamSpy cung cấp và đồng bộ định kỳ; không phải feed người chơi trực tiếp." : undefined}>{activityLabel}</span>
             <span className="card-link">Chi tiết <span aria-hidden="true">→</span></span>
           </div>
         </div>
