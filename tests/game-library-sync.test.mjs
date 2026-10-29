@@ -5,6 +5,7 @@ import test from "node:test";
 const library = readFileSync(new URL("../src/lib/game-library.ts", import.meta.url), "utf8");
 const provider = readFileSync(new URL("../src/components/game-library-provider.tsx", import.meta.url), "utf8");
 const control = readFileSync(new URL("../src/components/game-library-control.tsx", import.meta.url), "utf8");
+const locker = readFileSync(new URL("../src/components/game-locker.tsx", import.meta.url), "utf8");
 const migration = readFileSync(new URL("../supabase/migrations/20261029160000_user_game_library_cloud_sync.sql", import.meta.url), "utf8");
 const schema = readFileSync(new URL("../supabase/schema.sql", import.meta.url), "utf8");
 
@@ -31,6 +32,11 @@ test("P2 cloud library is protected by owner-only row-level security", () => {
   assert.match(migration, /with check \(user_id = \(select auth\.uid\(\)\)\)/);
   assert.match(migration, /revoke all on public\.user_game_library from anon/i);
   assert.match(schema, /create table if not exists public\.user_game_library/i);
+});
+
+test("P2 Game Locker exposes a dedicated favorites filter", () => {
+  assert.match(locker, /value: "favorites", label: "Yêu thích"/);
+  assert.match(locker, /activeFilter === "favorites" \? Boolean\(library\[game\.slug\]\?\.isFavorite\)/);
 });
 
 test("P2 UI exposes sync state and preserves a local-first guest experience", () => {
