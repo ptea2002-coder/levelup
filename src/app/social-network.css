@@ -7,6 +7,12 @@
   --motion-snap: cubic-bezier(.2, .75, .25, 1);
 }
 html { scroll-padding-top: 104px; }
+@keyframes levelup-route-enter {
+  from { opacity: 0; transform: translate3d(0, 8px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+#main-content main { animation: levelup-route-enter .48s var(--motion-spring) both; }
+
 body::after {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .18;
   background-image: linear-gradient(rgba(177,190,219,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(177,190,219,.035) 1px,transparent 1px);
@@ -201,7 +207,7 @@ button:not(:disabled) { touch-action: manipulation; }
   .social-feed-tabs button { flex: 0 0 auto; }
   .social-game-channels { margin-right: -3px; }
   .social-signin-card { align-items: flex-start; flex-direction: column; }
-  .community-hero h1 { font-size: clamp(3.3rem,12vw,5.7rem); }
+  .community-hero h1 { font-size: clamp(2.35rem,9.4vw,4.2rem); }
   .community-hero-actions,.community-actions { align-items: stretch; }
   .community-hero-actions .btn,.community-actions .btn { flex: 1 1 145px; }
   .hero-cinematic-actions { align-items: flex-start; }
@@ -223,5 +229,6 @@ button:not(:disabled) { touch-action: manipulation; }
 }
 @media (prefers-reduced-motion: reduce) {
   body::after { display: none; }
+  #main-content main { animation: none !important; }
   .social-pulse-card,.social-post-card,.social-aside-card,.social-game-channels button,.nav-links a::after,.brand-mark { transition: none !important; }
 }

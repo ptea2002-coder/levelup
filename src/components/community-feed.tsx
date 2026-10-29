@@ -315,7 +315,7 @@ export function CommunityFeed({ games }: CommunityFeedProps) {
           </div>
           <div className="social-game-channels" role="group" aria-label="Lọc bài viết theo game">
             <button type="button" className={gameFilter === "all" ? "is-active" : ""} aria-pressed={gameFilter === "all"} onClick={() => setGameFilter("all")}>Tất cả game</button>
-            {games.slice(0, 10).map((game) => (
+            {games.map((game) => (
               <button type="button" key={game.slug} className={gameFilter === game.slug ? "is-active" : ""} aria-pressed={gameFilter === game.slug} onClick={() => setGameFilter(game.slug)}>{game.title}</button>
             ))}
           </div>

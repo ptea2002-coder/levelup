@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/community",
-    title: "Bảng tin cộng đồng | LevelUP",
-    description: "Chia sẻ khoảnh khắc, tìm người cùng chơi và kết nối với cộng đồng game thủ LevelUP.",
+    title: "Mạng xã hội game thủ | LevelUP",
+    description: "Theo dõi game thủ, chia sẻ bài viết, bàn chiến thuật và tìm đồng đội trên LevelUP."
   },
   twitter: {
     card: "summary_large_image",
