@@ -5,7 +5,7 @@ import { GameExplorer } from "@/components/game-explorer";
 import { GamerCommandCenter } from "@/components/gamer-command-center";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
 import { articles } from "@/lib/articles";
-import { getGames, getGamesBySlugs } from "@/lib/game-repository";
+import { getGames, getGamesBySlugs, getGamesPage } from "@/lib/game-repository";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -15,11 +15,15 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const featuredSlugs = ["valorant", "league-of-legends", "counter-strike-2", "apex-legends", "genshin-impact", "elden-ring"];
-  const [games, featuredGames] = await Promise.all([getGames(48), getGamesBySlugs(featuredSlugs)]);
+  const [games, featuredGames, catalogSummary] = await Promise.all([
+    getGames(48),
+    getGamesBySlugs(featuredSlugs),
+    getGamesPage({ page: 1, pageSize: 1, sort: "popular" }),
+  ]);
 
   return (
     <main>
-      <HeroExperience games={games} articleCount={articles.length} />
+      <HeroExperience games={games} articleCount={articles.length} gameCount={catalogSummary.available ? catalogSummary.total : 0} />
 
       <div className="ticker" aria-label="Các chủ đề của LevelUP">
         <div className="ticker-track">
