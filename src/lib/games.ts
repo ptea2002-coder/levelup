@@ -20,6 +20,7 @@ export type Game = {
   negativeReviews?: number | null;
   concurrentPlayers?: number | null;
   ownersEstimate?: string | null;
+  sourceSyncedAt?: string | null;
 };
 
 export const games: Game[] = [
