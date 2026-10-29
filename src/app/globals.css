@@ -3239,3 +3239,90 @@ button.social-post-action { cursor: pointer; }
     transform: none !important;
   }
 }
+
+
+/* GAME DOSSIER CARDS — cinematic cover art, clear hierarchy, tactile hover */
+.game-card-cover {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #10121c;
+}
+.game-card-cover .game-art {
+  height: clamp(225px, 19vw, 275px);
+  background: linear-gradient(135deg, var(--art-primary), var(--art-secondary));
+}
+.game-card-cover .game-art-bottom { display: none; }
+.game-card-cover::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  opacity: .38;
+  background:
+    linear-gradient(135deg, rgba(199,255,70,.09), transparent 34%),
+    linear-gradient(0deg, rgba(6,7,12,.18), transparent 48%, rgba(6,7,12,.06));
+  transition: opacity .4s ease;
+}
+.game-card:hover .game-card-cover::after,
+.game-card.is-tilting .game-card-cover::after { opacity: .78; }
+.game-card-cover-copy {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: clamp(17px, 2vw, 24px);
+  pointer-events: none;
+  background: linear-gradient(0deg, rgba(6,7,12,.94), rgba(6,7,12,.54) 60%, transparent);
+  transform: translateZ(16px);
+}
+.game-card-cover-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 10px;
+  color: #8e98ae;
+  font: 500 .54rem/1.4 var(--mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.game-card-cover-meta span { color: var(--lime); }
+.game-card-cover-meta i {
+  display: inline-block;
+  width: 17px;
+  height: 1px;
+  background: rgba(199,255,70,.7);
+}
+.game-card-cover-copy h3 {
+  display: -webkit-box;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: #f7f8fc;
+  font: 900 clamp(1.4rem, 2.25vw, 2.05rem)/.9 var(--display);
+  letter-spacing: -.06em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  text-shadow: 0 5px 30px rgba(0,0,0,.5);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.game-card .game-body > p {
+  min-height: 65px;
+  margin: 0 0 18px;
+}
+.game-card:hover .game-card-cover .game-art-image,
+.game-card.is-tilting .game-card-cover .game-art-image { transform: scale(1.1); }
+@media (max-width: 900px) {
+  .game-card-cover .game-art { height: clamp(230px, 30vw, 290px); }
+}
+@media (max-width: 700px) {
+  .game-card-cover .game-art { height: clamp(220px, 58vw, 280px); }
+  .game-card-cover-copy { padding: 18px; }
+  .game-card-cover-copy h3 { font-size: clamp(1.45rem, 5vw, 1.9rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-card-cover::after { transition: none; }
+}

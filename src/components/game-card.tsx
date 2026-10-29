@@ -14,20 +14,22 @@ export function GameCard({ game, index }: GameCardProps) {
   return (
     <article className="game-card">
       <Link href={`/games/${game.slug}`} className="game-card-link" aria-label={`Xem thông tin ${game.title}`}>
-        <GameArtwork
-          slug={game.slug}
-          mark={game.mark}
-          category={game.category}
-          releaseYear={game.releaseYear}
-          artPrimary={game.artPrimary}
-          artSecondary={game.artSecondary}
-          index={index}
-        />
-        <div className="game-body">
-          <div className="game-title-row">
+        <div className="game-card-cover">
+          <GameArtwork
+            slug={game.slug}
+            mark={game.mark}
+            category={game.category}
+            releaseYear={game.releaseYear}
+            artPrimary={game.artPrimary}
+            artSecondary={game.artSecondary}
+            index={index}
+          />
+          <div className="game-card-cover-copy">
+            <p className="game-card-cover-meta"><span>{game.category}</span><i aria-hidden="true" />{game.releaseYear}</p>
             <h3>{game.title}</h3>
-            <span className="game-symbol" aria-hidden="true">↗</span>
           </div>
+        </div>
+        <div className="game-body">
           <p>{game.description}</p>
           <div className="card-foot">
             <span>{game.platforms[0]}{game.platforms.length > 1 ? ` +${game.platforms.length - 1}` : ""}</span>
