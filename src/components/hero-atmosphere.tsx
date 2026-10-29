@@ -163,7 +163,6 @@ export function HeroAtmosphere() {
       }
     };
 
-    const onPointerLeave = () => { pointer.active = false; };
     const onVisibilityChange = () => document.hidden ? stop() : start();
 
     const observer = typeof IntersectionObserver === "undefined"
@@ -176,7 +175,6 @@ export function HeroAtmosphere() {
 
     window.addEventListener("resize", resize, { passive: true });
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("pointerout", onPointerLeave, { passive: true });
     document.addEventListener("visibilitychange", onVisibilityChange);
     observer?.observe(canvas);
     resize();
@@ -187,7 +185,6 @@ export function HeroAtmosphere() {
       observer?.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerout", onPointerLeave);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
