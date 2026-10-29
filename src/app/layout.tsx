@@ -10,6 +10,7 @@ import "./aaa-motion.css";
 import "./social-network.css";
 import "./game-library.css";
 import "./game-community.css";
+import "./editorial-cms.css";
 
 const vietnameseFont = Be_Vietnam_Pro({
   variable: "--font-vietnam",

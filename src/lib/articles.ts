@@ -10,6 +10,15 @@ export type Article = {
   excerpt: string;
   readingTime: string;
   sections: ArticleSection[];
+  coverImageUrl?: string | null;
+  publishedAt?: string | null;
+  updatedAt?: string | null;
+  sourceUrl?: string | null;
+  sourceName?: string | null;
+  correctionNote?: string | null;
+  canonicalUrl?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
 };
 
 export const articles: Article[] = [

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { articles } from "@/lib/articles";
+import { getPublishedArticles } from "@/lib/article-repository";
 
 export const metadata: Metadata = {
   title: "Tin tức & hướng dẫn",
@@ -20,14 +20,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function NewsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function NewsPage() {
+  const articles = await getPublishedArticles();
   return (
     <main className="page-main">
       <section className="page-hero">
         <div className="container">
           <p className="eyebrow">EDITORIAL / 002</p>
           <h1>PLAY<br /><span>SMARTER.</span></h1>
-          <p>Hướng dẫn và bài viết nền tảng do LevelUP biên soạn. Tin tức theo thời gian thực sẽ được bổ sung khi có nguồn dữ liệu và quy trình biên tập.</p>
+          <p>Góc biên tập LevelUP: tin game, hướng dẫn thực chiến và phân tích có nguồn tham chiếu. Bài mới được xuất bản qua quy trình biên tập và kiểm tra nguồn.</p>
         </div>
       </section>
       <section className="section">
@@ -35,11 +38,7 @@ export default function NewsPage() {
           <div className="article-grid">
             {articles.map((article, index) => (
               <Link className="article-card" href={`/news/${article.slug}`} key={article.slug}>
-                <div className={`article-art article-art-${index + 1}`}>
-                  <span className="article-number">0{index + 1}</span>
-                  <span className="article-art-word">{index === 0 ? "BUILD" : index === 1 ? "BOOST" : "REVIEW"}</span>
-                  <span className="article-open" aria-hidden="true">↗</span>
-                </div>
+                {article.coverImageUrl ? <div className="article-art"><img src={article.coverImageUrl} alt="" loading="lazy" /><span className="article-open" aria-hidden="true">↗</span></div> : <div className={`article-art article-art-${index + 1}`}><span className="article-number">{String(index + 1).padStart(2, "0")}</span><span className="article-art-word">{article.category.slice(0, 12)}</span><span className="article-open" aria-hidden="true">↗</span></div>}
                 <div className="article-card-body">
                   <div className="article-meta"><span>{article.category}</span><span>{article.readingTime}</span></div>
                   <h3>{article.title}</h3>

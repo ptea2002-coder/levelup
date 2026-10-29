@@ -29,11 +29,12 @@
 
 ## Phase 3 — Editorial CMS
 
-- Admin/editor roles with server-side authorization.
-- Draft, preview, publish, and archive workflow.
-- Image storage with file validation and upload limits.
-- SEO metadata, sitemap, canonical URLs, and structured data.
-- Editorial source links and correction/update policy.
+- [x] Admin/editor roles validated from Supabase Auth `app_metadata` and enforced by PostgreSQL RLS.
+- [x] Draft, preview, publish, and archive workflow at `/admin/editorial`.
+- [x] Public editorial image bucket with editor-only upload/delete policies and 5 MB image limit.
+- [x] Dynamic published-article pages, SEO metadata, sitemap entries, canonical URLs, and Article structured data.
+- [x] Editorial source links and correction/update notes.
+- [ ] Add a reviewed RSS/news-source ingestion pipeline and validate source licensing before enabling automated ingestion.
 
 ## Phase 4 — Community and growth
 
@@ -54,4 +55,4 @@ Before production cutover:
 
 ## Current limitations
 
-The branch is a feature-complete preview foundation, not a production launch. Supabase auth and catalog reads are connected; the Game Locker syncs per-account statuses/favorites, and reviews/comments have rate limits, moderation, and abuse reporting. IGDB catalog sync remains intentionally disabled until credentials are configured. An editorial CMS and live news feed are not implemented, and the RLS integration suite plus full browser/mobile release audit remain open gates.
+The branch is a feature-complete preview foundation, not a production launch. Supabase auth and catalog reads are connected; the Game Locker syncs per-account statuses/favorites, and reviews/comments have rate limits, moderation, and abuse reporting. IGDB catalog sync remains intentionally disabled until credentials are configured. The editorial CMS is implemented in P3. Automated live-news/RSS ingestion remains intentionally gated until sources and reuse permissions are reviewed; the RLS integration suite plus full browser/mobile release audit remain open gates.

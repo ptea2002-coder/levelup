@@ -4,7 +4,7 @@ import { HeroExperience } from "@/components/hero-experience";
 import { GameExplorer } from "@/components/game-explorer";
 import { GamerCommandCenter } from "@/components/gamer-command-center";
 import { SteamLiveMetrics } from "@/components/steam-live-metrics";
-import { articles } from "@/lib/articles";
+import { getPublishedArticles } from "@/lib/article-repository";
 import { getGames, getGamesBySlugs, getGamesPage } from "@/lib/game-repository";
 
 export const metadata: Metadata = {
@@ -15,10 +15,11 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const featuredSlugs = ["valorant", "league-of-legends", "counter-strike-2", "apex-legends", "genshin-impact", "elden-ring"];
-  const [games, featuredGames, catalogSummary] = await Promise.all([
+  const [games, featuredGames, catalogSummary, articles] = await Promise.all([
     getGames(48),
     getGamesBySlugs(featuredSlugs),
     getGamesPage({ page: 1, pageSize: 1, sort: "popular" }),
+    getPublishedArticles(),
   ]);
 
   return (
@@ -91,11 +92,7 @@ export default async function HomePage() {
           <div className="article-grid">
             {articles.map((article, index) => (
               <Link className="article-card" href={`/news/${article.slug}`} key={article.slug}>
-                <div className={`article-art article-art-${index + 1}`}>
-                  <span className="article-number">0{index + 1}</span>
-                  <span className="article-art-word">{index === 0 ? "BUILD" : index === 1 ? "BOOST" : "REVIEW"}</span>
-                  <span className="article-open" aria-hidden="true">↗</span>
-                </div>
+                {article.coverImageUrl ? <div className="article-art"><img src={article.coverImageUrl} alt="" loading="lazy" /><span className="article-open" aria-hidden="true">↗</span></div> : <div className={`article-art article-art-${index + 1}`}><span className="article-number">{String(index + 1).padStart(2, "0")}</span><span className="article-art-word">{article.category.slice(0, 12)}</span><span className="article-open" aria-hidden="true">↗</span></div>}
                 <div className="article-card-body">
                   <div className="article-meta"><span>{article.category}</span><span>{article.readingTime}</span></div>
                   <h3>{article.title}</h3>
