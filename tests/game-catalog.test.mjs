@@ -84,7 +84,7 @@ test("sitemap reads every visible game slug in bounded pages instead of stopping
 test("homepage database count uses the catalog total and locker counts all local saves", () => {
   assert.match(home, /getGamesPage\(\{ page: 1, pageSize: 1/);
   assert.match(hero, /gameCount/);
-  assert.match(commandCenter, /Object\.keys\(library\)\.length/);
+  assert.match(commandCenter, /Object\.values\(library\)\.filter\(\(entry\) => isGameLibraryEntryActive\(entry\)\)\.length/);
   assert.match(commandCenter, /hiển thị tối đa 3 game nổi bật/);
 });
 
