@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 7,
     remotePatterns: [
       { protocol: "https", hostname: "cdn.akamai.steamstatic.com", pathname: "/steam/apps/**" },
+      { protocol: "https", hostname: "shared.akamai.steamstatic.com", pathname: "/store_item_assets/steam/apps/**" },
       { protocol: "https", hostname: "tuta.com", pathname: "/assets/**" },
       { protocol: "https", hostname: "miro.medium.com", pathname: "/**" },
       { protocol: "https", hostname: "images.squarespace-cdn.com", pathname: "/**" },

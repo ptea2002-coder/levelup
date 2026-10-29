@@ -61,10 +61,30 @@ const artworkBySlug: Record<string, ArtworkSources> = {
     card: ["https://miro.medium.com/1%2AZm4wg5T5PO7tzZudbLN2Hg.jpeg"],
     detail: ["https://miro.medium.com/1%2AZm4wg5T5PO7tzZudbLN2Hg.jpeg"],
   },
-  "zenless-zone-zero": steamArtwork("4162040"),
+  "zenless-zone-zero": {
+    card: ["https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4162040/22b56d833834d90674b30498f78e0839e48792db/header_alt_assets_2.jpg"],
+    detail: [
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4162040/2f9918909de1c99a5b27dd12bcc9a51369cc678a/page_bg_raw.jpg",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4162040/22b56d833834d90674b30498f78e0839e48792db/header_alt_assets_2.jpg",
+    ],
+    cinematic: [
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4162040/2f9918909de1c99a5b27dd12bcc9a51369cc678a/page_bg_raw.jpg",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4162040/22b56d833834d90674b30498f78e0839e48792db/header_alt_assets_2.jpg",
+    ],
+  },
   "black-myth-wukong": steamArtwork("2358720"),
   "stardew-valley": steamArtwork("413150"),
-  "ea-sports-fc-26": steamArtwork("3405690"),
+  "ea-sports-fc-26": {
+    card: ["https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/2d96aa1b06e453cd62dae9029d412f19e61932c3/header.jpg"],
+    detail: [
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/44dcd20ada52561b2a1ab2d9254ca49bc71628a9/page_bg_raw.jpg",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/2d96aa1b06e453cd62dae9029d412f19e61932c3/header.jpg",
+    ],
+    cinematic: [
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/44dcd20ada52561b2a1ab2d9254ca49bc71628a9/page_bg_raw.jpg",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/2d96aa1b06e453cd62dae9029d412f19e61932c3/header.jpg",
+    ],
+  },
   "the-witcher-3": steamArtwork("292030"),
   "final-fantasy-xiv": steamArtwork("39210"),
   "marvel-rivals": steamArtwork("2767030"),
