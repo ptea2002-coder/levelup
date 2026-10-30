@@ -31,6 +31,8 @@ jobs:
           STAGING_KEY: ${{ secrets.LEVELUP_STAGING_SUPABASE_ANON_KEY }}
           E2E_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_EMAIL }}
           E2E_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_PASSWORD }}
+          EDITOR_EMAIL: ${{ secrets.LEVELUP_STAGING_EDITOR_EMAIL }}
+          EDITOR_PASSWORD: ${{ secrets.LEVELUP_STAGING_EDITOR_PASSWORD }}
         run: |
           set -euo pipefail
           if [[ -n "$STAGING_URL" || -n "$STAGING_KEY" ]]; then
@@ -39,6 +41,9 @@ jobs:
           fi
           if [[ -n "$E2E_EMAIL" || -n "$E2E_PASSWORD" ]]; then
             [[ -n "$E2E_EMAIL" && -n "$E2E_PASSWORD" && -n "$STAGING_URL" && -n "$STAGING_KEY" ]] || { echo "::error::Authenticated Game Locker smoke needs the staging URL/key and both owner-account credentials."; exit 1; }
+          fi
+          if [[ -n "$EDITOR_EMAIL" || -n "$EDITOR_PASSWORD" ]]; then
+            [[ -n "$EDITOR_EMAIL" && -n "$EDITOR_PASSWORD" && -n "$STAGING_URL" && -n "$STAGING_KEY" ]] || { echo "::error::News Intelligence smoke needs the staging URL/key and both dedicated editor-account credentials."; exit 1; }
           fi
       - name: Install application dependencies
         run: npm install --no-audit --no-fund
@@ -79,3 +84,5 @@ jobs:
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.LEVELUP_STAGING_SUPABASE_ANON_KEY }}
           LEVELUP_E2E_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_EMAIL }}
           LEVELUP_E2E_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_PASSWORD }}
+          LEVELUP_EDITOR_E2E_EMAIL: ${{ secrets.LEVELUP_STAGING_EDITOR_EMAIL }}
+          LEVELUP_EDITOR_E2E_PASSWORD: ${{ secrets.LEVELUP_STAGING_EDITOR_PASSWORD }}
