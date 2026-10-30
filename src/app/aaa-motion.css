@@ -1,0 +1,271 @@
+/* LEVELUP // AAA CODE-HUD MOTION LAYER
+   A lightweight cinematic terminal overlay for the featured game stage. */
+
+.hero-code-terminal {
+  position: absolute;
+  z-index: 5;
+  top: 66px;
+  left: clamp(18px, 2.5vw, 30px);
+  width: min(58%, 320px);
+  padding: 11px 12px 10px;
+  overflow: hidden;
+  border: 1px solid rgba(199,255,70,.24);
+  background: linear-gradient(135deg, rgba(7,8,14,.86), rgba(13,16,28,.68));
+  box-shadow: 0 16px 45px rgba(0,0,0,.3), 0 0 25px rgba(199,255,70,.035);
+  -webkit-backdrop-filter: blur(13px);
+  backdrop-filter: blur(13px);
+  clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%);
+  isolation: isolate;
+}
+
+.hero-code-terminal::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 1px;
+  background: var(--lime);
+  box-shadow: 0 0 12px rgba(199,255,70,.6);
+}
+
+.hero-code-terminal::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: -55%;
+  width: 35%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(199,255,70,.07), rgba(99,230,223,.055), transparent);
+  transform: translateX(-100%);
+  animation: levelup-terminal-sweep 8.5s cubic-bezier(.16,1,.3,1) 2.1s infinite;
+}
+
+.hero-code-terminal > * {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-code-terminal-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  color: #d8deec;
+  font: 600 .49rem/1.3 var(--mono);
+  letter-spacing: .075em;
+}
+
+.hero-code-terminal-lights {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: 0 0 auto;
+}
+
+.hero-code-terminal-lights i {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(199,255,70,.78);
+  box-shadow: 0 0 7px rgba(199,255,70,.24);
+}
+
+.hero-code-terminal-lights i:nth-child(2) { background: var(--cyan); }
+.hero-code-terminal-lights i:nth-child(3) { background: var(--violet); }
+
+.hero-code-terminal-title {
+  overflow: hidden;
+  color: var(--lime);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hero-code-terminal-mode {
+  margin-left: auto;
+  color: #737d93;
+  font-size: .44rem;
+  white-space: nowrap;
+}
+
+.hero-code-terminal-lines {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0 11px;
+  overflow: hidden;
+  font: 500 clamp(.48rem, .68vw, .59rem)/1.55 var(--mono);
+  letter-spacing: .005em;
+}
+
+.hero-code-line {
+  display: block;
+  width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: levelup-terminal-type .66s steps(var(--terminal-steps), end) var(--terminal-delay) both;
+}
+
+.hero-code-line-command { color: var(--lime); }
+.hero-code-line-result { color: rgba(220,226,241,.78); }
+.hero-code-line-live { color: var(--cyan); }
+
+.hero-code-line-live::after {
+  content: "_";
+  display: inline-block;
+  margin-left: 1px;
+  color: var(--lime);
+  animation: levelup-terminal-caret 1.05s steps(2, end) 1.5s infinite;
+}
+
+.hero-code-terminal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,.09);
+  color: #747e93;
+  font: 500 .43rem/1.35 var(--mono);
+  letter-spacing: .055em;
+}
+
+.hero-code-terminal-footer b {
+  color: var(--cyan);
+  font-weight: 500;
+}
+
+.hero-stage-spotlight { overflow: hidden; }
+
+.hero-stage-spotlight::after {
+  content: "";
+  position: absolute;
+  top: -18%;
+  left: 0;
+  right: 0;
+  height: 16%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(99,230,223,.035) 28%, rgba(199,255,70,.12) 52%, rgba(99,230,223,.04) 70%, transparent);
+  opacity: .72;
+  transform: translateY(-140%);
+  animation: levelup-stage-scan 9.2s cubic-bezier(.3,0,.2,1) infinite;
+}
+
+.hero-cinematic-stage:hover .hero-stage-spotlight::after {
+  opacity: 1;
+  animation-duration: 6.4s;
+}
+
+@keyframes levelup-terminal-type {
+  to { width: var(--terminal-width); }
+}
+
+@keyframes levelup-terminal-sweep {
+  0%, 66%, 100% { transform: translateX(-100%); opacity: 0; }
+  69% { opacity: .9; }
+  83% { transform: translateX(420%); opacity: 0; }
+}
+
+@keyframes levelup-stage-scan {
+  0% { transform: translateY(-140%); }
+  100% { transform: translateY(760%); }
+}
+
+@media (max-width: 1120px) {
+  .hero-code-terminal {
+    width: min(62%, 300px);
+  }
+}
+
+@media (max-width: 700px) {
+  .hero-code-terminal {
+    top: 61px;
+    left: 14px;
+    width: min(67%, 270px);
+    padding: 9px 10px 9px;
+  }
+
+  .hero-code-terminal-head { gap: 6px; }
+  .hero-code-terminal-lines { gap: 3px; margin: 8px 0 9px; }
+  .hero-code-terminal-footer { font-size: .4rem; }
+  .hero-stage-spotlight::after { opacity: .48; }
+}
+
+@media (max-width: 400px) {
+  .hero-code-terminal {
+    width: calc(100% - 36px);
+    max-width: 255px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-code-terminal::after,
+  .hero-stage-spotlight::after,
+  .hero-code-line,
+  .hero-code-line-live::after {
+    animation: none !important;
+  }
+
+  .hero-code-line {
+    width: auto !important;
+    max-width: 100%;
+    overflow: visible;
+  }
+}
+
+
+/* Decode major section titles like a command stream as they enter the viewport. */
+.section-head.motion-reveal.is-visible h2,
+.page-hero.motion-reveal.is-visible h1,
+.community-panel.motion-reveal.is-visible .community-copy h2,
+.gamer-command-shell.motion-reveal.is-visible .gamer-command-top h2 {
+  animation: levelup-heading-decode .92s steps(24, end) 70ms both;
+  will-change: clip-path, filter;
+}
+
+@keyframes levelup-heading-decode {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: .62;
+    filter: blur(4px);
+    transform: translateY(5px);
+  }
+  13% {
+    opacity: 1;
+  }
+  70% {
+    clip-path: inset(0 0 0 0);
+    filter: blur(0);
+    transform: translateY(0);
+    text-shadow: -2px 0 rgba(99,230,223,.58), 2px 0 rgba(199,255,70,.34);
+  }
+  76% {
+    text-shadow: 2px 0 rgba(99,230,223,.4), -2px 0 rgba(167,139,250,.42);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+    text-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-head.motion-reveal.is-visible h2,
+  .page-hero.motion-reveal.is-visible h1,
+  .community-panel.motion-reveal.is-visible .community-copy h2,
+  .gamer-command-shell.motion-reveal.is-visible .gamer-command-top h2 {
+    animation: none !important;
+    clip-path: none !important;
+    filter: none !important;
+    transform: none !important;
+    will-change: auto;
+  }
+}

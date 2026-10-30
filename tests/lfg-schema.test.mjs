@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import test from "node:test";
+const sql = readFileSync(new URL("../supabase/lfg-squad.sql", import.meta.url), "utf8");
+const board = readFileSync(new URL("../src/components/lfg-board.tsx", import.meta.url), "utf8");
+test("creates additive squad tables with bounded inputs",()=>{assert.match(sql,/create table if not exists public\.squads/i);assert.match(sql,/create table if not exists public\.squad_memberships/i);assert.match(sql,/char_length\(btrim\(title\)\) between 5 and 80/i);assert.match(sql,/char_length\(description\) <= 600/i);assert.match(sql,/max_members between 2 and 8/i);});
+test("RLS restricts writes to the authenticated owner or requester",()=>{assert.match(sql,/alter table public\.squads enable row level security/i);assert.match(sql,/alter table public\.squad_memberships enable row level security/i);assert.match(sql,/owner_id=\(select auth\.uid\(\)\)/i);assert.match(sql,/user_id=\(select auth\.uid\(\)\)/i);assert.match(sql,/role='member' and status='pending'/i);});
+test("capacity checks use a row lock and reject overfilling",()=>{assert.match(sql,/for update;/i);assert.match(sql,/private\.enforce_squad_capacity/i);assert.match(sql,/accepted_count>=capacity/i);assert.match(sql,/SQUAD_FULL/i);});
+test("leader role is assigned by a protected trigger",()=>{assert.match(sql,/private\.add_squad_leader/i);assert.match(sql,/after insert on public\.squads/i);assert.match(sql,/revoke all on function private\.add_squad_leader\(\) from public,anon,authenticated/i);});
+test("Preview clearly labels demo data and blocks writes",()=>{assert.match(board,/PREVIEW MODE · DỮ LIỆU MẪU/);assert.match(board,/disabled=\{demo\}/);assert.match(board,/supabase\/lfg-squad\.sql/);});

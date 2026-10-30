@@ -1,0 +1,112 @@
+.game-library-control-compact {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.library-favorite-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,.025);
+  color: var(--text-muted, #a7a9b7);
+  font: 600 .7rem/1.2 var(--font-ibm-plex-mono, monospace);
+  letter-spacing: .015em;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.library-favorite-btn > span:first-child {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.library-favorite-btn:hover:not(:disabled) {
+  border-color: rgba(199,255,70,.5);
+  color: var(--text-primary, #f5f6fb);
+  transform: translateY(-1px);
+}
+
+.library-favorite-btn.is-favorite {
+  border-color: rgba(255,93,120,.4);
+  background: rgba(255,93,120,.08);
+  color: #ff8da0;
+}
+
+.library-favorite-btn:focus-visible,
+.locker-sync-link:focus-visible {
+  outline: 2px solid var(--lime, #c7ff46);
+  outline-offset: 3px;
+}
+
+.library-favorite-btn:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.library-favorite-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.library-sync-hint {
+  margin: 12px 0 0;
+  color: var(--text-muted, #a7a9b7);
+  font-size: .8rem;
+  line-height: 1.6;
+}
+
+.locker-sync-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--lime, #c7ff46);
+  font: 600 .68rem/1.4 var(--font-ibm-plex-mono, monospace);
+  text-decoration: none;
+}
+
+.locker-sync-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.gamer-command-foot > a {
+  color: var(--lime, #c7ff46);
+  font: 600 .68rem/1.4 var(--font-ibm-plex-mono, monospace);
+  text-decoration: none;
+}
+
+.gamer-command-foot > a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .game-library-control-compact {
+    gap: 6px;
+  }
+
+  .library-favorite-btn {
+    min-height: 32px;
+    padding: 6px 8px;
+    font-size: .65rem;
+  }
+
+  .library-favorite-row {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .library-favorite-btn {
+    transition: none;
+  }
+}
