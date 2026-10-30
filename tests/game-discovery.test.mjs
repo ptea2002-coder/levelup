@@ -7,6 +7,7 @@ const page = readFileSync(new URL("../src/app/discover/page.tsx", import.meta.ur
 const styles = readFileSync(new URL("../src/app/discovery.css", import.meta.url), "utf8");
 const header = readFileSync(new URL("../src/components/site-header.tsx", import.meta.url), "utf8");
 const api = readFileSync(new URL("../src/app/api/games/route.ts", import.meta.url), "utf8");
+const ranking = readFileSync(new URL("../src/lib/game-ranking.ts", import.meta.url), "utf8");
 
 test("P4 Game Discovery Lab is a real route with server-backed catalog paging and SEO", () => {
   assert.match(page, /GameDiscoveryStudio/);
@@ -65,7 +66,9 @@ test("catalog ranking uses Bayesian review smoothing and server-side mood filter
   assert.match(repository, /search_games_catalog_v2/);
   assert.match(repository, /p_categories:/);
   assert.match(repository, /p_mode:/);
-  assert.match(repository, /Bayesian smoothing/);
+  assert.match(ranking, /REVIEW_PRIOR_WEIGHT = 5000/);
+  assert.match(ranking, /REVIEW_PRIOR_MEAN = 0\.75/);
+  assert.match(ranking, /Bayesian rating keeps tiny review samples/);
   assert.match(migration, /search_games_catalog_v2/);
   assert.match(migration, /p_mode = 'competitive'/);
   assert.match(migration, /p_mode = 'coop'/);
