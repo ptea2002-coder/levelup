@@ -61,7 +61,7 @@ test("multi-category and mood filters are sent to the server catalog query", () 
 
 test("catalog ranking uses Bayesian review smoothing and server-side mood filtering", () => {
   const repository = readFileSync(new URL("../src/lib/game-repository.ts", import.meta.url), "utf8");
-  const migration = readFileSync(new URL("../supabase/migrations/202610300001_p4_discovery_ranking_and_filters.sql", import.meta.url), "utf8");
+  const migration = readFileSync(new URL("../supabase/migrations/20261029172810_p4_discovery_ranking_and_filters.sql", import.meta.url), "utf8");
   assert.match(repository, /search_games_catalog_v2/);
   assert.match(repository, /p_categories:/);
   assert.match(repository, /p_mode:/);
