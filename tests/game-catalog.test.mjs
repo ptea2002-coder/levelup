@@ -145,6 +145,6 @@ test("starter catalog fixtures are opt-in for CI only and never hide configured 
   assert.match(repository, /process\.env\.CI === "true"/);
   assert.match(repository, /process\.env\.LEVELUP_TEST_CATALOG === "1"/);
   assert.match(repository, /!hasAnySupabaseEnv/);
-  assert.match(repository, /useStarterCatalogFallback\(\) \? localSearch\(params\)/);
+  assert.match(repository, /useStarterCatalogFallback\\(\\)\\s*\\?\\s*localSearch\\(params\\)/);
   assert.match(repository, /return process\.env\.NODE_ENV === "development"\s*\? localSearch\(params\)/);
 });
