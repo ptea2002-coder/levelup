@@ -115,3 +115,5 @@ grant update(title,description,platform,region,rank_label,max_members,voice_chat
 grant select on public.squad_memberships to anon,authenticated;
 grant insert on public.squad_memberships to authenticated;
 grant update(status) on public.squad_memberships to authenticated;
+
+notify pgrst, 'reload schema';
