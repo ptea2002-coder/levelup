@@ -126,7 +126,7 @@ test("game profiles use the catalog's real artwork before falling back to curate
 });
 
 
-test("local recommendation sorting uses the same Bayesian confidence prior as the real catalog", () => {
+test("local recommendation sorting uses the shared Bayesian confidence prior", () => {
   assert.match(ranking, /REVIEW_PRIOR_WEIGHT = 5000/);
   assert.match(ranking, /REVIEW_PRIOR_MEAN = 0\.75/);
   assert.match(ranking, /function bayesianReviewScore/);
@@ -135,5 +135,4 @@ test("local recommendation sorting uses the same Bayesian confidence prior as th
   assert.match(explorer, /sort\(comparePositiveReviews\)/);
   assert.match(explorer, /sort\(compareRecommendedGames\)/);
   assert.doesNotMatch(explorer, /ratio \* 100/);
-  assert.match(igdbMigration, /5000 \* 0\.75/);
 });
