@@ -18,13 +18,6 @@ jobs:
     if: ${{ inputs.target == 'levelup-dev' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      LEVELUP_RLS_TEST_URL: ${{ secrets.LEVELUP_STAGING_SUPABASE_URL }}
-      LEVELUP_RLS_TEST_ANON_KEY: ${{ secrets.LEVELUP_STAGING_SUPABASE_ANON_KEY }}
-      LEVELUP_RLS_OWNER_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_EMAIL }}
-      LEVELUP_RLS_OWNER_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_PASSWORD }}
-      LEVELUP_RLS_OTHER_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OTHER_EMAIL }}
-      LEVELUP_RLS_OTHER_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OTHER_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,6 +27,13 @@ jobs:
           node-version: 22
       - name: Require dedicated staging credentials
         shell: bash
+        env:
+          LEVELUP_RLS_TEST_URL: ${{ secrets.LEVELUP_STAGING_SUPABASE_URL }}
+          LEVELUP_RLS_TEST_ANON_KEY: ${{ secrets.LEVELUP_STAGING_SUPABASE_ANON_KEY }}
+          LEVELUP_RLS_OWNER_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_EMAIL }}
+          LEVELUP_RLS_OWNER_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_PASSWORD }}
+          LEVELUP_RLS_OTHER_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OTHER_EMAIL }}
+          LEVELUP_RLS_OTHER_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OTHER_PASSWORD }}
         run: |
           set -euo pipefail
           for name in \
@@ -51,4 +51,11 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Verify staging RLS isolation
+        env:
+          LEVELUP_RLS_TEST_URL: ${{ secrets.LEVELUP_STAGING_SUPABASE_URL }}
+          LEVELUP_RLS_TEST_ANON_KEY: ${{ secrets.LEVELUP_STAGING_SUPABASE_ANON_KEY }}
+          LEVELUP_RLS_OWNER_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_EMAIL }}
+          LEVELUP_RLS_OWNER_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_PASSWORD }}
+          LEVELUP_RLS_OTHER_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OTHER_EMAIL }}
+          LEVELUP_RLS_OTHER_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OTHER_PASSWORD }}
         run: node --test tests/rls-integration.test.mjs
