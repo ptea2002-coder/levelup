@@ -54,6 +54,7 @@ test("P7 browser smoke covers guest discovery and optional staging-authenticated
   assert.match(browserWorkflow, /NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY/);
   assert.match(browserScript, /guestLibraryJourney/);
   assert.match(browserScript, /discoveryJourney/);
+  assert.match(browserScript, /Game Discovery pagination/);
   assert.match(browserScript, /authenticatedLibraryJourney/);
   assert.match(browserScript, /expectedStagingOrigin/);
   assert.match(browserScript, /original status/);
