@@ -318,7 +318,7 @@ create or replace function public.prevent_unedited_news_intake_publish()
 returns trigger
 language plpgsql
 set search_path = ''
-as $
+as $$
 begin
   if new.status = 'published' and (
     pg_catalog.strpos(new.body_md, '[Viết nội dung nguyên bản') > 0
@@ -330,7 +330,7 @@ begin
   end if;
   return new;
 end;
-$;
+$$;
 
 drop trigger if exists articles_require_original_news_content on public.articles;
 create trigger articles_require_original_news_content

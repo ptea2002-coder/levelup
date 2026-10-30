@@ -42,7 +42,7 @@ test("every queue action requires a human and draft promotion never auto-publish
   assert.match(migration, /'draft'/);
   assert.match(migration, /status = 'converted'/);
   assert.match(migration, /dismiss_news_ingest_item/);
-  assert.match(migration, /articles_require_original_news_content/);
+  assert.match(migration, /create or replace function public\.prevent_unedited_news_intake_publish\(\)[\s\S]*?as \$\$/);
   assert.match(editorialCms, /Bản nháp News Intelligence vẫn còn nội dung giữ chỗ/);
   assert.match(component, /Tạo bản nháp trong CMS/);
   assert.match(component, /Bỏ qua/);
