@@ -65,7 +65,7 @@ Two sync-state tables, `public.game_catalog_sync_state` and `public.game_igdb_sy
 
 The staging Auth advisor also reports leaked-password protection disabled. Before production cutover, the project owner should enable Supabase Auth's leaked-password protection in the Auth password-security settings and verify the desired password policy. This is a dashboard-level project setting, not something a repository migration can safely change.
 
-The remaining performance findings include RLS initialization-plan warnings and unused-index notices. Review policy rewrites with tests and query-plan evidence before changing access-control logic. Do not drop indexes based only on "unused" notices from a new staging project with little traffic.
+Migration `20261030064422_optimize_admin_rls_jwt_initplans.sql` rewrites seven admin policy expressions to evaluate `(select auth.jwt())` as an initplan without changing the `app_metadata.role = admin` condition. After applying it to `levelup-dev`, the Performance Advisor no longer reports unindexed foreign keys or `auth_rls_initplan` warnings. Remaining performance findings are five `multiple_permissive_policies` warnings and 39 unused-index notices; consolidate policies only with access-control regression tests, and do not drop indexes based only on "unused" notices from a new staging project with little traffic.
 
 ## Backup and recovery
 
