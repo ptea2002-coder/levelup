@@ -2,9 +2,9 @@ name: LevelUP CI
 
 on:
   push:
-    branches: [main, v2-foundation, p4-game-discovery, p4-discovery-ranking-fix, p5-pc-performance-lab]
+    branches: [main, v2-foundation, p3-1-editorial-hardening, p4-game-discovery, p4-discovery-ranking-fix, p5-pc-performance-lab]
   pull_request:
-    branches: [main, v2-foundation, p4-game-discovery, p5-pc-performance-lab]
+    branches: [main, v2-foundation, p3-1-editorial-hardening, p4-game-discovery, p5-pc-performance-lab]
 
 jobs:
   validate:

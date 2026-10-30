@@ -36,6 +36,18 @@
 - [x] Editorial source links and correction/update notes.
 - [ ] Add a reviewed RSS/news-source ingestion pipeline and validate source licensing before enabling automated ingestion.
 
+### P3.1 — Editorial operational hardening
+
+- [x] Fix archive feedback so an RLS-filtered/no-row update cannot be reported as successful.
+- [x] Allow editors to collaborate on existing articles while preserving author ownership; admins alone may reassign authors.
+- [x] Add a published-by index and editorial regression guards.
+- [x] Document safe role provisioning and the manual CMS smoke-test checklist.
+- [ ] Assign an approved Auth account's `app_metadata.role` and run the smoke tests.
+- [ ] Add automated RLS integration tests using anonymous, editor, admin, and cross-user identities.
+- [ ] Reconcile the live P3 schema with Supabase migration history before production cutover.
+
+
+
 ## Phase 4 — Game Discovery Engine
 
 - [x] Add Game Discovery Lab at `/discover` with server-backed catalog paging.
