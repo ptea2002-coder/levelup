@@ -311,7 +311,7 @@ export const pcGameRequirements: PCGameRequirement[] = [
     },
     osLabel: "Windows 10/11 64-bit",
     sourceLabel: "Steam Support — Monster Hunter Wilds System Requirements",
-    sourceUrl: "https://help.steampowered.com/en/wizard/HelpWithGameTechnicalIssue?appid=2246340",
+    sourceUrl: "https://store.steampowered.com/app/2246340/Monster_Hunter_Wilds/",
     checkedAt: "2026-10-30",
     officialPerformanceNote: "Nguồn ghi mức tối thiểu là 1080p (upscale từ 720p native) / 30 FPS ở Lowest; Recommended là 1080p / 60 FPS ở Medium khi bật Frame Generation.",
     caveat: "Mốc 60 FPS khuyến nghị phụ thuộc Frame Generation; không được hiểu là FPS bảo đảm khi tắt tính năng này.",
