@@ -79,7 +79,7 @@
 - [x] Document backup/restore verification, application rollback, database recovery, and production release gates.
 - [x] Add staging indexes for nine unindexed foreign-key columns and optimize seven admin JWT policy expressions; staging advisor no longer reports either finding class.
 - [ ] Enable Supabase Auth leaked-password protection in staging and verify the intended password policy.
-- [ ] Review the remaining `squad_memberships` permissive UPDATE policies with RLS regression tests before considering consolidation.
+- [ ] Review five remaining permissive-policy groups across `articles`, `comments`, `reviews`, and `squad_memberships` with RLS regression tests before considering consolidation.
 - [ ] Configure the staging test-account secrets and pass the live RLS integration workflow; record its run URL and commit SHA.
 - [x] Pass Playwright browser smoke on the current PR head for eight routes at 390px, 768px, and 1440px.
 - [ ] Complete manual keyboard, accessibility, authenticated, and real-device checks.
