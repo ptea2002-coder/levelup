@@ -84,7 +84,7 @@ test("recommendation feedback stays local and is isolated between guest and sign
   assert.match(component, /levelup:discovery-feedback:guest:v1/);
   assert.match(component, /window\.localStorage\.setItem\(feedbackStorageKey/);
   assert.match(component, /không gửi lên máy chủ/);
-  assert.match(provider, /userId: string \\| null/);
+  assert.ok(provider.includes("userId: string | null"));
   assert.match(styles, /discovery-feedback/);
   assert.match(browserScript, /levelup:discovery-feedback:guest:v1/);
 });
