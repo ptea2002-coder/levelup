@@ -63,7 +63,7 @@ test("P5 includes additional source-verified AAA requirements and never invents 
   assert.ok(requirements.includes("storageGb?: number"));
   assert.ok(requirements.includes("https://www.epicgames.com/help/c-34254770/c-5719357839387/a16548002"));
   assert.ok(requirements.includes("https://store.steampowered.com/app/2358720/Black_Myth_Wukong/"));
-  assert.ok(requirements.includes("https://help.steampowered.com/en/wizard/HelpWithGameTechnicalIssue?appid=2246340"));
+  assert.ok(requirements.includes("https://store.steampowered.com/app/2246340/Monster_Hunter_Wilds/"));
   assert.ok(component.includes('tier.storageGb === undefined ? "Không được công bố"'));
 });
 
