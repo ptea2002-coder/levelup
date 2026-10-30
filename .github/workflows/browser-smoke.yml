@@ -2,9 +2,9 @@ name: Browser and Mobile Smoke
 
 on:
   push:
-    branches: [p7-production-readiness]
+    branches: [main, p7-production-readiness]
   pull_request:
-    branches: [p6-news-intelligence, p7-production-readiness]
+    branches: [main, p6-news-intelligence, p7-production-readiness]
   workflow_dispatch:
 
 concurrency:
