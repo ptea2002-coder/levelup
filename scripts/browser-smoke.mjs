@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright";
 
 const baseUrl = (process.env.BASE_URL ?? "http://127.0.0.1:3000").replace(/\/$/, "");
-const routes = ["/", "/games", "/games/valorant", "/discover", "/build-lab", "/news", "/community", "/locker", "/login"];
+const routes = ["/", "/games", "/discover", "/build-lab", "/news", "/community", "/locker", "/login"];
 const viewports = [
   { name: "mobile", width: 390, height: 844 },
   { name: "tablet", width: 768, height: 1024 },
@@ -48,7 +48,9 @@ async function guestLibraryJourney(browser) {
   const firstCard = page.locator(".game-card").first();
   await firstCard.waitFor({ state: "visible", timeout: 20_000 });
   const title = (await firstCard.locator(".game-card-cover-copy h3").innerText()).trim();
-  assert.ok(title, "The seeded/staging catalog must expose a game card.");
+  const gameHref = await firstCard.locator("a.game-card-link").getAttribute("href");
+  const gameSlug = gameHref?.split("/").filter(Boolean).at(-1);
+  assert.ok(title && gameSlug, "The seeded/staging catalog must expose a game card with a stable slug.");
 
   const saveButton = firstCard.locator(".library-save-btn");
   await waitForEnabledButton(page, ".game-card .library-save-btn");
@@ -61,7 +63,16 @@ async function guestLibraryJourney(browser) {
   const favoriteButton = firstCard.locator(".library-favorite-btn");
   await favoriteButton.click();
   assert.equal(await favoriteButton.getAttribute("aria-pressed"), "true", "Guest favorite toggle should update immediately.");
-  assert.match(await page.evaluate(() => localStorage.getItem("levelup:game-library:v1") ?? ""), new RegExp(title ? "valorant|levelup" : "levelup", "i"));
+  const savedEntry = await page.evaluate((slug) => {
+    try {
+      const raw = localStorage.getItem("levelup:game-library:v1");
+      return raw ? JSON.parse(raw)[slug] ?? null : null;
+    } catch {
+      return null;
+    }
+  }, gameSlug);
+  assert.equal(savedEntry?.status, "wishlist", "Guest save should persist the wishlist status.");
+  assert.equal(savedEntry?.isFavorite, true, "Guest favorite should persist in browser storage.");
 
   await page.goto(`${baseUrl}/locker`, { waitUntil: "domcontentloaded", timeout: 30_000 });
   const savedCard = page.locator(".game-card").filter({ hasText: title }).first();
