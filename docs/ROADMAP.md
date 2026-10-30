@@ -52,7 +52,8 @@
 - [x] Show minimum/recommended requirement tiers, per-component checks, source links, and clear warnings instead of inventing FPS estimates.
 - [x] Keep guest and signed-in PC profiles isolated in local browser storage; do not send hardware data to the server.
 - [x] Expand the official-source-linked PC requirements catalog from 8 to 11 games, record checked dates/caveats, and represent unpublished storage requirements as unknown.
-- [ ] Add a sourced CPU/GPU benchmark index before automatic model-to-model performance scoring.
+- [x] Add an initial PassMark CPU Mark/G3D Mark reference index with source links, snapshot dates, sample counts when available, and explicit no-FPS caveats.
+- [ ] Expand benchmark coverage and validate model matching before any automatic CPU/GPU compatibility scoring.
 
 ## Phase 6 — News Intelligence
 
