@@ -53,6 +53,16 @@ The **Browser and Mobile Smoke** workflow builds the production app, starts it l
 
 It checks for HTTP errors, browser runtime exceptions, and horizontal page overflow while emulating reduced motion. This is a smoke test, not a substitute for manual interaction, keyboard, screen-reader, authenticated, or real-device testing. The authenticated P6 News Intelligence flow still needs a designated staging editor/admin and a human-reviewed source before end-to-end testing.
 
+## Supabase advisor follow-up
+
+The staging Supabase Performance Advisor reported nine foreign-key columns without covering indexes. Migration `20261030063018_add_foreign_key_supporting_indexes.sql` adds those indexes without changing data or RLS policy behavior. It has been applied to `levelup-dev`; re-run the advisor after this migration is included in the release branch and again after meaningful production traffic exists.
+
+Two sync-state tables, `public.game_catalog_sync_state` and `public.game_igdb_sync_state`, have RLS enabled and intentionally have no client-facing policies. They hold internal synchronization state and should remain inaccessible to `anon` and `authenticated` roles. Do **not** add a permissive policy just to silence the informational advisor finding; verify that only trusted backend/service-role paths use them.
+
+The staging Auth advisor also reports leaked-password protection disabled. Before production cutover, the project owner should enable Supabase Auth's leaked-password protection in the Auth password-security settings and verify the desired password policy. This is a dashboard-level project setting, not something a repository migration can safely change.
+
+The remaining performance findings include RLS initialization-plan warnings and unused-index notices. Review policy rewrites with tests and query-plan evidence before changing access-control logic. Do not drop indexes based only on "unused" notices from a new staging project with little traffic.
+
 ## Backup and recovery
 
 Backup coverage is a **release gate to verify**, not something this repository can enable by itself.
