@@ -7,6 +7,10 @@ on:
     branches: [p6-news-intelligence, p7-production-readiness]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
