@@ -98,6 +98,8 @@ A schema-only SQL dump may not include Auth users, Storage objects, secrets, or 
 
 ## Current P7 status
 
+Automated validation observed during implementation: CI passed with 63 tests passing, 0 failures, and 1 skipped test; the skipped case is the live RLS integration test because dedicated staging-account secrets are not configured. Browser smoke passed for eight routes across 390px, 768px, and 1440px viewports. Re-run both workflows against the final PR head before merging.
+
 Implemented in code: health endpoints, staging-only RLS test harness, manually dispatched RLS workflow, browser smoke workflow, and this runbook.
 
 Not yet verified/configured: dedicated staging account secrets, a passing live RLS integration run, the browser workflow result on the final PR commit, backup/restore evidence, external uptime alerts, authenticated P6 end-to-end QA, and production cutover approval.
