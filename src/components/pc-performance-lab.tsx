@@ -72,7 +72,7 @@ function RequirementList({ tier, label }: { tier?: PCGameTier; label: string }) 
         <div><dt>GPU</dt><dd>{tier.gpu}</dd></div>
         <div><dt>RAM</dt><dd>{tier.ramGb} GB</dd></div>
         {tier.vramGb !== undefined ? <div><dt>VRAM</dt><dd>{formatGB(tier.vramGb)}</dd></div> : null}
-        <div><dt>Lưu trữ</dt><dd>{tier.storageGb < 1 ? formatGB(tier.storageGb) : `${tier.storageGb} GB`}{tier.requiresSsd ? " · SSD bắt buộc" : ""}</dd></div>
+        <div><dt>Lưu trữ</dt><dd>{tier.storageGb === undefined ? "Không được công bố" : tier.storageGb < 1 ? formatGB(tier.storageGb) : `${tier.storageGb} GB`}{tier.requiresSsd ? " · SSD bắt buộc" : ""}</dd></div>
       </dl>
     </div>
   );
