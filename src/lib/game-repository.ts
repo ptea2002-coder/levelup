@@ -1,4 +1,5 @@
 import { games as starterGames, type Game } from "@/lib/games";
+import { comparePositiveReviews, compareRecommendedGames } from "@/lib/game-ranking";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 type GameRow = {
@@ -123,27 +124,8 @@ function localSearch(params: GameCatalogQuery): GameCatalogPage {
   });
   if (params.sort === "name") results = [...results].sort((a, b) => a.title.localeCompare(b.title, "vi"));
   if (params.sort === "newest") results = [...results].sort((a, b) => b.releaseYear - a.releaseYear);
-  if (params.sort === "positive") results = [...results].sort((a, b) => {
-    const score = (game: Game) => {
-      const positive = game.positiveReviews ?? 0;
-      const total = positive + (game.negativeReviews ?? 0);
-      return (positive + 5000 * 0.75) / (total + 5000);
-    };
-    const totalA = (a.positiveReviews ?? 0) + (a.negativeReviews ?? 0);
-    const totalB = (b.positiveReviews ?? 0) + (b.negativeReviews ?? 0);
-    return score(b) - score(a) || totalB - totalA || (b.positiveReviews ?? 0) - (a.positiveReviews ?? 0);
-  });
-  if (params.sort === "recommended") results = [...results].sort((a, b) => {
-    const score = (game: Game) => {
-      const positive = game.positiveReviews ?? 0;
-      const total = positive + (game.negativeReviews ?? 0);
-      // Bayesian smoothing stops tiny samples with 100% positive reviews from dominating.
-      return (positive + 5000 * 0.75) / (total + 5000)
-        + Math.log10(total + 1) * 0.002
-        + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.001;
-    };
-    return score(b) - score(a) || a.title.localeCompare(b.title, "vi");
-  });
+  if (params.sort === "positive") results = [...results].sort(comparePositiveReviews);
+  if (params.sort === "recommended") results = [...results].sort(compareRecommendedGames);
   const pageSize = Math.max(1, Math.min(params.pageSize ?? 24, 48));
   const page = Math.max(1, params.page ?? 1);
   const total = results.length;
