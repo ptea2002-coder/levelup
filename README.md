@@ -22,7 +22,7 @@ LevelUP is being rebuilt from a single-file static website into a modern gaming 
 - Preview environment variables remain scoped to `levelup-dev`. Production Vercel environment variables now point to the separate `levelup` Supabase project; no staging credentials are copied into production.
 - Production schema migrations are applied through `admin_helper_invoker`, including article RLS and foreign-key index tuning. RLS is enabled across public tables. Production still contains 22 visible games because the SteamSpy endpoint returned HTTP 403; the catalog cron is paused until the source is reachable or an explicitly approved catalog snapshot is imported.
 - IGDB enrichment remains disabled and unscheduled, as requested. Do not enable it until that integration is explicitly resumed.
-- The production Vercel deployment has not picked up the new environment variables yet: Vercel's daily deployment limit blocked the redeploy. The existing deployment remains protected by SSO until the updated build is verified.
+- The latest READY production deployment is on commit `7f2b432`, created after production environment variables were configured. The commits between that deployment and current `main` contain only README, migration, and test changes; frontend code is unchanged. Vercel's daily deployment limit is blocking newer deployment checks. Production aliases remain SSO-protected until public cutover is approved.
 - Guest Game Locker data remains local-first; authenticated cloud sync is backed by `public.user_game_library` with owner-only RLS policies.
 
 ## Requirements
