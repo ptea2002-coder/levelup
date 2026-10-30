@@ -346,6 +346,7 @@ export function PCPerformanceLab() {
           <RequirementList tier={selectedGame.minimum} label="TIER 01 / TỐI THIỂU" />
           <RequirementList tier={selectedGame.recommended} label="TIER 02 / KHUYẾN NGHỊ" />
         </div>
+        <p className="pc-os-note"><span>OS / PLATFORM NOTE</span>{selectedGame.osLabel}</p>
 
         <div className="pc-manual-check-panel">
           <div>
