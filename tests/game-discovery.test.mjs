@@ -71,5 +71,5 @@ test("catalog ranking uses Bayesian review smoothing and server-side mood filter
   assert.match(migration, /p_mode = 'coop'/);
   assert.match(migration, /p_mode = 'story'/);
   assert.match(migration, /p_mode = 'chill'/);
-  assert.match(migration, /positive_count \+ 1500 \* 0\.75/);
+  assert.match(migration, /positive_count \+ 5000 \* 0\.75/);
 });
