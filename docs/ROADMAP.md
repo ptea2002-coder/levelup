@@ -43,7 +43,9 @@
 - [x] Rank candidates using saved Game Locker genres/favorites and explain visible match reasons.
 - [x] Keep the scoring transparent as heuristic metadata matching; do not claim FPS/hardware fit.
 - [x] Add automated browser journeys for the CI-seeded catalog, guest Game Locker isolation/persistence, Discovery filters/search, and an opt-in guarded staging-account cloud-sync path (live account execution still requires staging secrets).
-- [ ] Expand candidate retrieval beyond the current catalog pages and validate recommendation quality with user feedback.
+- [x] Support paginated candidate retrieval beyond the first 48 results and add an automated full-catalog pagination check when staging catalog credentials are available.
+- [x] Add local-only recommendation fit feedback isolated between guest and signed-in accounts; feedback is not sent to the server.
+- [ ] Validate aggregate recommendation quality and tune ranking weights after the owner approves a privacy-safe analytics/user-study approach.
 
 ## Phase 5 — PC Build & Performance Lab
 
