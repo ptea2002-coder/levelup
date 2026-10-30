@@ -73,3 +73,8 @@ test("admin RLS policies use initplan-wrapped JWT evaluation without broadening 
   assert.ok(migration.includes('Admins moderate game comments'));
   assert.ok(migration.includes('Admins update news sources'));
 });
+
+test("fresh schema snapshot keeps admin JWT checks in initplan form", () => {
+  const schema = readFileSync(new URL("../supabase/schema.sql", import.meta.url), "utf8");
+  assert.ok(schema.includes("((select auth.jwt()) -> 'app_metadata' ->> 'role')"));
+});
