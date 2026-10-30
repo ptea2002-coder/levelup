@@ -327,8 +327,9 @@ export function NewsIntelligence() {
     const result = data as { sources?: number; fetched?: number; inserted?: number; duplicates?: number; errors?: Array<{ source: string; message: string }>; message?: string };
     const failed = result.errors?.length ?? 0;
     setMessage(result.message ?? ("Đã quét " + (result.sources ?? 0) + " nguồn · nhận " + (result.fetched ?? 0) + " mục · mới " + (result.inserted ?? 0) + " · trùng " + (result.duplicates ?? 0) + (failed ? " · lỗi nguồn " + failed : "") + "."));
-    if (failed) setError((result.errors ?? []).map((entry) => entry.source + ": " + entry.message).join(" · "));
+    const sourceErrors = failed ? (result.errors ?? []).map((entry) => entry.source + ": " + entry.message).join(" · ") : "";
     await loadData();
+    if (sourceErrors) setError(sourceErrors);
   }
 
   async function createDraft(item: IntakeItem) {
