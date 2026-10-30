@@ -55,3 +55,14 @@ test("the PC Lab includes responsive and reduced-motion safeguards", () => {
   assert.match(roadmap, /## Phase 5 — PC Build & Performance Lab/);
   assert.match(roadmap, /Expand the verified requirements catalog/);
 });
+
+test("P5 includes additional source-verified AAA requirements and never invents unpublished storage values", () => {
+  assert.ok(requirements.includes('slug: "fortnite"'));
+  assert.ok(requirements.includes('slug: "black-myth-wukong"'));
+  assert.ok(requirements.includes('slug: "monster-hunter-wilds"'));
+  assert.ok(requirements.includes("storageGb?: number"));
+  assert.ok(requirements.includes("https://www.epicgames.com/help/c-34254770/c-5719357839387/a16548002"));
+  assert.ok(requirements.includes("https://store.steampowered.com/app/2358720/Black_Myth_Wukong/"));
+  assert.ok(requirements.includes("https://help.steampowered.com/en/wizard/HelpWithGameTechnicalIssue?appid=2246340"));
+  assert.ok(component.includes('tier.storageGb === undefined ? "Không được công bố"'));
+});
