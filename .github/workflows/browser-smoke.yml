@@ -16,6 +16,7 @@ jobs:
     timeout-minutes: 20
     env:
       NEXT_TELEMETRY_DISABLED: 1
+      LEVELUP_TEST_CATALOG: 1
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,6 +24,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Validate optional staging-only browser credentials
+        shell: bash
+        env:
+          STAGING_URL: ${{ secrets.LEVELUP_STAGING_SUPABASE_URL }}
+          STAGING_KEY: ${{ secrets.LEVELUP_STAGING_SUPABASE_ANON_KEY }}
+          E2E_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$STAGING_URL" || -n "$STAGING_KEY" ]]; then
+            [[ -n "$STAGING_URL" && -n "$STAGING_KEY" ]] || { echo "::error::Set both staging URL and publishable key, or leave both unset."; exit 1; }
+            [[ "$STAGING_URL" == "https://ztzcpnyxgwhcdktpbxdq.supabase.co" ]] || { echo "::error::Browser tests may only write to the levelup-dev staging project."; exit 1; }
+          fi
+          if [[ -n "$E2E_EMAIL" || -n "$E2E_PASSWORD" ]]; then
+            [[ -n "$E2E_EMAIL" && -n "$E2E_PASSWORD" && -n "$STAGING_URL" && -n "$STAGING_KEY" ]] || { echo "::error::Authenticated Game Locker smoke needs the staging URL/key and both owner-account credentials."; exit 1; }
+          fi
       - name: Install application dependencies
         run: npm install --no-audit --no-fund
       - name: Install pinned Playwright runner
@@ -31,8 +48,14 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Build application
         run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.LEVELUP_STAGING_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.LEVELUP_STAGING_SUPABASE_ANON_KEY }}
       - name: Start production server
         shell: bash
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.LEVELUP_STAGING_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.LEVELUP_STAGING_SUPABASE_ANON_KEY }}
         run: |
           npm run start -- --hostname 127.0.0.1 > /tmp/levelup-next.log 2>&1 &
           echo $! > /tmp/levelup-next.pid
@@ -49,5 +72,10 @@ jobs:
             echo "::error::Next.js production server did not become healthy."
             exit 1
           fi
-      - name: Check routes and responsive layouts
+      - name: Check routes, guest flows, and optional authenticated Game Locker
         run: node scripts/browser-smoke.mjs
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.LEVELUP_STAGING_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.LEVELUP_STAGING_SUPABASE_ANON_KEY }}
+          LEVELUP_E2E_EMAIL: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_EMAIL }}
+          LEVELUP_E2E_PASSWORD: ${{ secrets.LEVELUP_STAGING_RLS_OWNER_PASSWORD }}
