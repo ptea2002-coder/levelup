@@ -1,6 +1,8 @@
 name: Staging RLS Integration
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       target:
@@ -15,7 +17,7 @@ permissions:
 
 jobs:
   verify-staging-rls:
-    if: ${{ inputs.target == 'levelup-dev' }}
+    if: ${{ github.event_name == 'push' || inputs.target == 'levelup-dev' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
