@@ -143,6 +143,7 @@ test("local recommendation sorting uses the shared Bayesian confidence prior", (
   assert.doesNotMatch(explorer, /ratio \* 100/);
   assert.match(confidenceMigration, /search_games_catalog_v2/);
   assert.match(confidenceMigration, /5000 \* 0\.75/);
+  assert.match(confidenceMigration, /\$function\$;\s*REVOKE ALL ON FUNCTION public\.search_games_catalog_v2/i);
 });
 
 test("starter catalog fixtures are opt-in for CI only and never hide configured Supabase failures", () => {
