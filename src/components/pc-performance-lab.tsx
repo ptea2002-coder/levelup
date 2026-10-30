@@ -9,7 +9,9 @@ import {
   PC_BUILD_GUEST_STORAGE_KEY,
   PC_BUILD_USER_STORAGE_PREFIX,
   pcGameRequirements,
+  pcBenchmarkReferences,
   type HardwareAssessment,
+  type PCBenchmarkKind,
   type PCBuildProfile,
   type PCGameRequirement,
   type PCGameTier,
@@ -97,6 +99,7 @@ export function PCPerformanceLab() {
   const [storageKey, setStorageKey] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [saveState, setSaveState] = useState<"loading" | "saved" | "error">("loading");
+  const [benchmarkKind, setBenchmarkKind] = useState<PCBenchmarkKind>("gpu");
 
   const selectedGame = useMemo(
     () => pcGameRequirements.find((game) => game.slug === selectedSlug) ?? pcGameRequirements[0],
@@ -409,6 +412,38 @@ export function PCPerformanceLab() {
             <a href={selectedGame.sourceUrl} target="_blank" rel="noreferrer">{selectedGame.sourceLabel} ↗</a>
           </div>
         </div>
+      </section>
+
+      <section className="pc-benchmark-panel" aria-labelledby="pc-benchmark-heading">
+        <div className="pc-benchmark-panel-head">
+          <div>
+            <p className="eyebrow">BENCHMARK INDEX / SOURCE-LOCKED</p>
+            <h2 id="pc-benchmark-heading">Điểm tham chiếu <span>có nguồn.</span></h2>
+            <p>Chỉ số tổng hợp để tham khảo tương quan phần cứng. Không chuyển điểm benchmark thành FPS và không tự động kết luận CPU/GPU của bạn đạt yêu cầu game.</p>
+          </div>
+          <div className="pc-benchmark-toggle" role="group" aria-label="Loại benchmark cần xem">
+            <button type="button" aria-pressed={benchmarkKind === "gpu"} onClick={() => setBenchmarkKind("gpu")}>GPU / G3D MARK</button>
+            <button type="button" aria-pressed={benchmarkKind === "cpu"} onClick={() => setBenchmarkKind("cpu")}>CPU / CPU MARK</button>
+          </div>
+        </div>
+        <div className="pc-benchmark-list" aria-live="polite">
+          {pcBenchmarkReferences.filter((item) => item.kind === benchmarkKind).map((item, index) => (
+            <article className="pc-benchmark-card" key={item.id}>
+              <div className="pc-benchmark-card-main">
+                <span className="pc-benchmark-card-index">{String(index + 1).padStart(2, "0")} / {item.kind.toUpperCase()}</span>
+                <h3>{item.model}</h3>
+                <p>{item.sampleCount ? `Mẫu benchmark: ${item.sampleCount.toLocaleString("en-US")}` : "Nguồn không lưu số mẫu trong snapshot"} · dữ liệu nguồn {item.dataAsOf}</p>
+              </div>
+              <div className="pc-benchmark-card-score">
+                <strong>{item.score.toLocaleString("en-US")}</strong>
+                <span>{item.metricLabel}</span>
+              </div>
+              <p className="pc-benchmark-card-caveat">{item.caveat}</p>
+              <a href={item.sourceUrl} target="_blank" rel="noreferrer">{item.sourceLabel} ↗</a>
+            </article>
+          ))}
+        </div>
+        <p className="pc-benchmark-footnote">Đã kiểm tra nguồn ngày 30/10/2026. PassMark cập nhật điểm theo mẫu gửi lên; điểm có thể thay đổi. So sánh CPU Mark với CPU Mark, G3D Mark với G3D Mark — không so chéo hai loại điểm.</p>
       </section>
     </div>
   );
