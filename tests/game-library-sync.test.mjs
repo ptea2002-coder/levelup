@@ -46,6 +46,11 @@ test("P2 UI exposes sync state and preserves a local-first guest experience", ()
 });
 
 
+test("initial anonymous auth state cannot leave guest library controls disabled", () => {
+  assert.ok(provider.includes("const userIdRef = useRef<string | null>(null);"));
+  assert.ok(!provider.includes("useRef<string | null | undefined>(undefined)"));
+});
+
 test("legacy guest library entries without status are preserved", () => {
   assert.match(library, /const status = entry\.status \?\? null/);
   assert.match(library, /status: status as GameLibraryStatus \| null/);
