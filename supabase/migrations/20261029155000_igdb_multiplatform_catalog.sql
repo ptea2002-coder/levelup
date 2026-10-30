@@ -117,51 +117,6 @@ $$;
 revoke all on function public.search_games_catalog(text, text, text, text, integer, integer) from public;
 grant execute on function public.search_games_catalog(text, text, text, text, integer, integer) to anon, authenticated;
 
-DO $$
-DECLARE
-  existing_job_id bigint;
-BEGIN
-  SELECT jobid INTO existing_job_id
-  FROM cron.job
-  WHERE jobname = 'levelup-igdb-catalog-sync';
-
-  IF existing_job_id IS NOT NULL THEN
-    PERFORM cron.unschedule(existing_job_id);
-  END IF;
-
-  PERFORM cron.schedule(
-    'levelup-igdb-catalog-sync',
-    '* * * * *',
-    $job$
-      WITH reset_completed AS (
-        UPDATE public.game_igdb_sync_state
-        SET status = 'idle',
-            next_offset = 0,
-            total_synced = 0,
-            last_attempt_at = NULL,
-            last_error = NULL,
-            updated_at = now()
-        WHERE id = 1
-          AND enabled = true
-          AND status = 'complete'
-          AND last_success_at < now() - interval '7 days'
-        RETURNING id
-      )
-      SELECT net.http_post(
-        url := 'https://ztzcpnyxgwhcdktpbxdq.supabase.co/functions/v1/sync-igdb-catalog',
-        headers := jsonb_build_object(
-          'Content-Type', 'application/json',
-          'x-catalog-sync-secret', (SELECT sync_secret FROM public.game_catalog_sync_state WHERE id = 1)
-        ),
-        body := '{}'::jsonb,
-        timeout_milliseconds := 60000
-      )
-      FROM public.game_igdb_sync_state
-      WHERE id = 1
-        AND enabled = true
-        AND status <> 'complete'
-        AND (last_attempt_at IS NULL OR last_attempt_at < now() - interval '55 seconds');
-    $job$
-  );
-END
-$$;
+-- IGDB remains intentionally paused. The state is created disabled and no cron
+-- job is registered until the user authorizes that integration and its secrets
+-- are configured for the specific Supabase project.
