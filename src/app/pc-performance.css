@@ -241,6 +241,23 @@
   letter-spacing: .06em;
 }
 .pc-requirement-list dd { margin: 0; font-size: .73rem; line-height: 1.55; overflow-wrap: anywhere; }
+.pc-os-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: -5px 0 18px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .72rem;
+  line-height: 1.6;
+}
+.pc-os-note span {
+  color: var(--lime);
+  font: 500 .55rem/1.7 var(--mono);
+  letter-spacing: .07em;
+}
+
 .pc-manual-check-panel {
   margin: 0 0 20px;
   padding: 18px;
