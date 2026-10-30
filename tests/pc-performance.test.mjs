@@ -66,3 +66,16 @@ test("P5 includes additional source-verified AAA requirements and never invents 
   assert.ok(requirements.includes("https://help.steampowered.com/en/wizard/HelpWithGameTechnicalIssue?appid=2246340"));
   assert.ok(component.includes('tier.storageGb === undefined ? "Không được công bố"'));
 });
+
+test("P5 benchmark index shows dated, sourced CPU/GPU aggregate scores without converting them to FPS", () => {
+  assert.ok(requirements.includes("export const pcBenchmarkReferences"));
+  assert.ok(requirements.includes('metricLabel: "CPU Mark"'));
+  assert.ok(requirements.includes('metricLabel: "G3D Mark"'));
+  assert.ok(requirements.includes("sampleCount"));
+  assert.ok(requirements.includes('checkedAt: "2026-10-30"'));
+  assert.ok(requirements.includes("https://www.cpubenchmark.net/compare/3098vs4681vs4811/Intel-i7-8700K-vs-Intel-i5-12400F-vs-AMD-Ryzen-5-5600"));
+  assert.ok(requirements.includes("https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB"));
+  assert.ok(component.includes("pcBenchmarkReferences.filter"));
+  assert.ok(component.includes("Không chuyển điểm benchmark thành FPS"));
+  assert.ok(styles.includes(".pc-benchmark-list"));
+});
