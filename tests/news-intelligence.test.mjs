@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const migration = readFileSync(new URL("../supabase/migrations/20261030100000_p6_news_intelligence.sql", import.meta.url), "utf8");
+const migration = readFileSync(new URL("../supabase/migrations/20261030041422_p6_news_intelligence.sql", import.meta.url), "utf8");
 const edge = readFileSync(new URL("../supabase/functions/ingest-news-feeds/index.ts", import.meta.url), "utf8");
 const component = readFileSync(new URL("../src/components/news-intelligence.tsx", import.meta.url), "utf8");
 const page = readFileSync(new URL("../src/app/admin/news-intelligence/page.tsx", import.meta.url), "utf8");

@@ -102,7 +102,8 @@ The community now uses Supabase-backed data rather than demo posts:
 - Canonical URL, feed ID, and normalized title/date fingerprints prevent duplicate queue entries. Queue access is editor/admin-only.
 - Converting a queue item creates an unpublished CMS draft with a source reference and editorial checklist. A database trigger blocks publication while the generated placeholders remain; editors must verify facts and write original content.
 - No cron schedule is enabled. Review source terms and test the intake in staging before considering automation. See [docs/news-intelligence.md](docs/news-intelligence.md).
-- Applying P6 requires the migration `supabase/migrations/20261030100000_p6_news_intelligence.sql` and deploying `supabase/functions/ingest-news-feeds/index.ts` as `ingest-news-feeds`. This feature branch does not change the live database.
+- P6.1 has applied the schema migration to the `levelup-dev` staging project and deployed `ingest-news-feeds` with JWT verification enabled. No sources are registered or scheduled, and production is untouched.
+- The matching repository migration is `supabase/migrations/20261030041422_p6_news_intelligence.sql`. Full signed-in browser QA remains blocked until a trusted staging admin/editor role is assigned to a designated test account.
 
 ## Steam live data
 
