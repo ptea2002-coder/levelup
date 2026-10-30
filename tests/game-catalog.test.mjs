@@ -8,7 +8,7 @@ const explorer = readFileSync(new URL("../src/components/game-explorer.tsx", imp
 const api = readFileSync(new URL("../src/app/api/games/route.ts", import.meta.url), "utf8");
 const migration = readFileSync(new URL("../supabase/migrations/20261029150000_expand_game_catalog.sql", import.meta.url), "utf8");
 const sync = readFileSync(new URL("../supabase/functions/sync-game-catalog/index.ts", import.meta.url), "utf8");
-const cron = readFileSync(new URL("../supabase/migrations/20261029151000_schedule_game_catalog_sync.sql", import.meta.url), "utf8");
+const cron = readFileSync(new URL("../supabase/migrations/20261030070000_environment_safe_catalog_cron.sql", import.meta.url), "utf8");
 const facetsMigration = readFileSync(new URL("../supabase/migrations/20261029154000_catalog_facets.sql", import.meta.url), "utf8");
 const igdbMigration = readFileSync(new URL("../supabase/migrations/20261029155000_igdb_multiplatform_catalog.sql", import.meta.url), "utf8");
 const confidenceMigration = readFileSync(new URL("../supabase/migrations/20261030031107_p4_discovery_ranking_confidence.sql", import.meta.url), "utf8");
@@ -56,10 +56,13 @@ test("real-data sync authenticates, deduplicates by provider ID and stores upstr
   assert.match(sync, /upsert\(rows\.slice/);
 });
 
-test("catalog import continues in the background with the upstream request rate respected", () => {
+test("catalog import continues in the background with a project-scoped cron target", () => {
   assert.match(sync, /< 55_000/);
   assert.match(cron, /'\* \* \* \* \*'/);
   assert.match(cron, /status <> 'complete'/);
+  assert.match(cron, /levelup_private\.runtime_config/);
+  assert.match(cron, /url := %L \|\| '\/functions\/v1\/sync-game-catalog'/);
+  assert.doesNotMatch(cron, /ztzcpnyxgwhcdktpbxdq/);
 });
 
 test("discovery facets are sourced from visible catalog records instead of hard-coded options", () => {
@@ -97,11 +100,13 @@ test("Game Locker resolves saved slugs outside its initial catalog page", () => 
 });
 
 
-test("IGDB catalog enrichment is provider-linked, optional, and scheduled behind an explicit enable flag", () => {
+test("IGDB catalog enrichment remains provider-linked but unscheduled until explicitly resumed", () => {
   assert.match(igdbMigration, /igdb_id bigint/);
   assert.match(igdbMigration, /igdb_synced_at timestamptz/);
   assert.match(igdbMigration, /enabled boolean not null default false/);
-  assert.match(igdbMigration, /levelup-igdb-catalog-sync/);
+  assert.doesNotMatch(igdbMigration, /cron\.schedule/);
+  assert.doesNotMatch(igdbMigration, /levelup-igdb-catalog-sync/);
+  assert.doesNotMatch(igdbMigration, /ztzcpnyxgwhcdktpbxdq/);
   assert.match(igdbSync, /IGDB_CLIENT_ID/);
   assert.match(igdbSync, /IGDB_CLIENT_SECRET/);
   assert.match(igdbSync, /external_game_source\.name/);
