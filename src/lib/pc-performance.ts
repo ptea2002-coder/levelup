@@ -318,6 +318,146 @@ export const pcGameRequirements: PCGameRequirement[] = [
   },
 ];
 
+export type PCBenchmarkKind = "cpu" | "gpu";
+
+export type PCBenchmarkReference = {
+  id: string;
+  kind: PCBenchmarkKind;
+  model: string;
+  metricLabel: "CPU Mark" | "G3D Mark";
+  score: number;
+  sampleCount?: number;
+  dataAsOf: string;
+  checkedAt: string;
+  sourceLabel: string;
+  sourceUrl: string;
+  caveat: string;
+};
+
+/**
+ * Curated reference scores from PassMark PerformanceTest comparisons.
+ * They are cross-workload aggregate scores, not gaming FPS or a prediction
+ * for a particular game, resolution, driver, power limit, or system build.
+ */
+export const pcBenchmarkReferences: PCBenchmarkReference[] = [
+  {
+    id: "cpu-i7-8700k",
+    kind: "cpu",
+    model: "Intel Core i7-8700K",
+    metricLabel: "CPU Mark",
+    score: 13554,
+    sampleCount: 19446,
+    dataAsOf: "2026-10-27",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark CPU Benchmarks",
+    sourceUrl: "https://www.cpubenchmark.net/compare/3098vs4681vs4811/Intel-i7-8700K-vs-Intel-i5-12400F-vs-AMD-Ryzen-5-5600",
+    caveat: "Điểm tổng hợp đa tác vụ; không phải FPS trong game.",
+  },
+  {
+    id: "cpu-i5-12400f",
+    kind: "cpu",
+    model: "Intel Core i5-12400F",
+    metricLabel: "CPU Mark",
+    score: 19527,
+    sampleCount: 18229,
+    dataAsOf: "2026-10-27",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark CPU Benchmarks",
+    sourceUrl: "https://www.cpubenchmark.net/compare/3098vs4681vs4811/Intel-i7-8700K-vs-Intel-i5-12400F-vs-AMD-Ryzen-5-5600",
+    caveat: "Điểm tổng hợp đa tác vụ; hiệu năng game còn phụ thuộc GPU và engine.",
+  },
+  {
+    id: "cpu-ryzen-5-5600",
+    kind: "cpu",
+    model: "AMD Ryzen 5 5600",
+    metricLabel: "CPU Mark",
+    score: 21488,
+    sampleCount: 16319,
+    dataAsOf: "2026-10-27",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark CPU Benchmarks",
+    sourceUrl: "https://www.cpubenchmark.net/compare/3098vs4681vs4811/Intel-i7-8700K-vs-Intel-i5-12400F-vs-AMD-Ryzen-5-5600",
+    caveat: "Điểm tổng hợp đa tác vụ; không quy đổi tuyến tính thành FPS.",
+  },
+  {
+    id: "cpu-ryzen-7-5700x",
+    kind: "cpu",
+    model: "AMD Ryzen 7 5700X",
+    metricLabel: "CPU Mark",
+    score: 26540,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark CPU Benchmarks",
+    sourceUrl: "https://www.cpubenchmark.net/compare/3098vs4677vs4811vs3859vs4814/Intel-i7-8700K-vs-Intel-i5-12400-vs-AMD-Ryzen-5-5600-vs-AMD-Ryzen-5-5600X-vs-AMD-Ryzen-7-5700X",
+    caveat: "Số mẫu riêng không được lưu trong bản tham chiếu này; kiểm tra nguồn để xem dữ liệu mới nhất.",
+  },
+  {
+    id: "gpu-rtx-2060",
+    kind: "gpu",
+    model: "NVIDIA GeForce RTX 2060",
+    metricLabel: "G3D Mark",
+    score: 14071,
+    sampleCount: 34895,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; không phải FPS của một tựa game hay một preset cụ thể.",
+  },
+  {
+    id: "gpu-rtx-2060-super",
+    kind: "gpu",
+    model: "NVIDIA GeForce RTX 2060 SUPER",
+    metricLabel: "G3D Mark",
+    score: 16456,
+    sampleCount: 13120,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; không phản ánh ray tracing, upscaling hay frame generation riêng.",
+  },
+  {
+    id: "gpu-rx-6600",
+    kind: "gpu",
+    model: "AMD Radeon RX 6600",
+    metricLabel: "G3D Mark",
+    score: 15033,
+    sampleCount: 16032,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; hiệu năng thực tế khác nhau theo game, API và driver.",
+  },
+  {
+    id: "gpu-rx-6600-xt",
+    kind: "gpu",
+    model: "AMD Radeon RX 6600 XT",
+    metricLabel: "G3D Mark",
+    score: 16446,
+    sampleCount: 7211,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; không phải cam kết FPS hay đánh giá giá/hiệu năng tại Việt Nam.",
+  },
+  {
+    id: "gpu-rtx-3060",
+    kind: "gpu",
+    model: "NVIDIA GeForce RTX 3060 12 GB",
+    metricLabel: "G3D Mark",
+    score: 16699,
+    sampleCount: 48123,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; VRAM 12 GB không bảo đảm FPS cao hơn ở mọi game.",
+  },
+];
+
 function validNumber(value: unknown, min: number, max: number): number | null {
   if (typeof value !== "number" || !Number.isFinite(value) || value < min || value > max) return null;
   return value;
