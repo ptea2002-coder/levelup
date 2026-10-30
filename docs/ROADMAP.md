@@ -42,7 +42,7 @@
 - [x] Let players combine category, platform, keyword, and play-mood filters.
 - [x] Rank candidates using saved Game Locker genres/favorites and explain visible match reasons.
 - [x] Keep the scoring transparent as heuristic metadata matching; do not claim FPS/hardware fit.
-- [ ] Add automated end-to-end coverage against a seeded catalog and guest/account libraries.
+- [x] Add automated browser journeys for the CI-seeded catalog, guest Game Locker isolation/persistence, Discovery filters/search, and an opt-in guarded staging-account cloud-sync path (live account execution still requires staging secrets).
 - [ ] Expand candidate retrieval beyond the current catalog pages and validate recommendation quality with user feedback.
 
 ## Phase 5 — PC Build & Performance Lab
@@ -51,7 +51,8 @@
 - [x] Compare RAM, VRAM, storage, and SSD requirements against a curated, source-linked set of eight PC games.
 - [x] Show minimum/recommended requirement tiers, per-component checks, source links, and clear warnings instead of inventing FPS estimates.
 - [x] Keep guest and signed-in PC profiles isolated in local browser storage; do not send hardware data to the server.
-- [ ] Expand the verified requirements catalog and add a sourced CPU/GPU benchmark index before automatic model-to-model performance scoring.
+- [x] Expand the official-source-linked PC requirements catalog from 8 to 11 games, record checked dates/caveats, and represent unpublished storage requirements as unknown.
+- [ ] Add a sourced CPU/GPU benchmark index before automatic model-to-model performance scoring.
 
 ## Phase 6 — News Intelligence
 
@@ -69,7 +70,7 @@
 - [x] Add low-information liveness and Supabase readiness endpoints at `/api/health` and `/api/health/ready`.
 - [x] Add an RLS integration test for anonymous, owner, and cross-user Game Locker access; guard write probes to the `levelup-dev` staging project only.
 - [x] Add a manually dispatched staging RLS workflow that requires two dedicated test accounts and never uses a service-role key.
-- [x] Add a Playwright Chromium smoke workflow for key routes at mobile, tablet, and desktop widths, including horizontal overflow and runtime-error checks.
+- [x] Add a Playwright Chromium smoke workflow for key routes at mobile, tablet, and desktop widths, including horizontal overflow, runtime errors, guest Game Locker persistence, and Discovery interactions.
 - [x] Document backup/restore verification, application rollback, database recovery, and production release gates.
 - [ ] Configure the staging test-account secrets and pass the live RLS integration workflow; record its run URL and commit SHA.
 - [x] Pass Playwright browser smoke on the current PR head for eight routes at 390px, 768px, and 1440px.
