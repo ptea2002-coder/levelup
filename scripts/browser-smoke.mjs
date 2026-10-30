@@ -137,6 +137,19 @@ async function discoveryJourney(browser) {
   assert.equal(await page.locator(".discovery-mode[aria-pressed='true']").innerText().then((text) => text.includes("Mở mọi cánh cửa")), true);
   assert.equal(await page.locator(".discovery-chip[aria-pressed='true']").count(), 0);
 
+  const loadMore = page.getByRole("button", { name: /Quét thêm/ });
+  if (await loadMore.count()) {
+    const beforeCount = Number(await page.locator(".discovery-result-counter strong").innerText());
+    await waitForCatalogResponse(page, () => loadMore.click());
+    await page.waitForFunction((previous) => {
+      const current = Number(document.querySelector(".discovery-result-counter strong")?.textContent);
+      return Number.isFinite(current) && current > previous;
+    }, beforeCount, { timeout: 20_000 });
+    console.log("Game Discovery pagination passed against the configured catalog.");
+  } else {
+    console.log("Game Discovery pagination skipped: the CI fixture catalog fits within one 48-game page; configure levelup-dev browser secrets to exercise real-catalog pagination.");
+  }
+
   const search = page.locator(".discovery-search input");
   await waitForCatalogResponse(page, () => search.fill("valorant"));
   await page.locator(".discovery-recommendation").filter({ hasText: /VALORANT/i }).first()
