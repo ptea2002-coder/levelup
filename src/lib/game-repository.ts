@@ -127,7 +127,7 @@ function localSearch(params: GameCatalogQuery): GameCatalogPage {
     const score = (game: Game) => {
       const positive = game.positiveReviews ?? 0;
       const total = positive + (game.negativeReviews ?? 0);
-      return (positive + 1500 * 0.75) / (total + 1500);
+      return (positive + 5000 * 0.75) / (total + 5000);
     };
     const totalA = (a.positiveReviews ?? 0) + (a.negativeReviews ?? 0);
     const totalB = (b.positiveReviews ?? 0) + (b.negativeReviews ?? 0);
@@ -138,7 +138,7 @@ function localSearch(params: GameCatalogQuery): GameCatalogPage {
       const positive = game.positiveReviews ?? 0;
       const total = positive + (game.negativeReviews ?? 0);
       // Bayesian smoothing stops tiny samples with 100% positive reviews from dominating.
-      return (positive + 1500 * 0.75) / (total + 1500)
+      return (positive + 5000 * 0.75) / (total + 5000)
         + Math.log10(total + 1) * 0.002
         + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.001;
     };
