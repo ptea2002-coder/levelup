@@ -7,6 +7,7 @@ import { isGameLibraryEntryActive } from "@/lib/game-library";
 import type { Game } from "@/lib/games";
 
 type DiscoveryMode = "all" | "competitive" | "coop" | "story" | "chill";
+type DiscoveryFeedback = "fit" | "not-fit";
 
 type Props = {
   initialGames: Game[];
@@ -31,7 +32,11 @@ const modes: { id: DiscoveryMode; label: string; description: string }[] = [
 ];
 
 export function GameDiscoveryStudio({ initialGames, initialTotal, categories, platforms, catalogReady }: Props) {
-  const { library, ready } = useGameLibrary();
+  const { library, ready, userId } = useGameLibrary();
+  const feedbackStorageKey = useMemo(
+    () => userId ? `levelup:discovery-feedback:user:${userId}` : "levelup:discovery-feedback:guest:v1",
+    [userId],
+  );
   const [query, setQuery] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [platform, setPlatform] = useState("");
@@ -45,6 +50,42 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
   const [savedProfileGames, setSavedProfileGames] = useState<Game[]>([]);
   const requestedProfileSlugs = useRef(new Set<string>());
   const [retry, setRetry] = useState(0);
+  const [feedbackState, setFeedbackState] = useState<{
+    storageKey: string;
+    values: Record<string, DiscoveryFeedback>;
+  }>({ storageKey: "", values: {} });
+
+  useEffect(() => {
+    const values: Record<string, DiscoveryFeedback> = {};
+    try {
+      const raw = window.localStorage.getItem(feedbackStorageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        for (const [slug, value] of Object.entries(parsed)) {
+          if (/^[a-z0-9-]{1,100}$/.test(slug) && (value === "fit" || value === "not-fit")) {
+            values[slug] = value;
+          }
+        }
+      }
+    } catch {
+      // Feedback is a local-only convenience; storage failure must not break discovery.
+    }
+    setFeedbackState({ storageKey: feedbackStorageKey, values });
+  }, [feedbackStorageKey]);
+
+  const feedbackBySlug = feedbackState.storageKey === feedbackStorageKey ? feedbackState.values : {};
+
+  const updateFeedback = useCallback((slug: string, value: DiscoveryFeedback | null) => {
+    const next = { ...feedbackBySlug };
+    if (value) next[slug] = value;
+    else delete next[slug];
+    setFeedbackState({ storageKey: feedbackStorageKey, values: next });
+    try {
+      window.localStorage.setItem(feedbackStorageKey, JSON.stringify(next));
+    } catch {
+      // Keep the in-memory feedback state usable if browser storage is unavailable.
+    }
+  }, [feedbackBySlug, feedbackStorageKey]);
 
   const activeSavedSlugs = useMemo(
     () => Object.entries(library)
@@ -292,6 +333,20 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
               <div className="discovery-recommendation" key={game.slug}>
                 <div className="discovery-reason-row"><span>FIT / {String(index + 1).padStart(2, "0")}</span><div>{reasons.map((reason) => <span key={reason}>{reason}</span>)}</div></div>
                 <GameCard game={game} index={index} />
+                <div className="discovery-feedback" role="group" aria-label={`Đánh giá gợi ý ${game.title}`}>
+                  <span className="discovery-feedback-label">FEEDBACK /</span>
+                  <button
+                    type="button"
+                    aria-pressed={feedbackBySlug[game.slug] === "fit"}
+                    onClick={() => updateFeedback(game.slug, feedbackBySlug[game.slug] === "fit" ? null : "fit")}
+                  >Đúng gu</button>
+                  <button
+                    type="button"
+                    aria-pressed={feedbackBySlug[game.slug] === "not-fit"}
+                    onClick={() => updateFeedback(game.slug, feedbackBySlug[game.slug] === "not-fit" ? null : "not-fit")}
+                  >Chưa đúng gu</button>
+                  <span className="discovery-feedback-note">{feedbackBySlug[game.slug] ? "Đã lưu cục bộ" : "Chỉ lưu trên thiết bị này"}</span>
+                </div>
               </div>
             ))}
           </div>
@@ -299,7 +354,7 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
         {!loading && !error && games.length < total ? (
           <div className="catalog-load-more"><button className="btn btn-secondary" type="button" onClick={loadMore} disabled={loadingMore}>{loadingMore ? "Đang quét thêm..." : "Quét thêm 48 game · " + Math.min(total - games.length, 48).toLocaleString("vi-VN")}</button></div>
         ) : null}
-        <p className="discovery-footnote">Điểm phù hợp là gợi ý heuristic dựa trên metadata hiện có, không phải đánh giá chất lượng tuyệt đối. Các chỉ số SteamSpy là ước tính được đồng bộ định kỳ.</p>
+        <p className="discovery-footnote">Điểm phù hợp là gợi ý heuristic dựa trên metadata hiện có, không phải đánh giá chất lượng tuyệt đối. Các chỉ số SteamSpy là ước tính được đồng bộ định kỳ. Phản hồi Đúng gu/Chưa đúng gu chỉ lưu cục bộ theo khách hoặc tài khoản hiện tại; không gửi lên máy chủ.</p>
       </section>
     </div>
   );
