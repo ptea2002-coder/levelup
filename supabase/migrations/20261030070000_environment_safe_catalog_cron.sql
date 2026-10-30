@@ -17,6 +17,7 @@ do $$
 declare
   v_supabase_url text;
   v_job_id bigint;
+  v_sync_enabled boolean := false;
 begin
   select value
     into v_supabase_url
@@ -29,6 +30,11 @@ begin
       'Set levelup_private.runtime_config.supabase_url to this project URL before scheduling catalog sync';
   end if;
 
+  select coalesce(bool_or(value = 'true'), false)
+    into v_sync_enabled
+    from levelup_private.runtime_config
+    where key = 'catalog_sync_enabled';
+
   for v_job_id in
     select jobid
     from cron.job
@@ -37,7 +43,8 @@ begin
     perform cron.unschedule(v_job_id);
   end loop;
 
-  perform cron.schedule(
+  if v_sync_enabled then
+    perform cron.schedule(
     'levelup-steamspy-catalog-sync',
     '* * * * *',
     format($job$
@@ -72,6 +79,7 @@ begin
           or last_attempt_at < pg_catalog.now() - interval '55 seconds'
         );
     $job$, v_supabase_url)
-  );
+    );
+  end if;
 end
-$$;
+$;
