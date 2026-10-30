@@ -62,6 +62,7 @@ async function guestLibraryJourney(browser) {
 
   const favoriteButton = firstCard.locator(".library-favorite-btn");
   await favoriteButton.click();
+  await page.waitForFunction(() => document.querySelector(".game-card .library-favorite-btn")?.getAttribute("aria-pressed") === "true", null, { timeout: 10_000 });
   assert.equal(await favoriteButton.getAttribute("aria-pressed"), "true", "Guest favorite toggle should update immediately.");
   const savedEntry = await page.evaluate((slug) => {
     try {
@@ -103,7 +104,16 @@ async function discoveryJourney(browser) {
     viewport: { width: 1440, height: 900 },
     reducedMotion: "reduce",
   });
+  const initialCatalogResponse = page.waitForResponse((response) => {
+    try {
+      return new URL(response.url()).pathname === "/api/games" && response.request().method() === "GET";
+    } catch {
+      return false;
+    }
+  }, { timeout: 20_000 });
   await page.goto(`${baseUrl}/discover`, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  const initialResponse = await initialCatalogResponse;
+  assert.equal(initialResponse.status(), 200, `Initial discovery catalog returned HTTP ${initialResponse.status()}.`);
   await page.locator(".discovery-studio").waitFor({ state: "visible", timeout: 20_000 });
   await page.locator(".discovery-result-grid .game-card").first().waitFor({ state: "visible", timeout: 20_000 });
 
