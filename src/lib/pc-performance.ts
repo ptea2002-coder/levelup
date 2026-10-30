@@ -20,7 +20,7 @@ export type PCGameTier = {
   gpu: string;
   ramGb: number;
   vramGb?: number;
-  storageGb: number;
+  storageGb?: number;
   requiresSsd?: boolean;
 };
 
@@ -242,6 +242,79 @@ export const pcGameRequirements: PCGameRequirement[] = [
     sourceUrl: "https://help.steampowered.com/en/wizard/HelpWithGameTechnicalIssue/?appid=413150",
     checkedAt: "2026-10-30",
     caveat: "Nhà phát hành không công bố cấu hình khuyến nghị trong trang yêu cầu hệ thống được tham chiếu.",
+  },
+  {
+    slug: "fortnite",
+    title: "Fortnite",
+    category: "BATTLE ROYALE / COMPETITIVE",
+    minimum: {
+      cpu: "Intel Core i3-3225 3.3 GHz",
+      gpu: "Intel HD 4000 / AMD Radeon Vega 8",
+      ramGb: 8,
+    },
+    recommended: {
+      cpu: "Intel Core i5-7300U 3.5 GHz / AMD Ryzen 3 3300U",
+      gpu: "NVIDIA GeForce GTX 960 / AMD Radeon R9 280 (DirectX 11)",
+      ramGb: 16,
+      vramGb: 2,
+      requiresSsd: true,
+    },
+    osLabel: "Windows 10 64-bit (minimum version 22H2); Windows 10/11 64-bit recommended",
+    sourceLabel: "Epic Games Support — Fortnite PC System Requirements",
+    sourceUrl: "https://www.epicgames.com/help/c-34254770/c-5719357839387/a16548002",
+    checkedAt: "2026-10-30",
+    officialPerformanceNote: "Epic công bố riêng preset Epic Quality với yêu cầu phần cứng cao hơn; mục này chỉ dùng tier Recommended tiêu chuẩn.",
+    caveat: "Nguồn không công bố dung lượng lưu trữ. VRAM 2 GB là mức Recommended tiêu chuẩn, không phải preset Epic Quality.",
+  },
+  {
+    slug: "black-myth-wukong",
+    title: "Black Myth: Wukong",
+    category: "ACTION RPG / AAA",
+    minimum: {
+      cpu: "Intel Core i5-8400 / AMD Ryzen 5 1600",
+      gpu: "NVIDIA GeForce GTX 1060 6 GB / AMD Radeon RX 580 8 GB",
+      ramGb: 16,
+      storageGb: 130,
+    },
+    recommended: {
+      cpu: "Intel Core i7-9700 / AMD Ryzen 5 5500",
+      gpu: "NVIDIA GeForce RTX 2060 / AMD Radeon RX 5700 XT / Intel Arc A750",
+      ramGb: 16,
+      storageGb: 130,
+      requiresSsd: true,
+    },
+    osLabel: "Windows 10 64-bit",
+    sourceLabel: "Steam Store — Black Myth: Wukong System Requirements",
+    sourceUrl: "https://store.steampowered.com/app/2358720/Black_Myth_Wukong/",
+    checkedAt: "2026-10-30",
+    officialPerformanceNote: "Nhà phát hành ghi chú cấu hình được kiểm thử với DLSS/FSR/XeSS bật; mức tối thiểu hỗ trợ HDD, còn tier Recommended yêu cầu SSD.",
+    caveat: "VRAM khác nhau theo lựa chọn GPU NVIDIA/AMD/Intel nên không quy đổi thành một ngưỡng VRAM duy nhất.",
+  },
+  {
+    slug: "monster-hunter-wilds",
+    title: "Monster Hunter Wilds",
+    category: "ACTION RPG / HUNTING",
+    minimum: {
+      cpu: "Intel Core i5-10400 / i3-12100 / AMD Ryzen 5 3600",
+      gpu: "NVIDIA GeForce GTX 1660 6 GB / AMD Radeon RX 5500 XT 8 GB",
+      ramGb: 16,
+      storageGb: 75,
+      requiresSsd: true,
+    },
+    recommended: {
+      cpu: "Intel Core i5-10400 / i3-12100 / AMD Ryzen 5 3600",
+      gpu: "NVIDIA GeForce RTX 2060 SUPER 8 GB / AMD Radeon RX 6600 8 GB",
+      ramGb: 16,
+      vramGb: 8,
+      storageGb: 75,
+      requiresSsd: true,
+    },
+    osLabel: "Windows 10/11 64-bit",
+    sourceLabel: "Steam Support — Monster Hunter Wilds System Requirements",
+    sourceUrl: "https://help.steampowered.com/en/wizard/HelpWithGameTechnicalIssue?appid=2246340",
+    checkedAt: "2026-10-30",
+    officialPerformanceNote: "Nguồn ghi mức tối thiểu là 1080p (upscale từ 720p native) / 30 FPS ở Lowest; Recommended là 1080p / 60 FPS ở Medium khi bật Frame Generation.",
+    caveat: "Mốc 60 FPS khuyến nghị phụ thuộc Frame Generation; không được hiểu là FPS bảo đảm khi tắt tính năng này.",
   },
 ];
 
