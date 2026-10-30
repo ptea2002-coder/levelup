@@ -119,7 +119,7 @@ export function GameLibraryProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [cloudReady, setCloudReady] = useState(false);
   const [syncStatus, setSyncStatus] = useState<LibrarySyncStatus>("local");
-  const userIdRef = useRef<string | null | undefined>(undefined);
+  const userIdRef = useRef<string | null>(null);
   const storageKey = useMemo(() => getGameLibraryStorageKey(userId), [userId]);
 
   useEffect(() => {
