@@ -50,7 +50,7 @@ test("browser smoke workflow checks mobile, tablet, and desktop layouts", () => 
 test("P7 browser smoke covers guest discovery and optional staging-authenticated library journeys", () => {
   assert.match(browserWorkflow, /LEVELUP_TEST_CATALOG: 1/);
   assert.match(browserWorkflow, /STAGING_URL/);
-  assert.match(browserWorkflow, /https:\\/\\/ztzcpnyxgwhcdktpbxdq\\.supabase\\.co/);
+  assert.ok(browserWorkflow.includes("https://ztzcpnyxgwhcdktpbxdq.supabase.co"));
   assert.match(browserWorkflow, /NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY/);
   assert.match(browserScript, /guestLibraryJourney/);
   assert.match(browserScript, /discoveryJourney/);
