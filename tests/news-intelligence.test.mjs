@@ -53,5 +53,5 @@ test("every queue action requires a human and draft promotion never auto-publish
 test("News Intelligence is private and integrated with the existing editorial workspace", () => {
   assert.match(page, /robots: \{ index: false, follow: false \}/);
   assert.match(page, /NewsIntelligence/);
-  assert.match(editorialCms, /admin\/news-intelligence/);
+  assert.match(editorialPage, /admin\/news-intelligence/);
 });
