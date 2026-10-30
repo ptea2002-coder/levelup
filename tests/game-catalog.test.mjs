@@ -12,6 +12,7 @@ const cron = readFileSync(new URL("../supabase/migrations/20261030070000_environ
 const facetsMigration = readFileSync(new URL("../supabase/migrations/20261029154000_catalog_facets.sql", import.meta.url), "utf8");
 const igdbMigration = readFileSync(new URL("../supabase/migrations/20261029155000_igdb_multiplatform_catalog.sql", import.meta.url), "utf8");
 const confidenceMigration = readFileSync(new URL("../supabase/migrations/20261030031107_p4_discovery_ranking_confidence.sql", import.meta.url), "utf8");
+const articleRlsMigration = readFileSync(new URL("../supabase/migrations/20261030072000_articles_rls_performance.sql", import.meta.url), "utf8");
 const igdbSync = readFileSync(new URL("../supabase/functions/sync-igdb-catalog/index.ts", import.meta.url), "utf8");
 const sitemap = readFileSync(new URL("../src/app/sitemap.ts", import.meta.url), "utf8");
 const gameCard = readFileSync(new URL("../src/components/game-card.tsx", import.meta.url), "utf8");
@@ -100,6 +101,13 @@ test("Game Locker resolves saved slugs outside its initial catalog page", () => 
   assert.match(locker, /allGames/);
 });
 
+
+test("article RLS uses initplan-safe role helpers and indexes its published_by foreign key", () => {
+  assert.match(articleRlsMigration, /articles_published_by_idx/);
+  assert.match(articleRlsMigration, /create or replace function public\.is_levelup_admin/);
+  assert.match(articleRlsMigration, /using \(\(select public\.is_levelup_editor\(\)\)\)/);
+  assert.match(articleRlsMigration, /or \(select public\.is_levelup_admin\(\)\)/);
+});
 
 test("IGDB catalog enrichment remains provider-linked but unscheduled until explicitly resumed", () => {
   assert.match(igdbMigration, /igdb_id bigint/);
