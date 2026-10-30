@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GameCard } from "@/components/game-card";
 import type { Game } from "@/lib/games";
+import { comparePositiveReviews, compareRecommendedGames } from "@/lib/game-ranking";
 
 const categoryOrder = [
   "FPS", "MOBA", "Battle Royale", "Action RPG", "Hero Shooter", "Sandbox",
@@ -135,21 +136,8 @@ export function GameExplorer({
   const sortedLocalGames = useMemo(() => {
     if (sortBy === "name") return [...filteredGames].sort((a, b) => a.title.localeCompare(b.title, "vi"));
     if (sortBy === "newest") return [...filteredGames].sort((a, b) => b.releaseYear - a.releaseYear);
-    if (sortBy === "positive") return [...filteredGames].sort((a, b) => {
-      const totalA = (a.positiveReviews ?? 0) + (a.negativeReviews ?? 0);
-      const totalB = (b.positiveReviews ?? 0) + (b.negativeReviews ?? 0);
-      const rateA = totalA > 0 ? (a.positiveReviews ?? 0) / totalA : -1;
-      const rateB = totalB > 0 ? (b.positiveReviews ?? 0) / totalB : -1;
-      return rateB - rateA || totalB - totalA || (b.positiveReviews ?? 0) - (a.positiveReviews ?? 0);
-    });
-    if (sortBy === "recommended") return [...filteredGames].sort((a, b) => {
-      const score = (game: Game) => {
-        const total = (game.positiveReviews ?? 0) + (game.negativeReviews ?? 0);
-        const ratio = total > 0 ? (game.positiveReviews ?? 0) / total : 0;
-        return ratio * 100 + Math.log10(total + 1) * 5 + Math.log10((game.concurrentPlayers ?? 0) + 1) * 0.5;
-      };
-      return score(b) - score(a) || a.title.localeCompare(b.title, "vi");
-    });
+    if (sortBy === "positive") return [...filteredGames].sort(comparePositiveReviews);
+    if (sortBy === "recommended") return [...filteredGames].sort(compareRecommendedGames);
     return filteredGames;
   }, [filteredGames, sortBy]);
 
