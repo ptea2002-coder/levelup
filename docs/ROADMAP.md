@@ -72,7 +72,8 @@
 - [x] Add a Playwright Chromium smoke workflow for key routes at mobile, tablet, and desktop widths, including horizontal overflow and runtime-error checks.
 - [x] Document backup/restore verification, application rollback, database recovery, and production release gates.
 - [ ] Configure the staging test-account secrets and pass the live RLS integration workflow; record its run URL and commit SHA.
-- [ ] Pass browser smoke on the final preview commit and complete manual keyboard, accessibility, authenticated, and real-device checks.
+- [x] Pass Playwright browser smoke on the current PR head for eight routes at 390px, 768px, and 1440px.
+- [ ] Complete manual keyboard, accessibility, authenticated, and real-device checks.
 - [ ] Verify the active Supabase backup plan/retention and complete a restore drill in an isolated recovery project.
 - [ ] Configure external uptime monitoring and alert routing for the readiness endpoint.
 - [ ] Rehearse Vercel rollback and database recovery/forward-fix procedures, then record evidence before cutover.
@@ -90,7 +91,8 @@ Before production cutover:
 - [x] CI passes on the exact P2 preview commit.
 - [x] Supabase environment configuration is present for the preview app.
 - [ ] Staging RLS integration passes with anonymous, owner, and cross-user checks on the exact release commit.
-- [ ] Browser and Mobile Smoke passes on the exact preview commit; manual accessibility and authenticated flows are also reviewed.
+- [x] Browser and Mobile Smoke passes on the current PR head (eight routes across three viewport sizes).
+- [ ] Manual accessibility, keyboard, authenticated flows, and real-device checks are reviewed.
 - [ ] Backup/restore and application/database rollback rehearsals are recorded; uptime alerts have a named owner.
 - [ ] Secrets, service-role keys, and private credentials are audited across Git history.
 - [ ] Domain, redirects, privacy policy, community rules, and contact path are ready.
