@@ -1,0 +1,54 @@
+name: Browser and Mobile Smoke
+
+on:
+  push:
+    branches: [p7-production-readiness]
+  pull_request:
+    branches: [p6-news-intelligence, p7-production-readiness]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install application dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install pinned Playwright runner
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build application
+        run: npm run build
+      - name: Start production server
+        shell: bash
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/levelup-next.log 2>&1 &
+          echo $! > /tmp/levelup-next.pid
+          ready=0
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:3000/api/health > /dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [[ "$ready" != "1" ]]; then
+            cat /tmp/levelup-next.log
+            echo "::error::Next.js production server did not become healthy."
+            exit 1
+          fi
+      - name: Check routes and responsive layouts
+        run: node scripts/browser-smoke.mjs
