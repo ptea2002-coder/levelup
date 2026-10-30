@@ -46,3 +46,22 @@ test("browser smoke workflow checks mobile, tablet, and desktop layouts", () => 
   assert.match(runbook, /Rollback rehearsal/);
   assert.match(roadmap, /## Phase 7 — Production readiness/);
 });
+
+test("P7 browser smoke covers guest discovery and optional staging-authenticated library journeys", () => {
+  assert.match(browserWorkflow, /LEVELUP_TEST_CATALOG: 1/);
+  assert.match(browserWorkflow, /STAGING_URL/);
+  assert.match(browserWorkflow, /https:\\/\\/ztzcpnyxgwhcdktpbxdq\\.supabase\\.co/);
+  assert.match(browserWorkflow, /NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY/);
+  assert.match(browserScript, /guestLibraryJourney/);
+  assert.match(browserScript, /discoveryJourney/);
+  assert.match(browserScript, /authenticatedLibraryJourney/);
+  assert.match(browserScript, /expectedStagingOrigin/);
+  assert.match(browserScript, /original status/);
+});
+
+test("staging foreign-key indexes are tracked in a repeatable migration", () => {
+  const migration = readFileSync(new URL("../supabase/migrations/20261030063018_add_foreign_key_supporting_indexes.sql", import.meta.url), "utf8");
+  assert.match(migration, /comments_parent_id_idx/);
+  assert.match(migration, /news_sources_license_reviewed_by_idx/);
+  assert.match(migration, /reviews_user_id_idx/);
+});
