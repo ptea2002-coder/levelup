@@ -50,6 +50,7 @@ test("the PC Lab includes responsive and reduced-motion safeguards", () => {
   assert.match(styles, /@media \(max-width: 640px\)/);
   assert.match(styles, /prefers-reduced-motion: reduce/);
   assert.match(component, /aria-live="polite"/);
+  assert.match(component, /pc-os-note/);
   assert.match(component, /aria-labelledby="pc-build-heading"/);
   assert.match(roadmap, /## Phase 5 — PC Build & Performance Lab/);
   assert.match(roadmap, /Expand the verified requirements catalog/);
