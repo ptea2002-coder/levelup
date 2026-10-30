@@ -27,6 +27,7 @@ type LibrarySyncStatus = "local" | "syncing" | "synced" | "error";
 
 type GameLibraryContextValue = {
   library: GameLibrary;
+  userId: string | null;
   ready: boolean;
   storageAvailable: boolean;
   signedIn: boolean;
@@ -310,6 +311,7 @@ export function GameLibraryProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       library,
+      userId,
       ready,
       storageAvailable,
       signedIn: Boolean(userId),
