@@ -334,7 +334,7 @@ $;
 
 drop trigger if exists articles_require_original_news_content on public.articles;
 create trigger articles_require_original_news_content
-  before insert or update of status, body_md, excerpt on public.articles
+  before insert or update on public.articles
   for each row execute function public.prevent_unedited_news_intake_publish();
 
 notify pgrst, 'reload schema';

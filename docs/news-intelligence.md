@@ -17,7 +17,7 @@ P6 adds a private source registry, a manually triggered RSS/Atom/JSON Feed intak
 
 ## Apply in a development/staging project
 
-1. Review and apply `supabase/migrations/20261030100000_p6_news_intelligence.sql` after the existing P3 editorial CMS migration.
+1. Review and apply `supabase/migrations/20261030100000_p6_news_intelligence.sql` after all earlier migrations, including P3 editorial CMS and P4 discovery.
 2. Deploy `supabase/functions/ingest-news-feeds/index.ts` as the Edge Function `ingest-news-feeds`. Supabase project URL and service-role key are read only inside the server-side function; never copy them into a `NEXT_PUBLIC_*` variable.
 3. Confirm a trusted admin is assigned `app_metadata.role = admin` in Supabase Auth. Editors may review queue items but cannot manage source approvals.
 4. Open `/admin/news-intelligence`, register an official RSS/Atom/JSON Feed source, then review the source's own terms and metadata-reuse permissions. Until that review is recorded, the source remains disabled and the ingest function will ignore it.
