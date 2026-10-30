@@ -47,6 +47,7 @@
 - [ ] Reconcile the live P3 schema with Supabase migration history before production cutover.
 
 
+
 ## Phase 4 — Game Discovery Engine
 
 - [x] Add Game Discovery Lab at `/discover` with server-backed catalog paging.
@@ -58,7 +59,11 @@
 
 ## Phase 5 — PC Build & Performance Lab
 
-- PC configuration input, requirement matching, and clearly caveated performance guidance.
+- [x] Add a PC build profile for CPU, GPU, RAM, VRAM, free storage, storage type, OS, resolution, and target FPS.
+- [x] Compare RAM, VRAM, storage, and SSD requirements against a curated, source-linked set of eight PC games.
+- [x] Show minimum/recommended requirement tiers, per-component checks, source links, and clear warnings instead of inventing FPS estimates.
+- [x] Keep guest and signed-in PC profiles isolated in local browser storage; do not send hardware data to the server.
+- [ ] Expand the verified requirements catalog and add a sourced CPU/GPU benchmark index before automatic model-to-model performance scoring.
 
 ## Phase 6 — News Intelligence
 

@@ -84,6 +84,15 @@ The community now uses Supabase-backed data rather than demo posts:
 - Apply `supabase/schema.sql` first, then `supabase/social-network.sql`. The social migration has already been applied to the connected Supabase project for branch `v2-foundation`.
 - Admin roles must be assigned by a trusted administrator in Supabase Auth app metadata, never through user-editable metadata. Do not expose service-role/secret keys in client code.
 
+## PC Build & Performance Lab (P5)
+
+- `/build-lab` compares a user-entered PC profile with source-linked minimum and recommended requirements for eight curated games.
+- RAM, VRAM, free storage, and mandatory SSD requirements are checked against published numeric values when the source provides them.
+- CPU/GPU model names are not automatically benchmarked. Players must explicitly confirm the CPU/GPU tier after comparing the listed official requirements; unknown data stays unknown.
+- Target FPS is a user preference, not a prediction. The advisor only displays FPS figures when the linked publisher source explicitly states a target, and still caveats real-world variation.
+- Guest and signed-in profiles are saved separately in the current browser. Hardware details are not uploaded or synced across devices in this phase.
+- Requirement records link to publisher/Steam support pages and include a checked date. The dataset is intentionally limited; an absent game or missing recommended tier is not treated as evidence of compatibility.
+
 ## Steam live data
 
 - `public.steam_game_metrics` caches Steam player counts and Vietnam-region store prices for supported Steam games.

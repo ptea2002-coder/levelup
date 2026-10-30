@@ -12,6 +12,7 @@ import "./game-library.css";
 import "./game-community.css";
 import "./editorial-cms.css";
 import "./discovery.css";
+import "./pc-performance.css";
 
 const vietnameseFont = Be_Vietnam_Pro({
   variable: "--font-vietnam",
