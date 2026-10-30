@@ -168,7 +168,8 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
         const platformMatch = Boolean(platform && game.platforms.includes(platform));
         const positive = game.positiveReviews ?? 0;
         const reviewTotal = positive + (game.negativeReviews ?? 0);
-        const bayesianReview = (positive + 1500 * 0.75) / (reviewTotal + 1500);
+        // A 5,000-review prior prevents tiny perfect samples from dominating mature titles.
+        const bayesianReview = (positive + 5000 * 0.75) / (reviewTotal + 5000);
         const score = shared.reduce((sum, genre) => sum + (preferredGenreWeights.get(genre) ?? 1), 0)
           + explicitMatches.length * 12
           + (platformMatch ? 3 : 0)
