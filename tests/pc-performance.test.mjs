@@ -53,7 +53,7 @@ test("the PC Lab includes responsive and reduced-motion safeguards", () => {
   assert.match(component, /pc-os-note/);
   assert.match(component, /aria-labelledby="pc-build-heading"/);
   assert.match(roadmap, /## Phase 5 — PC Build & Performance Lab/);
-  assert.match(roadmap, /Expand the verified requirements catalog/);
+  assert.match(roadmap, /official-source-linked PC requirements catalog from 8 to 11 games/);
 });
 
 test("P5 includes additional source-verified AAA requirements and never invents unpublished storage values", () => {
