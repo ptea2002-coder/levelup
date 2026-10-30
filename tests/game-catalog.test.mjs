@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const repository = readFileSync(new URL("../src/lib/game-repository.ts", import.meta.url), "utf8");
+const ranking = readFileSync(new URL("../src/lib/game-ranking.ts", import.meta.url), "utf8");
 const explorer = readFileSync(new URL("../src/components/game-explorer.tsx", import.meta.url), "utf8");
 const api = readFileSync(new URL("../src/app/api/games/route.ts", import.meta.url), "utf8");
 const migration = readFileSync(new URL("../supabase/migrations/20261029150000_expand_game_catalog.sql", import.meta.url), "utf8");
@@ -122,4 +123,17 @@ test("game profiles use the catalog's real artwork before falling back to curate
   assert.match(detailContent, /game\.backgroundUrl/);
   assert.match(detailContent, /game\.coverUrl/);
   assert.match(igdbSync, /microsoft windows\|windows\|linux/);
+});
+
+
+test("local recommendation sorting uses the same Bayesian confidence prior as the real catalog", () => {
+  assert.match(ranking, /REVIEW_PRIOR_WEIGHT = 5000/);
+  assert.match(ranking, /REVIEW_PRIOR_MEAN = 0\.75/);
+  assert.match(ranking, /function bayesianReviewScore/);
+  assert.match(repository, /sort\(comparePositiveReviews\)/);
+  assert.match(repository, /sort\(compareRecommendedGames\)/);
+  assert.match(explorer, /sort\(comparePositiveReviews\)/);
+  assert.match(explorer, /sort\(compareRecommendedGames\)/);
+  assert.doesNotMatch(explorer, /ratio \* 100/);
+  assert.match(igdbMigration, /5000 \* 0\.75/);
 });
