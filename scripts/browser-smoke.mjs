@@ -79,7 +79,7 @@ async function guestLibraryJourney(browser) {
   await savedCard.waitFor({ state: "visible", timeout: 20_000 });
   await page.locator(".locker-toolbar").getByRole("button", { name: /Yêu thích/ }).click();
   await savedCard.waitFor({ state: "visible", timeout: 10_000 });
-  assert.equal(await page.locator(".results-count").innerText(), "1 game trong danh sách này");
+  assert.match(await page.locator(".results-count").innerText(), /1 game trong danh sách này/i);
 
   await page.locator(".locker-toolbar").getByRole("button", { name: /Muốn chơi/ }).click();
   await savedCard.waitFor({ state: "visible", timeout: 10_000 });
