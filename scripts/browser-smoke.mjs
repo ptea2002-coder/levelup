@@ -152,8 +152,40 @@ async function discoveryJourney(browser) {
 
   const search = page.locator(".discovery-search input");
   await waitForCatalogResponse(page, () => search.fill("valorant"));
-  await page.locator(".discovery-recommendation").filter({ hasText: /VALORANT/i }).first()
-    .waitFor({ state: "visible", timeout: 20_000 });
+  const valorantRecommendation = page.locator(".discovery-recommendation").filter({ hasText: /VALORANT/i }).first();
+  await valorantRecommendation.waitFor({ state: "visible", timeout: 20_000 });
+  const detailHref = await valorantRecommendation.locator("a.game-card-link").getAttribute("href");
+  const slug = detailHref?.split("/").filter(Boolean).at(-1);
+  assert.ok(slug, "Discovery recommendations must expose a stable game slug.");
+
+  const feedback = valorantRecommendation.getByRole("group", { name: /Đánh giá gợi ý/ });
+  await feedback.getByRole("button", { name: "Chưa đúng gu", exact: true }).click();
+  await page.waitForFunction((gameSlug) => {
+    try {
+      const raw = localStorage.getItem("levelup:discovery-feedback:guest:v1");
+      return raw ? JSON.parse(raw)[gameSlug] === "not-fit" : false;
+    } catch {
+      return false;
+    }
+  }, slug, { timeout: 10_000 });
+  await feedback.getByRole("button", { name: "Đúng gu", exact: true }).click();
+  await page.waitForFunction((gameSlug) => {
+    try {
+      const raw = localStorage.getItem("levelup:discovery-feedback:guest:v1");
+      return raw ? JSON.parse(raw)[gameSlug] === "fit" : false;
+    } catch {
+      return false;
+    }
+  }, slug, { timeout: 10_000 });
+  await feedback.getByRole("button", { name: "Đúng gu", exact: true }).click();
+  await page.waitForFunction((gameSlug) => {
+    try {
+      const raw = localStorage.getItem("levelup:discovery-feedback:guest:v1");
+      return !raw || !Object.prototype.hasOwnProperty.call(JSON.parse(raw), gameSlug);
+    } catch {
+      return false;
+    }
+  }, slug, { timeout: 10_000 });
   await page.close();
   console.log("Game Discovery journey passed: mood, genre, platform, reset, and server-backed search.");
 }
