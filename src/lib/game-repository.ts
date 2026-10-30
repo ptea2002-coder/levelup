@@ -39,6 +39,20 @@ const gameFields = [
   "igdb_id", "igdb_synced_at",
 ].join(",");
 
+function useStarterCatalogFallback(): boolean {
+  const hasAnySupabaseEnv = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+
+  // This opt-in fixture path exists only for CI browser tests when no Supabase
+  // credentials are supplied. A configured (but failing) database never falls
+  // back to sample data, and Vercel/production does not set this flag.
+  return process.env.NODE_ENV === "development" ||
+    (process.env.CI === "true" && process.env.LEVELUP_TEST_CATALOG === "1" && !hasAnySupabaseEnv);
+}
+
 export type GameCatalogPage = {
   items: Game[];
   total: number;
@@ -138,7 +152,7 @@ function localSearch(params: GameCatalogQuery): GameCatalogPage {
  */
 export async function getGames(limit = 48): Promise<Game[]> {
   const supabase = getSupabaseServerClient();
-  if (!supabase) return process.env.NODE_ENV === "development" ? starterGames.slice(0, limit) : [];
+  if (!supabase) return useStarterCatalogFallback() ? starterGames.slice(0, limit) : [];
 
   try {
     const { data, error } = await supabase
@@ -164,7 +178,7 @@ export async function getGamesBySlugs(slugs: string[]): Promise<Game[]> {
   if (slugs.length === 0) return [];
   const supabase = getSupabaseServerClient();
   if (!supabase) {
-    return process.env.NODE_ENV === "development"
+    return useStarterCatalogFallback()
       ? slugs.map((slug) => starterGames.find((game) => game.slug === slug)).filter((game): game is Game => Boolean(game))
       : [];
   }
@@ -182,7 +196,7 @@ export async function getGamesBySlugs(slugs: string[]): Promise<Game[]> {
 export async function getGamesPage(params: GameCatalogQuery = {}): Promise<GameCatalogPage> {
   const supabase = getSupabaseServerClient();
   if (!supabase) {
-    return process.env.NODE_ENV === "development"
+    return useStarterCatalogFallback()
       ? localSearch(params)
       : { items: [], total: 0, available: false };
   }
@@ -219,7 +233,7 @@ export async function getGamesPage(params: GameCatalogQuery = {}): Promise<GameC
 export async function getGameCatalogFacets(): Promise<GameCatalogFacets> {
   const supabase = getSupabaseServerClient();
   if (!supabase) {
-    if (process.env.NODE_ENV !== "development") {
+    if (!useStarterCatalogFallback()) {
       return { categories: [], platforms: [], available: false };
     }
     return {
@@ -250,7 +264,7 @@ export async function getGameCatalogFacets(): Promise<GameCatalogFacets> {
 export async function getGameBySlug(slug: string): Promise<Game | undefined> {
   const supabase = getSupabaseServerClient();
   if (!supabase) {
-    return process.env.NODE_ENV === "development" ? starterGames.find((game) => game.slug === slug) : undefined;
+    return useStarterCatalogFallback() ? starterGames.find((game) => game.slug === slug) : undefined;
   }
 
   const { data, error } = await supabase.from("games").select(gameFields)
@@ -276,7 +290,7 @@ export async function getRelatedGames(game: Game, limit = 3): Promise<Game[]> {
   const safeLimit = Math.max(1, Math.min(limit, 12));
   const supabase = getSupabaseServerClient();
   if (!supabase) {
-    return process.env.NODE_ENV === "development"
+    return useStarterCatalogFallback()
       ? starterGames.filter((candidate) => candidate.slug !== game.slug)
         .sort((a, b) => scoreRelatedGame(b, game) - scoreRelatedGame(a, game) || a.title.localeCompare(b.title, "vi"))
         .slice(0, safeLimit)
@@ -307,7 +321,7 @@ export async function getRelatedGames(game: Game, limit = 3): Promise<Game[]> {
 export async function getSitemapGameSlugs(): Promise<string[]> {
   const supabase = getSupabaseServerClient();
   if (!supabase) {
-    return process.env.NODE_ENV === "development" ? starterGames.map((game) => game.slug) : [];
+    return useStarterCatalogFallback() ? starterGames.map((game) => game.slug) : [];
   }
 
   const { count, error: countError } = await supabase
