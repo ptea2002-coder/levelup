@@ -65,3 +65,11 @@ test("staging foreign-key indexes are tracked in a repeatable migration", () => 
   assert.match(migration, /news_sources_license_reviewed_by_idx/);
   assert.match(migration, /reviews_user_id_idx/);
 });
+
+test("admin RLS policies use initplan-wrapped JWT evaluation without broadening the role predicate", () => {
+  const migration = readFileSync(new URL("../supabase/migrations/20261030064422_optimize_admin_rls_jwt_initplans.sql", import.meta.url), "utf8");
+  assert.equal(migration.split("(select auth.jwt())").length - 1, 9);
+  assert.ok(migration.includes("'app_metadata'::text ->> 'role'::text) = 'admin'::text"));
+  assert.ok(migration.includes('Admins moderate game comments'));
+  assert.ok(migration.includes('Admins update news sources'));
+});
