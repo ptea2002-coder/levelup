@@ -54,9 +54,11 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
     storageKey: string;
     values: Record<string, DiscoveryFeedback>;
   }>({ storageKey: "", values: {} });
+  const [feedbackStorageAvailable, setFeedbackStorageAvailable] = useState(true);
 
   useEffect(() => {
     const values: Record<string, DiscoveryFeedback> = {};
+    let storageAvailable = true;
     try {
       const raw = window.localStorage.getItem(feedbackStorageKey);
       if (raw) {
@@ -68,8 +70,9 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
         }
       }
     } catch {
-      // Feedback is a local-only convenience; storage failure must not break discovery.
+      storageAvailable = false;
     }
+    setFeedbackStorageAvailable(storageAvailable);
     setFeedbackState({ storageKey: feedbackStorageKey, values });
   }, [feedbackStorageKey]);
 
@@ -82,8 +85,9 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
     setFeedbackState({ storageKey: feedbackStorageKey, values: next });
     try {
       window.localStorage.setItem(feedbackStorageKey, JSON.stringify(next));
+      setFeedbackStorageAvailable(true);
     } catch {
-      // Keep the in-memory feedback state usable if browser storage is unavailable.
+      setFeedbackStorageAvailable(false);
     }
   }, [feedbackBySlug, feedbackStorageKey]);
 
@@ -345,7 +349,7 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
                     aria-pressed={feedbackBySlug[game.slug] === "not-fit"}
                     onClick={() => updateFeedback(game.slug, feedbackBySlug[game.slug] === "not-fit" ? null : "not-fit")}
                   >Chưa đúng gu</button>
-                  <span className="discovery-feedback-note">{feedbackBySlug[game.slug] ? "Đã lưu cục bộ" : "Chỉ lưu trên thiết bị này"}</span>
+                  <span className="discovery-feedback-note">{feedbackBySlug[game.slug] ? feedbackStorageAvailable ? "Đã lưu cục bộ" : "Chỉ giữ trong phiên" : "Không gửi lên máy chủ"}</span>
                 </div>
               </div>
             ))}
