@@ -102,8 +102,8 @@ as $function$
         order by
           case when p_sort = 'newest' then nullif(f.release_year, 0) end desc nulls last,
           case when p_sort in ('positive', 'recommended') then
-            (f.positive_count + 1500 * 0.75)
-            / nullif(f.positive_count + f.negative_count + 1500, 0)
+            (f.positive_count + 5000 * 0.75)
+            / nullif(f.positive_count + f.negative_count + 5000, 0)
           end desc nulls last,
           case when p_sort in ('positive', 'recommended')
             then f.positive_count + f.negative_count
