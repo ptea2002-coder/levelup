@@ -2,7 +2,7 @@
 
 LevelUP is being rebuilt from a single-file static website into a modern gaming discovery and editorial platform.
 
-> **Current status:** foundation code lives on the `v2-foundation` branch. The existing `main` branch and its GitHub Pages site are intentionally left unchanged until the new app has passed checks and a production host is configured.
+> **Current status:** `main` is the active application branch and deploys to Vercel. Preview deployments use the isolated `levelup-dev` Supabase project. Production Supabase schema and environment configuration are being aligned with the current app before full production validation. IGDB synchronization remains intentionally disabled.
 
 ## What's in this foundation
 
@@ -15,14 +15,14 @@ LevelUP is being rebuilt from a single-file static website into a modern gaming 
 - Supabase SQL starter for games, profiles, favorites, reviews, articles, and comments, including initial RLS policies and seed games.
 - GitHub Actions workflow for type-checking and building the app.
 
-## Not live yet
+## Current rollout status
 
-- Supabase browser/server clients and an email/password login/register screen are wired into the app, but they need environment variables and the SQL schema before live use.
-- The game catalog reads from `public.games` when available and falls back to starter data if Supabase is not configured or the schema is not ready.
-- Cloud favorites, profile editing, reviews, comments, and admin/editor tools are not active yet.
-- Guide content currently comes from typed files in `src/lib/`.
-- News is not automatically synced from external feeds.
-- This branch has not replaced the current GitHub Pages deployment.
+- The Next.js app, Supabase clients, email/password authentication, Game Discovery, Game Locker, community, editorial CMS, PC Build Lab, and News Intelligence code are present on `main`.
+- The latest GitHub CI and Browser/Mobile Smoke runs passed on the current `main` commit. Vercel's latest check is currently blocked by a build-rate limit, so a successful GitHub build does not yet prove that the latest commit is live on the production alias.
+- Preview environment variables are scoped to `levelup-dev`; production must use the separate `levelup` Supabase project. Do not copy staging credentials into production.
+- Production Supabase is behind the current schema and catalog. Apply the reviewed migrations and configure the project-specific catalog cron target before enabling production app traffic.
+- IGDB sync remains paused by design. Its state table is created disabled, and no IGDB cron job should be registered until the integration is explicitly resumed.
+- Guest Game Locker data remains local-first; authenticated cloud sync depends on the `public.user_game_library` table and its owner-only RLS policies.
 
 ## Requirements
 
@@ -109,7 +109,7 @@ The community now uses Supabase-backed data rather than demo posts:
 
 - `/api/health` is a low-information liveness endpoint; `/api/health/ready` checks that the public Supabase catalog is reachable without exposing upstream error details.
 - The **Browser and Mobile Smoke** workflow runs Playwright checks against key routes at 390px, 768px, and 1440px widths.
-- The **Staging RLS Integration** workflow is manually dispatched and requires two dedicated staging accounts. It refuses any Supabase origin except `levelup-dev` and never uses a service-role key.
+- The **Staging RLS Integration** workflow runs on pushes to `main` and can also be manually dispatched; it requires two dedicated staging accounts. It refuses any Supabase origin except `levelup-dev` and never uses a service-role key.
 - Backup verification, isolated restore drills, monitoring setup, and rollback procedures are documented in [docs/PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md).
 - These are readiness controls, not a production launch. The live RLS run, browser regression result, backup/restore evidence, external alert configuration, and explicit cutover approval remain required release gates.
 
