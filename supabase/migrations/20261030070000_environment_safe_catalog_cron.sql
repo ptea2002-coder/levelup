@@ -10,6 +10,7 @@ create table if not exists levelup_private.runtime_config (
   value text not null,
   updated_at timestamptz not null default pg_catalog.now()
 );
+alter table levelup_private.runtime_config enable row level security;
 revoke all on levelup_private.runtime_config from public, anon, authenticated;
 
 do $$
