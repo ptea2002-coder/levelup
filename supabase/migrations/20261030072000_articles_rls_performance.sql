@@ -6,7 +6,7 @@ create or replace function public.is_levelup_admin()
 returns boolean
 language sql
 stable
-security definer
+security invoker
 set search_path = ''
 as $$
   select coalesce((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin', false);
