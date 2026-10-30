@@ -61,6 +61,7 @@ test("catalog import continues in the background with a project-scoped cron targ
   assert.match(cron, /'\* \* \* \* \*'/);
   assert.match(cron, /status <> 'complete'/);
   assert.match(cron, /levelup_private\.runtime_config/);
+  assert.match(cron, /catalog_sync_enabled/);
   assert.match(cron, /url := %L \|\| '\/functions\/v1\/sync-game-catalog'/);
   assert.doesNotMatch(cron, /ztzcpnyxgwhcdktpbxdq/);
 });
