@@ -76,7 +76,7 @@ export function GameDiscoveryStudio({ initialGames, initialTotal, categories, pl
     setFeedbackState({ storageKey: feedbackStorageKey, values });
   }, [feedbackStorageKey]);
 
-  const feedbackBySlug = feedbackState.storageKey === feedbackStorageKey ? feedbackState.values : {};
+  const feedbackBySlug: Record<string, DiscoveryFeedback> = feedbackState.storageKey === feedbackStorageKey ? feedbackState.values : {};
 
   const updateFeedback = useCallback((slug: string, value: DiscoveryFeedback | null) => {
     const next = { ...feedbackBySlug };
