@@ -11,6 +11,7 @@ const sync = readFileSync(new URL("../supabase/functions/sync-game-catalog/index
 const cron = readFileSync(new URL("../supabase/migrations/20261029151000_schedule_game_catalog_sync.sql", import.meta.url), "utf8");
 const facetsMigration = readFileSync(new URL("../supabase/migrations/20261029154000_catalog_facets.sql", import.meta.url), "utf8");
 const igdbMigration = readFileSync(new URL("../supabase/migrations/20261029155000_igdb_multiplatform_catalog.sql", import.meta.url), "utf8");
+const confidenceMigration = readFileSync(new URL("../supabase/migrations/20261030031107_p4_discovery_ranking_confidence.sql", import.meta.url), "utf8");
 const igdbSync = readFileSync(new URL("../supabase/functions/sync-igdb-catalog/index.ts", import.meta.url), "utf8");
 const sitemap = readFileSync(new URL("../src/app/sitemap.ts", import.meta.url), "utf8");
 const gameCard = readFileSync(new URL("../src/components/game-card.tsx", import.meta.url), "utf8");
@@ -135,4 +136,6 @@ test("local recommendation sorting uses the shared Bayesian confidence prior", (
   assert.match(explorer, /sort\(comparePositiveReviews\)/);
   assert.match(explorer, /sort\(compareRecommendedGames\)/);
   assert.doesNotMatch(explorer, /ratio \* 100/);
+  assert.match(confidenceMigration, /search_games_catalog_v2/);
+  assert.match(confidenceMigration, /5000 \* 0\.75/);
 });
