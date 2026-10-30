@@ -4,6 +4,7 @@ import test from "node:test";
 
 const migration = readFileSync(new URL("../supabase/migrations/20261030041422_p6_news_intelligence.sql", import.meta.url), "utf8");
 const accessMigration = readFileSync(new URL("../supabase/migrations/20261030041654_p6_news_access_hardening.sql", import.meta.url), "utf8");
+const rpcHardeningMigration = readFileSync(new URL("../supabase/migrations/20261030041756_p6_rpc_hardening.sql", import.meta.url), "utf8");
 const edge = readFileSync(new URL("../supabase/functions/ingest-news-feeds/index.ts", import.meta.url), "utf8");
 const component = readFileSync(new URL("../src/components/news-intelligence.tsx", import.meta.url), "utf8");
 const page = readFileSync(new URL("../src/app/admin/news-intelligence/page.tsx", import.meta.url), "utf8");
@@ -62,4 +63,12 @@ test("P6.1 explicitly revokes anonymous access and keeps ingestion service-only"
   assert.match(accessMigration, /revoke all on function public\.ingest_news_items\(jsonb\) from public, anon, authenticated/);
   assert.match(accessMigration, /grant execute on function public\.ingest_news_items\(jsonb\) to service_role/);
   assert.match(accessMigration, /grant execute on function public\.create_article_draft_from_news_item\(uuid\) to authenticated/);
+});
+
+test("P6.1 keeps public draft RPCs as invoker wrappers and isolates definer implementations", () => {
+  assert.match(rpcHardeningMigration, /create schema if not exists private/);
+  assert.match(rpcHardeningMigration, /function private\.create_article_draft_from_news_item/);
+  assert.match(rpcHardeningMigration, /function public\.create_article_draft_from_news_item[\s\S]*?security invoker/);
+  assert.match(rpcHardeningMigration, /function private\.dismiss_news_ingest_item/);
+  assert.match(rpcHardeningMigration, /function public\.dismiss_news_ingest_item[\s\S]*?security invoker/);
 });

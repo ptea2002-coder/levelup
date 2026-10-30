@@ -103,7 +103,7 @@ The community now uses Supabase-backed data rather than demo posts:
 - Converting a queue item creates an unpublished CMS draft with a source reference and editorial checklist. A database trigger blocks publication while the generated placeholders remain; editors must verify facts and write original content.
 - No cron schedule is enabled. Review source terms and test the intake in staging before considering automation. See [docs/news-intelligence.md](docs/news-intelligence.md).
 - P6.1 has applied the schema migration to the `levelup-dev` staging project and deployed `ingest-news-feeds` with JWT verification enabled. No sources are registered or scheduled, and production is untouched.
-- The matching repository migrations are `supabase/migrations/20261030041422_p6_news_intelligence.sql` and `supabase/migrations/20261030041654_p6_news_access_hardening.sql`. Full signed-in browser QA remains blocked until a trusted staging admin/editor role is assigned to a designated test account.
+- The matching repository migrations are `supabase/migrations/20261030041422_p6_news_intelligence.sql`, `supabase/migrations/20261030041654_p6_news_access_hardening.sql`, and `supabase/migrations/20261030041756_p6_rpc_hardening.sql`. Full signed-in browser QA remains blocked until a trusted staging admin/editor role is assigned to a designated test account.
 
 ## Steam live data
 

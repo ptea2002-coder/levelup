@@ -26,9 +26,9 @@ P6 adds a private source registry, a manually triggered RSS/Atom/JSON Feed intak
 
 ## P6.1 staging deployment status (2026-10-30)
 
-- Applied to the Supabase `levelup-dev` project; recorded migration versions: `20261030041422` (`p6_news_intelligence`) and `20261030041654` (`p6_news_access_hardening`).
+- Applied to the Supabase `levelup-dev` project; recorded migration versions: `20261030041422` (`p6_news_intelligence`), `20261030041654` (`p6_news_access_hardening`), and `20261030041756` (`p6_rpc_hardening`).
 - Deployed Edge Function `ingest-news-feeds` version 1 with `verify_jwt = true`.
-- Verified the three tables exist with RLS enabled, expected triggers exist, `anon` has no table privileges on the intake tables, the service role can insert intake records, and `anon` cannot execute ingestion or draft-conversion RPCs.
+- Verified the three tables exist with RLS enabled, expected triggers exist, `anon` has no table privileges on the intake tables, the service role can ingest, `anon` cannot execute intake RPCs, and the exposed draft/dismiss RPCs are SECURITY INVOKER wrappers over guarded implementations in the private schema.
 - No source records or queue items were created. Production project `levelup` was not modified.
 - Full end-to-end signed-in QA is blocked because the staging project currently has no user with trusted `app_metadata.role = admin` or `editor`. No existing account was elevated automatically; designate a test account before testing the UI and feed ingestion.
 
