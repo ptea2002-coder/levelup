@@ -46,7 +46,29 @@
 - [ ] Add automated RLS integration tests using anonymous, editor, admin, and cross-user identities.
 - [ ] Reconcile the live P3 schema with Supabase migration history before production cutover.
 
-## Phase 4 — Community and growth
+
+## Phase 4 — Game Discovery Engine
+
+- [x] Add Game Discovery Lab at `/discover` with server-backed catalog paging.
+- [x] Let players combine category, platform, keyword, and play-mood filters.
+- [x] Rank candidates using saved Game Locker genres/favorites and explain visible match reasons.
+- [x] Keep the scoring transparent as heuristic metadata matching; do not claim FPS/hardware fit.
+- [ ] Add automated end-to-end coverage against a seeded catalog and guest/account libraries.
+- [ ] Expand candidate retrieval beyond the current catalog pages and validate recommendation quality with user feedback.
+
+## Phase 5 — PC Build & Performance Lab
+
+- PC configuration input, requirement matching, and clearly caveated performance guidance.
+
+## Phase 6 — News Intelligence
+
+- Reviewed RSS/API ingestion, source deduplication, and editorial approval.
+
+## Phase 7 — Production readiness
+
+- Monitoring, RLS integration tests, backups, mobile/browser regression, and rollback rehearsal.
+
+## Phase 8 — Community and growth
 
 - Community posts, groups, and finding teammates.
 - XP and badges only after abuse prevention and moderation are working.

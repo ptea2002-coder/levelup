@@ -44,3 +44,17 @@ test("P2 UI exposes sync state and preserves a local-first guest experience", ()
   assert.match(control, /Đăng nhập để đồng bộ giữa các thiết bị/);
   assert.match(control, /Dữ liệu cục bộ vẫn được giữ/);
 });
+
+
+test("legacy guest library entries without status are preserved", () => {
+  assert.match(library, /const status = entry\.status \?\? null/);
+  assert.match(library, /status: status as GameLibraryStatus \| null/);
+});
+
+test("Game Locker avoids duplicate lookups and exposes a retry for unresolved saved games", () => {
+  assert.match(locker, /activeSlugSignature/);
+  assert.match(locker, /attemptedSlugsRef/);
+  assert.match(locker, /lookupRetryKey/);
+  assert.match(locker, /unresolvedSlugs/);
+  assert.match(locker, /Thử tải lại/);
+});

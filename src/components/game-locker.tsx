@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { GameCard } from "@/components/game-card";
 import { useGameLibrary } from "@/components/game-library-provider";
 import type { Game } from "@/lib/games";
@@ -26,19 +26,34 @@ export function GameLocker({ games }: GameLockerProps) {
   const [activeFilter, setActiveFilter] = useState<LockerFilter>("all");
   const [additionalGames, setAdditionalGames] = useState<Game[]>([]);
   const [lookupState, setLookupState] = useState<"idle" | "loading" | "error">("idle");
+  const [lookupRetryKey, setLookupRetryKey] = useState(0);
+  const attemptedSlugsRef = useRef(new Set<string>());
+  const activeSlugSignature = useMemo(
+    () => Object.entries(library)
+      .filter(([, entry]) => isGameLibraryEntryActive(entry))
+      .map(([slug]) => slug)
+      .sort()
+      .join(","),
+    [library],
+  );
 
   useEffect(() => {
     if (!ready) return;
+
+    const activeSlugs = activeSlugSignature ? activeSlugSignature.split(",") : [];
     const knownSlugs = new Set(games.map((game) => game.slug));
-    const missingSlugs = Object.entries(library).filter(([slug, entry]) => isGameLibraryEntryActive(entry) && !knownSlugs.has(slug)).map(([slug]) => slug);
+    const missingSlugs = activeSlugs.filter((slug) =>
+      !knownSlugs.has(slug) && !attemptedSlugsRef.current.has(slug)
+    );
 
     if (missingSlugs.length === 0) {
-      setAdditionalGames([]);
       setLookupState("idle");
       return;
     }
 
     let cancelled = false;
+    let settled = false;
+    missingSlugs.forEach((slug) => attemptedSlugsRef.current.add(slug));
     setLookupState("loading");
 
     const loadMissingGames = async () => {
@@ -55,23 +70,30 @@ export function GameLocker({ games }: GameLockerProps) {
           return payload.items ?? [];
         }));
 
-        if (!cancelled) {
-          setAdditionalGames(results.flat());
-          setLookupState("idle");
-        }
+        if (cancelled) return;
+
+        const fetchedGames = results.flat();
+        setAdditionalGames((current) => {
+          const bySlug = new Map(current.map((game) => [game.slug, game] as const));
+          for (const game of fetchedGames) bySlug.set(game.slug, game);
+          return [...bySlug.values()];
+        });
+        setLookupState("idle");
+        settled = true;
       } catch {
-        if (!cancelled) {
-          setAdditionalGames([]);
-          setLookupState("error");
-        }
+        if (cancelled) return;
+        missingSlugs.forEach((slug) => attemptedSlugsRef.current.delete(slug));
+        setLookupState("error");
+        settled = true;
       }
     };
 
     void loadMissingGames();
     return () => {
       cancelled = true;
+      if (!settled) missingSlugs.forEach((slug) => attemptedSlugsRef.current.delete(slug));
     };
-  }, [games, library, ready]);
+  }, [activeSlugSignature, games, lookupRetryKey, ready]);
 
   const allGames = useMemo(() => {
     const bySlug = new Map(games.map((game) => [game.slug, game] as const));
@@ -85,6 +107,16 @@ export function GameLocker({ games }: GameLockerProps) {
       .sort((a, b) => (library[b.slug]?.updatedAt ?? 0) - (library[a.slug]?.updatedAt ?? 0)),
     [allGames, library],
   );
+
+  const allGameSlugs = useMemo(() => new Set(allGames.map((game) => game.slug)), [allGames]);
+  const unresolvedSlugs = activeSlugSignature
+    ? activeSlugSignature.split(",").filter((slug) => !allGameSlugs.has(slug))
+    : [];
+
+  const retryLookup = () => {
+    unresolvedSlugs.forEach((slug) => attemptedSlugsRef.current.delete(slug));
+    setLookupRetryKey((current) => current + 1);
+  };
 
   const visibleGames = savedGames.filter((game) =>
     activeFilter === "all" || (activeFilter === "favorites" ? Boolean(library[game.slug]?.isFavorite) : library[game.slug]?.status === activeFilter)
@@ -125,6 +157,13 @@ export function GameLocker({ games }: GameLockerProps) {
           ))}
         </div>
 
+        {ready && savedGames.length > 0 && unresolvedSlugs.length > 0 && lookupState !== "loading" ? (
+          <div className="locker-lookup-warning" role="status">
+            <p>{unresolvedSlugs.length} game đã lưu chưa tải được từ catalog. Dữ liệu trong Game Locker vẫn được giữ nguyên.</p>
+            <button className="text-link" type="button" onClick={retryLookup}>Thử tải lại ↻</button>
+          </div>
+        ) : null}
+
         {!ready ? (
           <div className="empty-state" role="status">
             <p className="eyebrow">PLAYER INVENTORY / LOADING</p>
@@ -141,13 +180,15 @@ export function GameLocker({ games }: GameLockerProps) {
           <div className="empty-state locker-empty-state" role="status">
             <p className="eyebrow">CATALOG / CONNECTION</p>
             <h3>Chưa tải được các game đã lưu.</h3>
-            <p>Bộ sưu tập trên trình duyệt vẫn được giữ nguyên. Hãy thử tải lại trang khi kết nối ổn định.</p>
+            <p>Bộ sưu tập trên trình duyệt vẫn được giữ nguyên. Hãy thử tải lại khi kết nối ổn định.</p>
+            <button className="btn btn-secondary" type="button" onClick={retryLookup}>Thử lại</button>
           </div>
         ) : savedGames.length === 0 && Object.values(library).some((entry) => isGameLibraryEntryActive(entry)) ? (
           <div className="empty-state locker-empty-state">
             <p className="eyebrow">SAVED ITEMS / NOT IN CATALOG</p>
             <h3>Có {Object.values(library).filter((entry) => isGameLibraryEntryActive(entry)).length} mục đã lưu chưa khớp với catalog hiện tại.</h3>
             <p>Những game này có thể đã bị ẩn hoặc không còn trong nguồn dữ liệu. Dữ liệu lưu trên trình duyệt vẫn được giữ nguyên.</p>
+            <button className="btn btn-secondary" type="button" onClick={retryLookup}>Thử tra cứu lại</button>
           </div>
         ) : savedGames.length === 0 ? (
           <div className="empty-state locker-empty-state">

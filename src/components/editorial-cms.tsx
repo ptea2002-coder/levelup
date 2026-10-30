@@ -192,24 +192,10 @@ export function EditorialCms() {
     const supabase = getSupabaseBrowserClient();
     if (!supabase) return;
     setBusy(true); setError(""); setMessage("");
-    try {
-      const { data, error: archiveError } = await supabase.from("articles")
-        .update({ status: "archived", archived_at: new Date().toISOString() })
-        .eq("id", article.id)
-        .select("id")
-        .maybeSingle();
-      if (archiveError || !data) {
-        setError("Không thể lưu trữ bài viết. Hãy kiểm tra quyền và tải lại danh sách.");
-        return;
-      }
-      setMessage("Đã lưu trữ bài viết.");
-      if (draft.id === article.id) setField("status", "archived");
-      await loadArticles();
-    } catch {
-      setError("Có lỗi kết nối khi lưu trữ bài viết. Hãy thử lại.");
-    } finally {
-      setBusy(false);
-    }
+    const { error: archiveError } = await supabase.from("articles").update({ status: "archived", archived_at: new Date().toISOString() }).eq("id", article.id);
+    setBusy(false);
+    if (archiveError) setError("Không thể lưu trữ bài viết.");
+    else { setMessage("Đã lưu trữ bài viết."); if (draft.id === article.id) setField("status", "archived"); await loadArticles(); }
   }
 
   if (!authReady || loading) return <section className="section"><div className="container editorial-state" role="status">Đang kiểm tra quyền biên tập…</div></section>;

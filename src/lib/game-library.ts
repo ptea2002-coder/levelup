@@ -53,7 +53,7 @@ export function readGameLibrary(storageKey = GAME_LIBRARY_STORAGE_KEY): GameLibr
       if (!/^[a-z0-9-]{1,100}$/.test(slug) || !value || typeof value !== "object") continue;
 
       const entry = value as Partial<GameLibraryEntry>;
-      const status = entry.status;
+      const status = entry.status ?? null;
       if (status !== null && (typeof status !== "string" || !validStatuses.has(status))) continue;
 
       result[slug] = {

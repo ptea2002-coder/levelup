@@ -26,8 +26,18 @@ export async function GET(request: NextRequest) {
   const page = Math.max(1, Math.min(Number(search.get("page") ?? 1) || 1, 100000));
   const pageSize = Math.max(1, Math.min(Number(search.get("limit") ?? 24) || 24, 48));
   const query = (search.get("query") ?? "").trim().slice(0, 100);
-  const category = (search.get("category") ?? "").trim().slice(0, 80);
+  const categoryParam = search.get("category");
+  const categoriesParam = search.get("categories");
+  const categories = [...new Set(
+    (categoriesParam !== null ? categoriesParam.split(",") : categoryParam ? [categoryParam] : [])
+      .map((category) => category.trim().slice(0, 80))
+      .filter(Boolean),
+  )].slice(0, 20);
   const platform = (search.get("platform") ?? "").trim().slice(0, 80);
+  const modeParam = search.get("mode");
+  const safeMode = modeParam === "competitive" || modeParam === "coop" || modeParam === "story" || modeParam === "chill"
+    ? modeParam
+    : "all";
   const sort = search.get("sort");
   const safeSort = sort === "newest" || sort === "name" || sort === "positive" || sort === "recommended"
     ? sort
@@ -35,8 +45,9 @@ export async function GET(request: NextRequest) {
 
   const result = await getGamesPage({
     query,
-    category,
+    categories,
     platform,
+    mode: safeMode,
     sort: safeSort,
     page,
     pageSize,
