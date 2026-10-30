@@ -48,7 +48,7 @@
 ## Phase 5 — PC Build & Performance Lab
 
 - [x] Add a PC build profile for CPU, GPU, RAM, VRAM, free storage, storage type, OS, resolution, and target FPS.
-- [x] Compare RAM, VRAM, storage, and SSD requirements against a curated, source-linked set of eight PC games.
+- [x] Compare RAM, VRAM, storage, and SSD requirements against a curated, source-linked set of eleven PC games.
 - [x] Show minimum/recommended requirement tiers, per-component checks, source links, and clear warnings instead of inventing FPS estimates.
 - [x] Keep guest and signed-in PC profiles isolated in local browser storage; do not send hardware data to the server.
 - [x] Expand the official-source-linked PC requirements catalog from 8 to 11 games, record checked dates/caveats, and represent unpublished storage requirements as unknown.
