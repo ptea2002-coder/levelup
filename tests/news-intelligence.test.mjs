@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const migration = readFileSync(new URL("../supabase/migrations/20261030041422_p6_news_intelligence.sql", import.meta.url), "utf8");
+const accessMigration = readFileSync(new URL("../supabase/migrations/20261030041654_p6_news_access_hardening.sql", import.meta.url), "utf8");
 const edge = readFileSync(new URL("../supabase/functions/ingest-news-feeds/index.ts", import.meta.url), "utf8");
 const component = readFileSync(new URL("../src/components/news-intelligence.tsx", import.meta.url), "utf8");
 const page = readFileSync(new URL("../src/app/admin/news-intelligence/page.tsx", import.meta.url), "utf8");
@@ -54,4 +55,11 @@ test("News Intelligence is private and integrated with the existing editorial wo
   assert.match(page, /robots: \{ index: false, follow: false \}/);
   assert.match(page, /NewsIntelligence/);
   assert.match(editorialPage, /admin\/news-intelligence/);
+});
+
+test("P6.1 explicitly revokes anonymous access and keeps ingestion service-only", () => {
+  assert.match(accessMigration, /revoke all on table public\.news_sources, public\.news_ingest_items, public\.news_ingest_runs from anon/);
+  assert.match(accessMigration, /revoke all on function public\.ingest_news_items\(jsonb\) from public, anon, authenticated/);
+  assert.match(accessMigration, /grant execute on function public\.ingest_news_items\(jsonb\) to service_role/);
+  assert.match(accessMigration, /grant execute on function public\.create_article_draft_from_news_item\(uuid\) to authenticated/);
 });
