@@ -16,7 +16,7 @@ export default function EditorialAdminPage() {
           <p className="eyebrow">LEVELUP STUDIO / PRIVATE WORKSPACE</p>
           <h1>EDITORIAL<br /><span>CONTROL.</span></h1>
           <p>Không gian biên tập có phân quyền. Bản nháp chỉ hiển thị với editor/admin; nội dung công khai phải được xuất bản có chủ đích.</p>
-          <p><Link href="/admin/moderation" className="text-link">← Quay lại kiểm duyệt cộng đồng</Link></p>
+          <p><Link href="/admin/moderation" className="text-link">← Quay lại kiểm duyệt cộng đồng</Link> <span aria-hidden="true"> · </span> <Link href="/admin/news-intelligence" className="text-link">Mở News Intelligence →</Link></p>
         </div>
       </section>
       <EditorialCms />

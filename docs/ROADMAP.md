@@ -48,6 +48,7 @@
 
 
 
+
 ## Phase 4 — Game Discovery Engine
 
 - [x] Add Game Discovery Lab at `/discover` with server-backed catalog paging.
@@ -67,7 +68,14 @@
 
 ## Phase 6 — News Intelligence
 
-- Reviewed RSS/API ingestion, source deduplication, and editorial approval.
+- [x] Add a private source registry for RSS, Atom, and JSON Feed with admin-only licensing/reuse review.
+- [x] Keep every source disabled by default; require a reviewed HTTPS policy URL, reviewer identity, timestamp, and written notes before enabling ingestion.
+- [x] Add a manually triggered Edge Function with editor authentication, HTTPS/redirect/size limits, and bounded feed parsing.
+- [x] Deduplicate by source/external ID, canonical URL, and normalized title/date fingerprint with database-enforced idempotency.
+- [x] Add an editor-only queue with run history, dismiss action, and atomic conversion into a CMS draft; publishing remains a separate human action.
+- [x] Apply the schema migration to `levelup-dev` staging and deploy `ingest-news-feeds` with JWT verification enabled; verify table/RLS/grant/trigger presence.
+- [ ] Assign a designated staging test account the trusted `app_metadata.role` of `admin` or `editor`, then verify authenticated UI actions and run a reviewed feed end to end.
+- [ ] Review real source terms and feed quality, then decide whether any recurring schedule is appropriate.
 
 ## Phase 7 — Production readiness
 

@@ -93,6 +93,18 @@ The community now uses Supabase-backed data rather than demo posts:
 - Guest and signed-in profiles are saved separately in the current browser. Hardware details are not uploaded or synced across devices in this phase.
 - Requirement records link to publisher/Steam support pages and include a checked date. The dataset is intentionally limited; an absent game or missing recommended tier is not treated as evidence of compatibility.
 
+## News Intelligence (P6)
+
+- `/admin/news-intelligence` is a private, role-gated workspace for RSS 2.0, Atom, and JSON Feed metadata.
+- Admins register sources and must record a HTTPS terms/policy URL, review notes, reviewer identity, and an explicit reuse policy before enabling a feed. All sources are disabled by default; no source is pre-approved.
+- The intake function runs manually, only reads approved/enabled sources, caps each feed at 512 KB and 25 items, blocks cross-host redirects, and records run counts/errors.
+- The default policy stores only title and canonical HTTPS link. Short excerpts (up to 280 characters) are stored only when the admin explicitly records that metadata-excerpt reuse is permitted.
+- Canonical URL, feed ID, and normalized title/date fingerprints prevent duplicate queue entries. Queue access is editor/admin-only.
+- Converting a queue item creates an unpublished CMS draft with a source reference and editorial checklist. A database trigger blocks publication while the generated placeholders remain; editors must verify facts and write original content.
+- No cron schedule is enabled. Review source terms and test the intake in staging before considering automation. See [docs/news-intelligence.md](docs/news-intelligence.md).
+- P6.1 has applied the schema migration to the `levelup-dev` staging project and deployed `ingest-news-feeds` with JWT verification enabled. No sources are registered or scheduled, and production is untouched.
+- The matching repository migrations are `supabase/migrations/20261030041422_p6_news_intelligence.sql`, `supabase/migrations/20261030041654_p6_news_access_hardening.sql`, and `supabase/migrations/20261030041756_p6_rpc_hardening.sql`. Full signed-in browser QA remains blocked until a trusted staging admin/editor role is assigned to a designated test account.
+
 ## Steam live data
 
 - `public.steam_game_metrics` caches Steam player counts and Vietnam-region store prices for supported Steam games.
