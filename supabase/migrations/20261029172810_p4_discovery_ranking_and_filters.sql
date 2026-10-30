@@ -1,9 +1,17 @@
-CREATE OR REPLACE FUNCTION public.search_games_catalog_v2(p_query text DEFAULT NULL::text, p_categories text[] DEFAULT NULL::text[], p_platform text DEFAULT NULL::text, p_mode text DEFAULT 'all'::text, p_sort text DEFAULT 'popular'::text, p_limit integer DEFAULT 24, p_offset integer DEFAULT 0)
- RETURNS jsonb
- LANGUAGE sql
- STABLE
- SET search_path TO ''
-AS $function$
+create or replace function public.search_games_catalog_v2(
+  p_query text default null,
+  p_categories text[] default null,
+  p_platform text default null,
+  p_mode text default 'all',
+  p_sort text default 'popular',
+  p_limit integer default 24,
+  p_offset integer default 0
+)
+returns jsonb
+language sql
+stable
+set search_path = ''
+as $function$
   with prepared as materialized (
     select
       g.id, g.slug, g.title, g.category, g.genres, g.platforms, g.developer,
@@ -94,7 +102,8 @@ AS $function$
         order by
           case when p_sort = 'newest' then nullif(f.release_year, 0) end desc nulls last,
           case when p_sort in ('positive', 'recommended') then
-            f.positive_count / nullif(f.positive_count + f.negative_count, 0)
+            (f.positive_count + 5000 * 0.75)
+            / nullif(f.positive_count + f.negative_count + 5000, 0)
           end desc nulls last,
           case when p_sort in ('positive', 'recommended')
             then f.positive_count + f.negative_count
@@ -120,9 +129,7 @@ AS $function$
     ),
     'total', (select count(*) from filtered)
   );
-$function$
+$function$;
 
- 
-REVOKE ALL ON FUNCTION public.search_games_catalog_v2(text, text[], text, text, text, integer, integer) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.search_games_catalog_v2(text, text[], text, text, text, integer, integer) TO anon, authenticated;
-NOTIFY pgrst, 'reload schema';
+revoke execute on function public.search_games_catalog_v2(text, text[], text, text, text, integer, integer) from public;
+grant execute on function public.search_games_catalog_v2(text, text[], text, text, text, integer, integer) to anon, authenticated, service_role;
