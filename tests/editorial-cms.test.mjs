@@ -28,3 +28,18 @@ test("public editorial pages can combine database articles with evergreen guides
   assert.ok(repository.includes("canonicalUrl"));
   assert.ok(page.includes("EditorialCms"));
 });
+
+test("P3.1 lets editors collaborate without allowing author reassignment", () => {
+  const hardening = readFileSync(new URL("../supabase/migrations/20261029164550_editorial_hardening.sql", import.meta.url), "utf8");
+  assert.ok(hardening.includes("create trigger articles_guard_author_id"));
+  assert.ok(hardening.includes("new.author_id := old.author_id"));
+  assert.ok(hardening.includes("drop policy if exists \"Editors update articles\""));
+  assert.ok(hardening.includes("(select public.is_levelup_editor())"));
+  assert.ok(hardening.includes("articles_published_by_idx"));
+});
+
+test("archive operation requires a returned row before showing success", () => {
+  assert.ok(cms.includes('.select("id")'));
+  assert.ok(cms.includes('.maybeSingle()'));
+  assert.ok(cms.includes("Có lỗi kết nối khi lưu trữ bài viết. Hãy thử lại."));
+});
