@@ -73,6 +73,9 @@
 - [x] Add a manually dispatched staging RLS workflow that requires two dedicated test accounts and never uses a service-role key.
 - [x] Add a Playwright Chromium smoke workflow for key routes at mobile, tablet, and desktop widths, including horizontal overflow, runtime errors, guest Game Locker persistence, and Discovery interactions.
 - [x] Document backup/restore verification, application rollback, database recovery, and production release gates.
+- [x] Add staging indexes for nine unindexed foreign-key columns and optimize seven admin JWT policy expressions; staging advisor no longer reports either finding class.
+- [ ] Enable Supabase Auth leaked-password protection in staging and verify the intended password policy.
+- [ ] Review the remaining `squad_memberships` permissive UPDATE policies with RLS regression tests before considering consolidation.
 - [ ] Configure the staging test-account secrets and pass the live RLS integration workflow; record its run URL and commit SHA.
 - [x] Pass Playwright browser smoke on the current PR head for eight routes at 390px, 768px, and 1440px.
 - [ ] Complete manual keyboard, accessibility, authenticated, and real-device checks.
@@ -97,6 +100,7 @@ Before production cutover:
 - [ ] Manual accessibility, keyboard, authenticated flows, and real-device checks are reviewed.
 - [ ] Backup/restore and application/database rollback rehearsals are recorded; uptime alerts have a named owner.
 - [ ] Secrets, service-role keys, and private credentials are audited across Git history.
+- [ ] Supabase Auth leaked-password protection is enabled and verified for the release environment.
 - [ ] Domain, redirects, privacy policy, community rules, and contact path are ready.
 
 ## Current limitations
