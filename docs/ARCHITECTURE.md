@@ -31,6 +31,7 @@ When the backend is connected:
 - `/games/[slug]` — game profile and official link
 - `/news` — editorial guides
 - `/news/[slug]` — guide detail
+- `/admin/news-intelligence` — private, source-reviewed intake queue for editors/admins
 - `/community` — transparent community roadmap
 
 ## Production principles
@@ -40,3 +41,4 @@ When the backend is connected:
 - Keep the app accessible by keyboard and respect `prefers-reduced-motion`.
 - Add tests, error monitoring, analytics, backup/recovery, and rate limits before opening community submissions.
 - Do not scrape copyrighted game artwork or republish news without rights and source attribution.
+- News intake is disabled by default per source, stores only reviewed metadata, and creates drafts rather than auto-publishing. Do not schedule ingestion until source terms and staging behavior have been reviewed.

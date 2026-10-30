@@ -158,6 +158,14 @@ export function EditorialCms() {
     }
 
     const status = nextStatus ?? draft.status;
+    if (status === "published" && (
+      draft.body_md.includes("[Viết nội dung nguyên bản") ||
+      draft.body_md.includes("Đây là đầu mối tin tức từ nguồn bên ngoài") ||
+      draft.excerpt.startsWith("Tin tham khảo từ ")
+    )) {
+      setError("Bản nháp News Intelligence vẫn còn nội dung giữ chỗ. Hãy xác minh dữ kiện, viết nội dung nguyên bản và cập nhật mô tả trước khi xuất bản.");
+      return;
+    }
     const payload = {
       slug, title, excerpt: draft.excerpt.trim(), body_md: draft.body_md.trim(), status,
       category: draft.category.trim() || "LEVELUP EDITORIAL",
