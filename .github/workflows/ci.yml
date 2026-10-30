@@ -7,7 +7,7 @@ on:
     branches: [main, v2-foundation, p4-game-discovery, p5-pc-performance-lab, p6-news-intelligence, p7-production-readiness]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
