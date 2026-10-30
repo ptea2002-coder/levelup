@@ -105,6 +105,7 @@ test("Game Locker resolves saved slugs outside its initial catalog page", () => 
 test("article RLS uses initplan-safe role helpers and indexes its published_by foreign key", () => {
   assert.match(articleRlsMigration, /articles_published_by_idx/);
   assert.match(articleRlsMigration, /create or replace function public\.is_levelup_admin/);
+  assert.match(articleRlsMigration, /security invoker/);
   assert.match(articleRlsMigration, /using \(\(select public\.is_levelup_editor\(\)\)\)/);
   assert.match(articleRlsMigration, /or \(select public\.is_levelup_admin\(\)\)/);
 });
