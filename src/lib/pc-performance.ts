@@ -20,7 +20,7 @@ export type PCGameTier = {
   gpu: string;
   ramGb: number;
   vramGb?: number;
-  storageGb: number;
+  storageGb?: number;
   requiresSsd?: boolean;
 };
 
@@ -242,6 +242,219 @@ export const pcGameRequirements: PCGameRequirement[] = [
     sourceUrl: "https://help.steampowered.com/en/wizard/HelpWithGameTechnicalIssue/?appid=413150",
     checkedAt: "2026-10-30",
     caveat: "Nhà phát hành không công bố cấu hình khuyến nghị trong trang yêu cầu hệ thống được tham chiếu.",
+  },
+  {
+    slug: "fortnite",
+    title: "Fortnite",
+    category: "BATTLE ROYALE / COMPETITIVE",
+    minimum: {
+      cpu: "Intel Core i3-3225 3.3 GHz",
+      gpu: "Intel HD 4000 / AMD Radeon Vega 8",
+      ramGb: 8,
+    },
+    recommended: {
+      cpu: "Intel Core i5-7300U 3.5 GHz / AMD Ryzen 3 3300U",
+      gpu: "NVIDIA GeForce GTX 960 / AMD Radeon R9 280 (DirectX 11)",
+      ramGb: 16,
+      vramGb: 2,
+      requiresSsd: true,
+    },
+    osLabel: "Windows 10 64-bit (minimum version 22H2); Windows 10/11 64-bit recommended",
+    sourceLabel: "Epic Games Support — Fortnite PC System Requirements",
+    sourceUrl: "https://www.epicgames.com/help/c-34254770/c-5719357839387/a16548002",
+    checkedAt: "2026-10-30",
+    officialPerformanceNote: "Epic công bố riêng preset Epic Quality với yêu cầu phần cứng cao hơn; mục này chỉ dùng tier Recommended tiêu chuẩn.",
+    caveat: "Nguồn không công bố dung lượng lưu trữ. VRAM 2 GB là mức Recommended tiêu chuẩn, không phải preset Epic Quality.",
+  },
+  {
+    slug: "black-myth-wukong",
+    title: "Black Myth: Wukong",
+    category: "ACTION RPG / AAA",
+    minimum: {
+      cpu: "Intel Core i5-8400 / AMD Ryzen 5 1600",
+      gpu: "NVIDIA GeForce GTX 1060 6 GB / AMD Radeon RX 580 8 GB",
+      ramGb: 16,
+      storageGb: 130,
+    },
+    recommended: {
+      cpu: "Intel Core i7-9700 / AMD Ryzen 5 5500",
+      gpu: "NVIDIA GeForce RTX 2060 / AMD Radeon RX 5700 XT / Intel Arc A750",
+      ramGb: 16,
+      storageGb: 130,
+      requiresSsd: true,
+    },
+    osLabel: "Windows 10 64-bit",
+    sourceLabel: "Steam Store — Black Myth: Wukong System Requirements",
+    sourceUrl: "https://store.steampowered.com/app/2358720/Black_Myth_Wukong/",
+    checkedAt: "2026-10-30",
+    officialPerformanceNote: "Nhà phát hành ghi chú cấu hình được kiểm thử với DLSS/FSR/XeSS bật; mức tối thiểu hỗ trợ HDD, còn tier Recommended yêu cầu SSD.",
+    caveat: "VRAM khác nhau theo lựa chọn GPU NVIDIA/AMD/Intel nên không quy đổi thành một ngưỡng VRAM duy nhất.",
+  },
+  {
+    slug: "monster-hunter-wilds",
+    title: "Monster Hunter Wilds",
+    category: "ACTION RPG / HUNTING",
+    minimum: {
+      cpu: "Intel Core i5-10400 / i3-12100 / AMD Ryzen 5 3600",
+      gpu: "NVIDIA GeForce GTX 1660 6 GB / AMD Radeon RX 5500 XT 8 GB",
+      ramGb: 16,
+      storageGb: 75,
+      requiresSsd: true,
+    },
+    recommended: {
+      cpu: "Intel Core i5-10400 / i3-12100 / AMD Ryzen 5 3600",
+      gpu: "NVIDIA GeForce RTX 2060 SUPER 8 GB / AMD Radeon RX 6600 8 GB",
+      ramGb: 16,
+      vramGb: 8,
+      storageGb: 75,
+      requiresSsd: true,
+    },
+    osLabel: "Windows 10/11 64-bit",
+    sourceLabel: "Steam Support — Monster Hunter Wilds System Requirements",
+    sourceUrl: "https://store.steampowered.com/app/2246340/Monster_Hunter_Wilds/",
+    checkedAt: "2026-10-30",
+    officialPerformanceNote: "Nguồn ghi mức tối thiểu là 1080p (upscale từ 720p native) / 30 FPS ở Lowest; Recommended là 1080p / 60 FPS ở Medium khi bật Frame Generation.",
+    caveat: "Mốc 60 FPS khuyến nghị phụ thuộc Frame Generation; không được hiểu là FPS bảo đảm khi tắt tính năng này.",
+  },
+];
+
+export type PCBenchmarkKind = "cpu" | "gpu";
+
+export type PCBenchmarkReference = {
+  id: string;
+  kind: PCBenchmarkKind;
+  model: string;
+  metricLabel: "CPU Mark" | "G3D Mark";
+  score: number;
+  sampleCount?: number;
+  dataAsOf: string;
+  checkedAt: string;
+  sourceLabel: string;
+  sourceUrl: string;
+  caveat: string;
+};
+
+/**
+ * Curated reference scores from PassMark PerformanceTest comparisons.
+ * They are cross-workload aggregate scores, not gaming FPS or a prediction
+ * for a particular game, resolution, driver, power limit, or system build.
+ */
+export const pcBenchmarkReferences: PCBenchmarkReference[] = [
+  {
+    id: "cpu-i7-8700k",
+    kind: "cpu",
+    model: "Intel Core i7-8700K",
+    metricLabel: "CPU Mark",
+    score: 13554,
+    sampleCount: 19446,
+    dataAsOf: "2026-10-27",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark CPU Benchmarks",
+    sourceUrl: "https://www.cpubenchmark.net/compare/3098vs4681vs4811/Intel-i7-8700K-vs-Intel-i5-12400F-vs-AMD-Ryzen-5-5600",
+    caveat: "Điểm tổng hợp đa tác vụ; không phải FPS trong game.",
+  },
+  {
+    id: "cpu-i5-12400f",
+    kind: "cpu",
+    model: "Intel Core i5-12400F",
+    metricLabel: "CPU Mark",
+    score: 19527,
+    sampleCount: 18229,
+    dataAsOf: "2026-10-27",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark CPU Benchmarks",
+    sourceUrl: "https://www.cpubenchmark.net/compare/3098vs4681vs4811/Intel-i7-8700K-vs-Intel-i5-12400F-vs-AMD-Ryzen-5-5600",
+    caveat: "Điểm tổng hợp đa tác vụ; hiệu năng game còn phụ thuộc GPU và engine.",
+  },
+  {
+    id: "cpu-ryzen-5-5600",
+    kind: "cpu",
+    model: "AMD Ryzen 5 5600",
+    metricLabel: "CPU Mark",
+    score: 21488,
+    sampleCount: 16319,
+    dataAsOf: "2026-10-27",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark CPU Benchmarks",
+    sourceUrl: "https://www.cpubenchmark.net/compare/3098vs4681vs4811/Intel-i7-8700K-vs-Intel-i5-12400F-vs-AMD-Ryzen-5-5600",
+    caveat: "Điểm tổng hợp đa tác vụ; không quy đổi tuyến tính thành FPS.",
+  },
+  {
+    id: "cpu-ryzen-7-5700x",
+    kind: "cpu",
+    model: "AMD Ryzen 7 5700X",
+    metricLabel: "CPU Mark",
+    score: 26540,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark CPU Benchmarks",
+    sourceUrl: "https://www.cpubenchmark.net/compare/3098vs4677vs4811vs3859vs4814/Intel-i7-8700K-vs-Intel-i5-12400-vs-AMD-Ryzen-5-5600-vs-AMD-Ryzen-5-5600X-vs-AMD-Ryzen-7-5700X",
+    caveat: "Số mẫu riêng không được lưu trong bản tham chiếu này; kiểm tra nguồn để xem dữ liệu mới nhất.",
+  },
+  {
+    id: "gpu-rtx-2060",
+    kind: "gpu",
+    model: "NVIDIA GeForce RTX 2060",
+    metricLabel: "G3D Mark",
+    score: 14071,
+    sampleCount: 34895,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; không phải FPS của một tựa game hay một preset cụ thể.",
+  },
+  {
+    id: "gpu-rtx-2060-super",
+    kind: "gpu",
+    model: "NVIDIA GeForce RTX 2060 SUPER",
+    metricLabel: "G3D Mark",
+    score: 16456,
+    sampleCount: 13120,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; không phản ánh ray tracing, upscaling hay frame generation riêng.",
+  },
+  {
+    id: "gpu-rx-6600",
+    kind: "gpu",
+    model: "AMD Radeon RX 6600",
+    metricLabel: "G3D Mark",
+    score: 15033,
+    sampleCount: 16032,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; hiệu năng thực tế khác nhau theo game, API và driver.",
+  },
+  {
+    id: "gpu-rx-6600-xt",
+    kind: "gpu",
+    model: "AMD Radeon RX 6600 XT",
+    metricLabel: "G3D Mark",
+    score: 16446,
+    sampleCount: 7211,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; không phải cam kết FPS hay đánh giá giá/hiệu năng tại Việt Nam.",
+  },
+  {
+    id: "gpu-rtx-3060",
+    kind: "gpu",
+    model: "NVIDIA GeForce RTX 3060 12 GB",
+    metricLabel: "G3D Mark",
+    score: 16699,
+    sampleCount: 48123,
+    dataAsOf: "2026-10-29",
+    checkedAt: "2026-10-30",
+    sourceLabel: "PassMark Video Card Benchmarks",
+    sourceUrl: "https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB",
+    caveat: "Điểm GPU tổng hợp; VRAM 12 GB không bảo đảm FPS cao hơn ở mọi game.",
   },
 ];
 

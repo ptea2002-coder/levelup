@@ -8,6 +8,8 @@ const styles = readFileSync(new URL("../src/app/discovery.css", import.meta.url)
 const header = readFileSync(new URL("../src/components/site-header.tsx", import.meta.url), "utf8");
 const api = readFileSync(new URL("../src/app/api/games/route.ts", import.meta.url), "utf8");
 const ranking = readFileSync(new URL("../src/lib/game-ranking.ts", import.meta.url), "utf8");
+const provider = readFileSync(new URL("../src/components/game-library-provider.tsx", import.meta.url), "utf8");
+const browserScript = readFileSync(new URL("../scripts/browser-smoke.mjs", import.meta.url), "utf8");
 
 test("P4 Game Discovery Lab is a real route with server-backed catalog paging and SEO", () => {
   assert.match(page, /GameDiscoveryStudio/);
@@ -75,4 +77,14 @@ test("catalog ranking uses Bayesian review smoothing and server-side mood filter
   assert.match(migration, /p_mode = 'story'/);
   assert.match(migration, /p_mode = 'chill'/);
   assert.match(migration, /positive_count \+ 5000 \* 0\.75/);
+});
+
+test("recommendation feedback stays local and is isolated between guest and signed-in accounts", () => {
+  assert.match(component, /levelup:discovery-feedback:user:/);
+  assert.match(component, /levelup:discovery-feedback:guest:v1/);
+  assert.match(component, /window\.localStorage\.setItem\(feedbackStorageKey/);
+  assert.match(component, /không gửi lên máy chủ/);
+  assert.ok(provider.includes("userId: string | null"));
+  assert.match(styles, /discovery-feedback/);
+  assert.match(browserScript, /levelup:discovery-feedback:guest:v1/);
 });

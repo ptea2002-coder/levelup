@@ -53,5 +53,29 @@ test("the PC Lab includes responsive and reduced-motion safeguards", () => {
   assert.match(component, /pc-os-note/);
   assert.match(component, /aria-labelledby="pc-build-heading"/);
   assert.match(roadmap, /## Phase 5 — PC Build & Performance Lab/);
-  assert.match(roadmap, /Expand the verified requirements catalog/);
+  assert.match(roadmap, /official-source-linked PC requirements catalog from 8 to 11 games/);
+});
+
+test("P5 includes additional source-verified AAA requirements and never invents unpublished storage values", () => {
+  assert.ok(requirements.includes('slug: "fortnite"'));
+  assert.ok(requirements.includes('slug: "black-myth-wukong"'));
+  assert.ok(requirements.includes('slug: "monster-hunter-wilds"'));
+  assert.ok(requirements.includes("storageGb?: number"));
+  assert.ok(requirements.includes("https://www.epicgames.com/help/c-34254770/c-5719357839387/a16548002"));
+  assert.ok(requirements.includes("https://store.steampowered.com/app/2358720/Black_Myth_Wukong/"));
+  assert.ok(requirements.includes("https://store.steampowered.com/app/2246340/Monster_Hunter_Wilds/"));
+  assert.ok(component.includes('tier.storageGb === undefined ? "Không được công bố"'));
+});
+
+test("P5 benchmark index shows dated, sourced CPU/GPU aggregate scores without converting them to FPS", () => {
+  assert.ok(requirements.includes("export const pcBenchmarkReferences"));
+  assert.ok(requirements.includes('metricLabel: "CPU Mark"'));
+  assert.ok(requirements.includes('metricLabel: "G3D Mark"'));
+  assert.ok(requirements.includes("sampleCount"));
+  assert.ok(requirements.includes('checkedAt: "2026-10-30"'));
+  assert.ok(requirements.includes("https://www.cpubenchmark.net/compare/3098vs4681vs4811/Intel-i7-8700K-vs-Intel-i5-12400F-vs-AMD-Ryzen-5-5600"));
+  assert.ok(requirements.includes("https://www.videocardbenchmark.net/compare/4037vs4117vs4465vs4444vs4345/GeForce-RTX-2060-vs-GeForce-RTX-2060-SUPER-vs-Radeon-RX-6600-vs-Radeon-RX-6600-XT-vs-GeForce-RTX-3060-12GB"));
+  assert.ok(component.includes("pcBenchmarkReferences.filter"));
+  assert.ok(component.includes("Không chuyển điểm benchmark thành FPS"));
+  assert.ok(styles.includes(".pc-benchmark-list"));
 });

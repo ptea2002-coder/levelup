@@ -16,7 +16,7 @@
 - [x] Configure the deployed app with browser-safe Supabase URL/anon-key settings; secrets stay server-side.
 - [x] Add Supabase client/server utilities and migrate catalog reads to PostgreSQL.
 - [x] Add signup, login, logout, session handling, and profile creation.
-- [ ] Add automated integration tests proving anonymous access is denied and one user cannot read or write another user's private rows.
+- [x] Add a staging-only integration test harness for anonymous, owner, and cross-user access; execution against two dedicated staging accounts remains a P7 release gate.
 
 ## Phase 2 — User features
 
@@ -49,22 +49,27 @@
 
 
 
+
 ## Phase 4 — Game Discovery Engine
 
 - [x] Add Game Discovery Lab at `/discover` with server-backed catalog paging.
 - [x] Let players combine category, platform, keyword, and play-mood filters.
 - [x] Rank candidates using saved Game Locker genres/favorites and explain visible match reasons.
 - [x] Keep the scoring transparent as heuristic metadata matching; do not claim FPS/hardware fit.
-- [ ] Add automated end-to-end coverage against a seeded catalog and guest/account libraries.
-- [ ] Expand candidate retrieval beyond the current catalog pages and validate recommendation quality with user feedback.
+- [x] Add automated browser journeys for the CI-seeded catalog, guest Game Locker isolation/persistence, Discovery filters/search, and an opt-in guarded staging-account cloud-sync path (live account execution still requires staging secrets).
+- [x] Support paginated candidate retrieval beyond the first 48 results and add an automated full-catalog pagination check when staging catalog credentials are available.
+- [x] Add local-only recommendation fit feedback isolated between guest and signed-in accounts; feedback is not sent to the server.
+- [ ] Validate aggregate recommendation quality and tune ranking weights after the owner approves a privacy-safe analytics/user-study approach.
 
 ## Phase 5 — PC Build & Performance Lab
 
 - [x] Add a PC build profile for CPU, GPU, RAM, VRAM, free storage, storage type, OS, resolution, and target FPS.
-- [x] Compare RAM, VRAM, storage, and SSD requirements against a curated, source-linked set of eight PC games.
+- [x] Compare RAM, VRAM, storage, and SSD requirements against a curated, source-linked set of eleven PC games.
 - [x] Show minimum/recommended requirement tiers, per-component checks, source links, and clear warnings instead of inventing FPS estimates.
 - [x] Keep guest and signed-in PC profiles isolated in local browser storage; do not send hardware data to the server.
-- [ ] Expand the verified requirements catalog and add a sourced CPU/GPU benchmark index before automatic model-to-model performance scoring.
+- [x] Expand the official-source-linked PC requirements catalog from 8 to 11 games, record checked dates/caveats, and represent unpublished storage requirements as unknown.
+- [x] Add an initial PassMark CPU Mark/G3D Mark reference index with source links, snapshot dates, sample counts when available, and explicit no-FPS caveats.
+- [ ] Expand benchmark coverage and validate model matching before any automatic CPU/GPU compatibility scoring.
 
 ## Phase 6 — News Intelligence
 
@@ -74,12 +79,27 @@
 - [x] Deduplicate by source/external ID, canonical URL, and normalized title/date fingerprint with database-enforced idempotency.
 - [x] Add an editor-only queue with run history, dismiss action, and atomic conversion into a CMS draft; publishing remains a separate human action.
 - [x] Apply the schema migration to `levelup-dev` staging and deploy `ingest-news-feeds` with JWT verification enabled; verify table/RLS/grant/trigger presence.
-- [ ] Assign a designated staging test account the trusted `app_metadata.role` of `admin` or `editor`, then verify authenticated UI actions and run a reviewed feed end to end.
+- [x] Add an optional, origin-guarded browser smoke for the authenticated News Intelligence registry/queue; it does not approve sources or start ingestion.
+- [ ] Designate a staging test account with trusted `app_metadata.role` of `admin` or `editor`, configure its GitHub secrets, and run the authenticated dashboard smoke.
+- [ ] After a human reviews source terms and feed quality, run one controlled feed-ingestion/draft E2E and decide whether any recurring schedule is appropriate.
 - [ ] Review real source terms and feed quality, then decide whether any recurring schedule is appropriate.
 
 ## Phase 7 — Production readiness
 
-- Monitoring, RLS integration tests, backups, mobile/browser regression, and rollback rehearsal.
+- [x] Add low-information liveness and Supabase readiness endpoints at `/api/health` and `/api/health/ready`.
+- [x] Add an RLS integration test for anonymous, owner, and cross-user Game Locker access; guard write probes to the `levelup-dev` staging project only.
+- [x] Add a manually dispatched staging RLS workflow that requires two dedicated test accounts and never uses a service-role key.
+- [x] Add a Playwright Chromium smoke workflow for key routes at mobile, tablet, and desktop widths, including horizontal overflow, runtime errors, guest Game Locker persistence, and Discovery interactions.
+- [x] Document backup/restore verification, application rollback, database recovery, and production release gates.
+- [x] Add staging indexes for nine unindexed foreign-key columns and optimize seven admin JWT policy expressions; staging advisor no longer reports either finding class.
+- [ ] Enable Supabase Auth leaked-password protection in staging and verify the intended password policy.
+- [ ] Review five remaining permissive-policy groups across `articles`, `comments`, `reviews`, and `squad_memberships` with RLS regression tests before considering consolidation.
+- [ ] Configure the staging test-account secrets and pass the live RLS integration workflow; record its run URL and commit SHA.
+- [x] Pass Playwright browser smoke on the current PR head for eight routes at 390px, 768px, and 1440px.
+- [ ] Complete manual keyboard, accessibility, authenticated, and real-device checks.
+- [ ] Verify the active Supabase backup plan/retention and complete a restore drill in an isolated recovery project.
+- [ ] Configure external uptime monitoring and alert routing for the readiness endpoint.
+- [ ] Rehearse Vercel rollback and database recovery/forward-fix procedures, then record evidence before cutover.
 
 ## Phase 8 — Community and growth
 
@@ -93,11 +113,14 @@
 Before production cutover:
 - [x] CI passes on the exact P2 preview commit.
 - [x] Supabase environment configuration is present for the preview app.
-- [ ] RLS policies are verified with automated anonymous, owner, and cross-user integration tests.
-- [ ] All navigation routes and mobile breakpoints receive a full browser regression pass.
+- [ ] Staging RLS integration passes with anonymous, owner, and cross-user checks on the exact release commit.
+- [x] Browser and Mobile Smoke passes on the current PR head (eight routes across three viewport sizes).
+- [ ] Manual accessibility, keyboard, authenticated flows, and real-device checks are reviewed.
+- [ ] Backup/restore and application/database rollback rehearsals are recorded; uptime alerts have a named owner.
 - [ ] Secrets, service-role keys, and private credentials are audited across Git history.
+- [ ] Supabase Auth leaked-password protection is enabled and verified for the release environment.
 - [ ] Domain, redirects, privacy policy, community rules, and contact path are ready.
 
 ## Current limitations
 
-The branch is a feature-complete preview foundation, not a production launch. Supabase auth and catalog reads are connected; the Game Locker syncs per-account statuses/favorites, and reviews/comments have rate limits, moderation, and abuse reporting. IGDB catalog sync remains intentionally disabled until credentials are configured. The editorial CMS is implemented in P3. Automated live-news/RSS ingestion remains intentionally gated until sources and reuse permissions are reviewed; the RLS integration suite plus full browser/mobile release audit remain open gates.
+The branch is a feature-complete preview foundation, not a production launch. Supabase auth and catalog reads are connected; the Game Locker syncs per-account statuses/favorites, and reviews/comments have rate limits, moderation, and abuse reporting. IGDB catalog sync remains intentionally disabled until credentials are configured. The editorial CMS is implemented in P3. Automated live-news/RSS ingestion remains intentionally gated until sources and reuse permissions are reviewed. P7 now provides RLS and browser-smoke harnesses plus a backup/rollback runbook, but live staging execution, backup restore evidence, uptime alert configuration, and the full manual release audit remain open gates.
