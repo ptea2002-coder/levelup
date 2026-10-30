@@ -65,7 +65,9 @@
 - [x] Deduplicate by source/external ID, canonical URL, and normalized title/date fingerprint with database-enforced idempotency.
 - [x] Add an editor-only queue with run history, dismiss action, and atomic conversion into a CMS draft; publishing remains a separate human action.
 - [x] Apply the schema migration to `levelup-dev` staging and deploy `ingest-news-feeds` with JWT verification enabled; verify table/RLS/grant/trigger presence.
-- [ ] Assign a designated staging test account the trusted `app_metadata.role` of `admin` or `editor`, then verify authenticated UI actions and run a reviewed feed end to end.
+- [x] Add an optional, origin-guarded browser smoke for the authenticated News Intelligence registry/queue; it does not approve sources or start ingestion.
+- [ ] Designate a staging test account with trusted `app_metadata.role` of `admin` or `editor`, configure its GitHub secrets, and run the authenticated dashboard smoke.
+- [ ] After a human reviews source terms and feed quality, run one controlled feed-ingestion/draft E2E and decide whether any recurring schedule is appropriate.
 - [ ] Review real source terms and feed quality, then decide whether any recurring schedule is appropriate.
 
 ## Phase 7 — Production readiness
