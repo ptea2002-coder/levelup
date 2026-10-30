@@ -2,7 +2,7 @@
 
 LevelUP is being rebuilt from a single-file static website into a modern gaming discovery and editorial platform.
 
-> **Current status:** `main` is the active application branch and deploys to Vercel. Preview deployments use the isolated `levelup-dev` Supabase project. Production Supabase schema and environment configuration are being aligned with the current app before full production validation. IGDB synchronization remains intentionally disabled.
+> **Current status:** `main` is the canonical application branch. GitHub CI, Browser/Mobile Smoke, and staging RLS integration pass. Production Supabase schema migrations and production Vercel environment variables are configured; the current Vercel daily deployment limit is blocking the new production build. Production catalog sync is paused after SteamSpy returned HTTP 403. IGDB remains intentionally disabled.
 
 ## What's in this foundation
 
@@ -17,12 +17,13 @@ LevelUP is being rebuilt from a single-file static website into a modern gaming 
 
 ## Current rollout status
 
-- The Next.js app, Supabase clients, email/password authentication, Game Discovery, Game Locker, community, editorial CMS, PC Build Lab, and News Intelligence code are present on `main`.
-- The latest GitHub CI and Browser/Mobile Smoke runs passed on the current `main` commit. Vercel's latest check is currently blocked by a build-rate limit, so a successful GitHub build does not yet prove that the latest commit is live on the production alias.
-- Preview environment variables are scoped to `levelup-dev`; production must use the separate `levelup` Supabase project. Do not copy staging credentials into production.
-- Production Supabase is behind the current schema and catalog. Apply the reviewed migrations and configure the project-specific catalog cron target before enabling production app traffic.
-- IGDB sync remains paused by design. Its state table is created disabled, and no IGDB cron job should be registered until the integration is explicitly resumed.
-- Guest Game Locker data remains local-first; authenticated cloud sync depends on the `public.user_game_library` table and its owner-only RLS policies.
+- The Next.js app, Supabase clients, email/password authentication, Game Discovery, Game Locker, community, editorial CMS, PC Build Lab, Squad/LFG, and News Intelligence code are present on `main`.
+- The latest `main` commit passed LevelUP CI, Browser/Mobile Smoke, and the staging RLS integration test using the dedicated staging credentials.
+- Preview environment variables remain scoped to `levelup-dev`. Production Vercel environment variables now point to the separate `levelup` Supabase project; no staging credentials are copied into production.
+- Production schema migrations are applied through `catalog_sync_opt_in`. RLS is enabled across public tables. Production still contains 22 visible games because the SteamSpy endpoint returned HTTP 403; the catalog cron is paused until the source is reachable or an explicitly approved catalog snapshot is imported.
+- IGDB enrichment remains disabled and unscheduled, as requested. Do not enable it until that integration is explicitly resumed.
+- The production Vercel deployment has not picked up the new environment variables yet: Vercel's daily deployment limit blocked the redeploy. The existing deployment remains protected by SSO until the updated build is verified.
+- Guest Game Locker data remains local-first; authenticated cloud sync is backed by `public.user_game_library` with owner-only RLS policies.
 
 ## Requirements
 
@@ -81,7 +82,7 @@ The community now uses Supabase-backed data rather than demo posts:
 - `/notifications`: database-generated follow/like/comment notifications and read state.
 - `/admin/moderation`: report queue, available only to accounts whose trusted Supabase Auth `app_metadata.role` is set to `admin`.
 - `posts`, `post_likes`, `post_comments`, `follows`, `notifications` and `content_reports` use Row Level Security. A private-schema auth trigger creates a public profile for new accounts.
-- Apply `supabase/schema.sql` first, then `supabase/social-network.sql`. The social migration has already been applied to the connected Supabase project for branch `v2-foundation`.
+- Apply `supabase/schema.sql` first, then `supabase/social-network.sql`. The social schema is present in both the isolated `levelup-dev` staging project and the production `levelup` project.
 - Admin roles must be assigned by a trusted administrator in Supabase Auth app metadata, never through user-editable metadata. Do not expose service-role/secret keys in client code.
 
 ## PC Build & Performance Lab (P5)
@@ -125,7 +126,11 @@ For an existing project, run `supabase/steam-metrics.sql`, deploy the Edge Funct
 
 ## Deployment plan
 
-Use a Node-capable host such as Vercel for the Next.js app. Keep the current GitHub Pages site available until the new branch builds successfully and its environment configuration has been tested. See [docs/ROADMAP.md](docs/ROADMAP.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+1. Keep Preview scoped to `levelup-dev`; keep Production scoped to `levelup`.
+2. Wait for Vercel's deployment limit to reset, then redeploy the current `main` commit and verify the production Supabase connection.
+3. Keep the production domain protected until the new build passes smoke tests. Only then change deployment protection to leave Production public while keeping Preview protected.
+4. Keep SteamSpy catalog sync paused until upstream connectivity returns. Any staging-to-production catalog snapshot import must be explicitly approved and limited to public game metadata—never user accounts, profiles, or Game Locker data.
+5. IGDB remains disabled until explicitly resumed.
 
 ## Current site
 
