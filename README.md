@@ -105,6 +105,14 @@ The community now uses Supabase-backed data rather than demo posts:
 - P6.1 has applied the schema migration to the `levelup-dev` staging project and deployed `ingest-news-feeds` with JWT verification enabled. No sources are registered or scheduled, and production is untouched.
 - The matching repository migrations are `supabase/migrations/20261030041422_p6_news_intelligence.sql`, `supabase/migrations/20261030041654_p6_news_access_hardening.sql`, and `supabase/migrations/20261030041756_p6_rpc_hardening.sql`. Full signed-in browser QA remains blocked until a trusted staging admin/editor role is assigned to a designated test account.
 
+## Production Readiness (P7)
+
+- `/api/health` is a low-information liveness endpoint; `/api/health/ready` checks that the public Supabase catalog is reachable without exposing upstream error details.
+- The **Browser and Mobile Smoke** workflow runs Playwright checks against key routes at 390px, 768px, and 1440px widths.
+- The **Staging RLS Integration** workflow is manually dispatched and requires two dedicated staging accounts. It refuses any Supabase origin except `levelup-dev` and never uses a service-role key.
+- Backup verification, isolated restore drills, monitoring setup, and rollback procedures are documented in [docs/PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md).
+- These are readiness controls, not a production launch. The live RLS run, browser regression result, backup/restore evidence, external alert configuration, and explicit cutover approval remain required release gates.
+
 ## Steam live data
 
 - `public.steam_game_metrics` caches Steam player counts and Vietnam-region store prices for supported Steam games.
