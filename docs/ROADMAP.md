@@ -16,7 +16,7 @@
 - [x] Configure the deployed app with browser-safe Supabase URL/anon-key settings; secrets stay server-side.
 - [x] Add Supabase client/server utilities and migrate catalog reads to PostgreSQL.
 - [x] Add signup, login, logout, session handling, and profile creation.
-- [ ] Add automated integration tests proving anonymous access is denied and one user cannot read or write another user's private rows.
+- [x] Add a staging-only integration test harness for anonymous, owner, and cross-user access; execution against two dedicated staging accounts remains a P7 release gate.
 
 ## Phase 2 — User features
 
@@ -66,7 +66,16 @@
 
 ## Phase 7 — Production readiness
 
-- Monitoring, RLS integration tests, backups, mobile/browser regression, and rollback rehearsal.
+- [x] Add low-information liveness and Supabase readiness endpoints at `/api/health` and `/api/health/ready`.
+- [x] Add an RLS integration test for anonymous, owner, and cross-user Game Locker access; guard write probes to the `levelup-dev` staging project only.
+- [x] Add a manually dispatched staging RLS workflow that requires two dedicated test accounts and never uses a service-role key.
+- [x] Add a Playwright Chromium smoke workflow for key routes at mobile, tablet, and desktop widths, including horizontal overflow and runtime-error checks.
+- [x] Document backup/restore verification, application rollback, database recovery, and production release gates.
+- [ ] Configure the staging test-account secrets and pass the live RLS integration workflow; record its run URL and commit SHA.
+- [ ] Pass browser smoke on the final preview commit and complete manual keyboard, accessibility, authenticated, and real-device checks.
+- [ ] Verify the active Supabase backup plan/retention and complete a restore drill in an isolated recovery project.
+- [ ] Configure external uptime monitoring and alert routing for the readiness endpoint.
+- [ ] Rehearse Vercel rollback and database recovery/forward-fix procedures, then record evidence before cutover.
 
 ## Phase 8 — Community and growth
 
@@ -80,11 +89,12 @@
 Before production cutover:
 - [x] CI passes on the exact P2 preview commit.
 - [x] Supabase environment configuration is present for the preview app.
-- [ ] RLS policies are verified with automated anonymous, owner, and cross-user integration tests.
-- [ ] All navigation routes and mobile breakpoints receive a full browser regression pass.
+- [ ] Staging RLS integration passes with anonymous, owner, and cross-user checks on the exact release commit.
+- [ ] Browser and Mobile Smoke passes on the exact preview commit; manual accessibility and authenticated flows are also reviewed.
+- [ ] Backup/restore and application/database rollback rehearsals are recorded; uptime alerts have a named owner.
 - [ ] Secrets, service-role keys, and private credentials are audited across Git history.
 - [ ] Domain, redirects, privacy policy, community rules, and contact path are ready.
 
 ## Current limitations
 
-The branch is a feature-complete preview foundation, not a production launch. Supabase auth and catalog reads are connected; the Game Locker syncs per-account statuses/favorites, and reviews/comments have rate limits, moderation, and abuse reporting. IGDB catalog sync remains intentionally disabled until credentials are configured. The editorial CMS is implemented in P3. Automated live-news/RSS ingestion remains intentionally gated until sources and reuse permissions are reviewed; the RLS integration suite plus full browser/mobile release audit remain open gates.
+The branch is a feature-complete preview foundation, not a production launch. Supabase auth and catalog reads are connected; the Game Locker syncs per-account statuses/favorites, and reviews/comments have rate limits, moderation, and abuse reporting. IGDB catalog sync remains intentionally disabled until credentials are configured. The editorial CMS is implemented in P3. Automated live-news/RSS ingestion remains intentionally gated until sources and reuse permissions are reviewed. P7 now provides RLS and browser-smoke harnesses plus a backup/rollback runbook, but live staging execution, backup restore evidence, uptime alert configuration, and the full manual release audit remain open gates.
