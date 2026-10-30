@@ -51,7 +51,11 @@ The **Browser and Mobile Smoke** workflow builds the production app, starts it l
 - `/locker`
 - `/login`
 
-It checks for HTTP errors, browser runtime exceptions, and horizontal page overflow while emulating reduced motion. This is a smoke test, not a substitute for manual interaction, keyboard, screen-reader, authenticated, or real-device testing. The authenticated P6 News Intelligence flow still needs a designated staging editor/admin and a human-reviewed source before end-to-end testing.
+It checks for HTTP errors, browser runtime exceptions, and horizontal page overflow while emulating reduced motion. It also runs interactive journeys against a CI-only seeded catalog when no Supabase environment is configured: guest save/favorite/filter/reload persistence, isolation between browser contexts, and Game Discovery mood/genre/platform/reset/search behavior. The fixture fallback is opt-in through `LEVELUP_TEST_CATALOG=1` plus the GitHub CI environment; if any Supabase environment value is present, fixtures are disabled, and a configured-but-failing database never silently falls back to sample data.
+
+When the dedicated `levelup-dev` URL, publishable key, and owner test-account credentials are configured, the same workflow additionally signs in through the actual UI, verifies cloud Game Locker status/favorite persistence across reloads, restores the account's original values, and signs out. The workflow rejects any configured Supabase origin other than `https://ztzcpnyxgwhcdktpbxdq.supabase.co`. If owner-account credentials are absent, the authenticated journey is explicitly skipped and is not evidence of cloud-sync validation.
+
+This smoke test is not a substitute for manual interaction, keyboard, screen-reader, or real-device testing. The authenticated P6 News Intelligence flow still needs a designated staging editor/admin and a human-reviewed source before end-to-end testing.
 
 ## Supabase advisor follow-up
 
