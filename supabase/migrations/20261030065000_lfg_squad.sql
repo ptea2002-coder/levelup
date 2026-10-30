@@ -1,5 +1,4 @@
 -- LevelUP LFG & Squad system. Additive production-ready migration; RLS is enabled on both tables.
-begin;
 create schema if not exists private;
 revoke all on schema private from public, anon, authenticated;
 create table if not exists public.squads (
