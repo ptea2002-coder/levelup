@@ -285,6 +285,53 @@ async function authenticatedLibraryJourney(browser) {
   }
 }
 
+async function authenticatedNewsIntelligenceJourney(browser) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+  const email = process.env.LEVELUP_EDITOR_E2E_EMAIL ?? "";
+  const password = process.env.LEVELUP_EDITOR_E2E_PASSWORD ?? "";
+  const hasAnyCredential = Boolean(email || password);
+
+  if (!hasAnyCredential) {
+    console.log("News Intelligence admin journey skipped: designated staging editor secrets are not configured.");
+    return;
+  }
+
+  assert.ok(url && key && email && password, "News Intelligence smoke requires staging URL, publishable key, editor email, and editor password.");
+  assert.equal(new URL(url).origin, expectedStagingOrigin, "Refusing News Intelligence browser checks outside levelup-dev.");
+
+  const page = await browser.newPage({
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: "reduce",
+  });
+
+  try {
+    await page.goto(`${baseUrl}/login`, { waitUntil: "domcontentloaded", timeout: 30_000 });
+    await page.locator('input[type="email"]').fill(email);
+    await page.locator('input[type="password"]').fill(password);
+    await page.locator(".auth-submit").click();
+    await page.getByText("Đăng nhập thành công.", { exact: true }).waitFor({ state: "visible", timeout: 20_000 });
+
+    await page.goto(`${baseUrl}/admin/news-intelligence`, { waitUntil: "domcontentloaded", timeout: 30_000 });
+    await page.locator(".news-intel-overview").waitFor({ state: "visible", timeout: 20_000 });
+    await page.getByRole("heading", { name: /Danh mục nguồn tin/ }).waitFor({ state: "visible", timeout: 10_000 });
+    await page.getByRole("heading", { name: /Hàng chờ biên tập/ }).waitFor({ state: "visible", timeout: 10_000 });
+    assert.equal(await page.getByRole("heading", { name: "Không có quyền truy cập." }).count(), 0,
+      "The designated staging account must have trusted admin/editor app_metadata.");
+    assert.equal(await page.locator(".news-intel-alert.is-error").count(), 0,
+      "News Intelligence must load its source registry and queue without an RLS error.");
+
+    // Deliberately do not approve sources or start ingestion: source licensing
+    // and reuse terms require a human owner review before any feed is enabled.
+    await page.goto(`${baseUrl}/login`, { waitUntil: "domcontentloaded", timeout: 30_000 });
+    await page.locator(".auth-signout").click();
+    await page.getByText("Bạn đã đăng xuất.", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
+    console.log("News Intelligence admin journey passed: authenticated registry and review queue loaded without starting ingestion.");
+  } finally {
+    await page.close();
+  }
+}
+
 const browser = await chromium.launch({ headless: true });
 try {
   for (const viewport of viewports) {
@@ -330,6 +377,7 @@ try {
   await guestLibraryJourney(browser);
   await discoveryJourney(browser);
   await authenticatedLibraryJourney(browser);
+  await authenticatedNewsIntelligenceJourney(browser);
 } finally {
   await browser.close();
 }
