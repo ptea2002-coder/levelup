@@ -121,9 +121,8 @@ AS $function$
     ),
     'total', (select count(*) from filtered)
   );
-$function$
+$function$;
 
- 
 REVOKE ALL ON FUNCTION public.search_games_catalog_v2(text, text[], text, text, text, integer, integer) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.search_games_catalog_v2(text, text[], text, text, text, integer, integer) TO anon, authenticated, service_role;
 NOTIFY pgrst, 'reload schema';
